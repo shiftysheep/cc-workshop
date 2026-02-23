@@ -7,7 +7,6 @@ Progress from module branch to module branch bringing our project with us as we 
 
 ## Variables
 
-MODULE_NUMBER = $ARG1
 CURRENT_BRANCH = !` git branch --show-current`
 
 ## Instructions
