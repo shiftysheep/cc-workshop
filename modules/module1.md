@@ -15,4 +15,8 @@ Let's setup our project scaffolding utilizing UV. We will be creating a Typer cl
 /statusline Show {model short name} | {context}% context | {cwd} | {git_status} | {branch} where git status is green "clean" or yellow "modified" using ANSI colors, and omit git fields if not in a repo.
 ```
 7. Claude should have setup your status line with the requested information giving you a nice heads up display to utilize as you are working in the terminal. 
-8. If Claude hasn't, ask to commit your changes before executing `/module` to proceed. 
+8. If Claude hasn't, ask to commit your changes before executing `/module` to proceed.
+
+---
+
+[Module 2 →](module2.md)
