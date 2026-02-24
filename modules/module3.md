@@ -18,8 +18,8 @@ by using session logs to analyze agent behavior and improve ADW velocity.
 | **Hook** | A script that runs at a Claude Code lifecycle event (e.g. `PostToolUse`, `Stop`, `PreToolUse`). Configured in `.claude/settings.json`. Used for validation, logging, and back pressure. |
 | **Dynamic context injection** | Providing Claude with relevant context at the moment it's needed — via hooks, skills, or CLAUDE.md — rather than up front in every prompt. |
 | **Progressive disclosure** | Surfacing information incrementally: start with a summary, reveal detail on demand. Prevents overwhelming agents and users with irrelevant context. |
-| **User-invocable skill** | A skill with `user-invocable: true` in its frontmatter. Invoked as a slash command (`/<name>`) rather than auto-loaded by description match. Bridges skills and commands. |
-| **Prompt-driven orchestration** | Composing a multi-step workflow through prose instructions in a SKILL.md. Claude reads the sequence and executes each phase — no code, no state management. |
+| **Prompt-driven orchestration** | Composing a multi-step workflow through prose instructions in a command or skill. Single-agent commands execute phases sequentially; team commands coordinate parallel specialist workers — both defined in markdown, no code required. |
+| **Team orchestration** | Composing a multi-step workflow through an agent team where a leader coordinates specialist workers via `TeamCreate`, `TaskCreate`, and `SendMessage`. Parallel where possible, prompt-driven, and defined in a slash command. |
 | **JSONL** | JSON Lines — one JSON object per line. Claude Code session transcripts are stored in this format, making them easy to stream and parse. |
 
 ---
@@ -93,18 +93,18 @@ The distinction in practice:
 | **Location** | `.claude/commands/<name>.md` | `.claude/skills/<name>/SKILL.md` |
 | **Good for** | "Do this specific thing" | "Know this when doing related things" |
 
-> **Two ways to orchestrate phases.** The phase commands are reusable primitives.
-> You can compose them in two ways:
+> **Four ways to deliver work.** The phase commands are reusable primitives.
+> You can compose them in four ways — two single-agent, two multi-agent:
 >
-> 1. **Prompt-driven** (this module) — a SKILL.md describes the sequence in
->    prose. Claude reads the instructions and runs each phase in order. Simple
->    but stateless.
-> 2. **Code-driven** (Module 4) — a Python orchestrator invokes each phase via
->    `claude -p /<phase>`, carries state between phases via a JSON file, and
->    runs in an isolated worktree. Robust, resumable, and parallelizable.
+> 1. **`/feature`** — single-agent, sequential, all 7 phases
+> 2. **`/bug`** — single-agent, sequential, 6 phases (no design)
+> 3. **`/team:feature`** — multi-agent, parallel analysis then coordinated
+>    implementation, all 7 phases
+> 4. **`/team:bug`** — multi-agent, parallel analysis then coordinated
+>    implementation, 6 phases (no design)
 >
-> A PRD at `docs/prds/adw-skills.md` defines the `/feature` and `/bug` skills
-> we'll build in this module using prompt-driven orchestration.
+> A PRD at `docs/prds/adw-commands.md` defines all four commands we'll build
+> in this module using prompt-driven orchestration.
 
 ---
 
@@ -132,7 +132,7 @@ Browse to the **Discover** tab, find **document-skills** from the
 
 ---
 
-## 4. Plan the Higher-Order Skills
+## 4. Plan the Orchestration Commands
 
 Now activate plan mode and give Claude the PRD. Claude will research the
 existing scaffolding to understand what it's composing before proposing a plan.
@@ -140,9 +140,10 @@ existing scaffolding to understand what it's composing before proposing a plan.
 Press `Shift+Tab` twice to enter plan mode, then enter:
 
 ```markdown
-Read docs/prds/adw-skills.md and plan how to create the /feature and /bug
-skills described in the PRD. Use the document-skills:skill-creator patterns
-for correct skill structure and frontmatter.
+Read docs/prds/adw-commands.md and plan how to create the four orchestration
+commands described in the PRD: /feature, /bug, /team:feature, and /team:bug.
+Research the existing phase commands and agent definitions to understand
+the invocation and team coordination patterns.
 ```
 
 Claude will begin exploring the codebase — reading phase commands, existing
@@ -166,15 +167,14 @@ While Claude works on its plan, here's what it's exploring and why it matters.
 `.claude/commands/` — research, design, plan, validation, implement, review,
 document. Each is a single-responsibility slash command: one clear job,
 defined inputs, defined output. This is what makes them composable — the
-`/feature` skill can chain them precisely because each phase is self-contained.
+orchestration commands can chain them both sequentially (single-agent) and
+in parallel (team-based) because each phase is self-contained.
 
-**Existing skills as patterns.** Claude reads the SKILL.md files in
-`.claude/skills/` — code-review, testing, documentation-standards. These
-show the structure the new skills need to follow: YAML frontmatter with
-`name` and `description`, a body with instructions, and optional `references/`
-for supporting content. The `user-invocable: true` field is what makes a
-skill appear in the `/` slash menu — the existing skills don't have it
-because they're auto-loaded by description match instead.
+**Existing skills as patterns.** Claude reads existing commands AND skills to
+understand patterns. The new commands compose phase commands; the team variants
+also use TeamCreate/SendMessage for parallel worker coordination. Commands are
+stored in `.claude/commands/<name>.md`, while skills in `.claude/skills/<name>/SKILL.md`
+show structure with YAML frontmatter, instructions, and optional `references/`.
 
 **Dynamic context injection.** Skills, hooks, and CLAUDE.md form a layered
 context system:
@@ -185,10 +185,10 @@ context system:
 | **Skill** | When task matches description | Standards loaded on demand |
 | **Hook** | At lifecycle events | Validation, back pressure |
 
-The new `/feature` and `/bug` skills add a fourth pattern: **explicit
-invocation** via `user-invocable: true`. Unlike auto-loaded skills, these
-fire only when the user types `/<name>` — giving the user direct control
-over when orchestration starts.
+The new `/feature` command adds a fourth pattern: **explicit invocation** of
+orchestration workflows. Unlike auto-loaded skills, commands fire only when
+the user types `/<name>` — giving the user direct control over when
+orchestration starts.
 
 > **Progressive disclosure applied here.** Claude doesn't load all skills
 > into every context. A code quality skill doesn't fire when writing
@@ -200,22 +200,23 @@ over when orchestration starts.
 
 ## 6. Review and Build
 
-Claude will present a plan for the two skill files. Review it, then confirm.
+Claude will present a plan for the four command files. Review it, then confirm.
 
 Verify the plan includes:
-- Correct frontmatter for both skills (`user-invocable: true`, `argument-hint`)
-- The right phase sequence (`/feature` has 7, `/bug` has 6 — no design)
-- Context handoff instructions between phases
-- `$ARGUMENTS` to pass user input to the first phase
+- `/feature` and `/bug`: correct phase sequences, `$ARGUMENTS`, context handoff between phases
+- `/team:feature` and `/team:bug`: Group 1 parallel workers (4 for feature, 3 for bug), leader synthesis step, Group 2 coordinated workers
+- File locations: `.claude/commands/feature.md`, `.claude/commands/bug.md`, `.claude/commands/team:feature.md`, `.claude/commands/team:bug.md`
 
-Once satisfied, approve the plan. Claude will create the skill files at
-`.claude/skills/feature/SKILL.md` and `.claude/skills/bug/SKILL.md`.
+Once satisfied, approve the plan. Claude will create the command files in
+`.claude/commands/`.
 
-> **What just happened?** You gave Claude a PRD and a meta-skill
-> (skill-creator), and it produced two user-invocable skills that compose
-> seven existing phase commands. No code was written — just configuration.
-> This is the power of the `.claude/` scaffolding: commands are primitives,
-> skills compose them, and the entire system is defined in markdown.
+> **What just happened?** You gave Claude a PRD and it produced four
+> orchestration commands that compose the seven existing phase commands. The
+> team commands introduce `TeamCreate` and `SendMessage` — the first time
+> these tools appear in the workshop. No code was written — just markdown
+> configuration. This is the power of the `.claude/` scaffolding: commands
+> are primitives, they compose each other, and the entire system is defined
+> in markdown.
 
 ---
 
@@ -268,7 +269,7 @@ moments to inject or capture context dynamically.
 Ask Claude to commit the changes, then advance to the next module:
 
 ```markdown
-Commit the new skill files and then run /module to proceed to module 4.
+Commit the new command files and then run /module to proceed to module 4.
 ```
 
 ---
