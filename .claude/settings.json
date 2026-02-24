@@ -4,12 +4,12 @@
       {
         "hooks": [
           {
-            "command": ".claude/hooks/lint-check.sh",
+            "command": "uv run python .claude/hooks/lint-check.py",
             "timeout": 30,
             "type": "command"
           }
         ],
-        "matcher": "Write|Edit"
+        "matcher": "Write|Edit|MultiEdit"
       }
     ]
   },

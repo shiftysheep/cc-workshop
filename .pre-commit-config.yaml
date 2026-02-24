@@ -35,11 +35,13 @@ repos:
     hooks:
       - id: vulture
         args: ["--min-confidence", "80", "src/"]
+        exclude: '^\.claude/'
   # Check for security issues
   - repo: https://github.com/PyCQA/bandit
     rev: 1.9.3
     hooks:
       - id: bandit
+        exclude: '^\.claude/'
   # Check for type checking issues
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.19.1
