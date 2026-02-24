@@ -5,6 +5,12 @@ description: MUST BE USED when reviewing code, evaluating merge readiness, or as
 
 # Code Review Skill
 
+## When to Use
+
+Load this skill when reviewing code changes, evaluating merge readiness, conducting
+security audits, or assessing implementation quality. Applied by the validation and
+review agents across all phases.
+
 ## Review Dimensions
 
 Evaluate code across four dimensions in every review:
@@ -83,3 +89,8 @@ Remediation: Add brief description of parameters and return value
 ### Recommendation
 APPROVE | REQUEST_CHANGES | NEEDS_DISCUSSION
 ```
+
+## Related
+
+- **testing** — tests are a core review dimension; use testing skill for coverage and TDD standards
+- **documentation-standards** — documentation is a core review dimension; use documentation-standards for file location and frontmatter conventions

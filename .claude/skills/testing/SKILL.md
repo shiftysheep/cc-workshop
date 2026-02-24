@@ -5,6 +5,12 @@ description: MUST BE USED when writing tests, planning test strategy, or evaluat
 
 # Testing Skill
 
+## When to Use
+
+Load this skill when writing tests, planning test strategy, evaluating coverage, or
+following TDD methodology during implementation. Applied by the implementation agent
+and referenced by the validation agent when assessing test quality.
+
 ## TDD Methodology: Red-Green-Refactor
 
 1. **Red**: Write a failing test that describes the desired behavior
@@ -67,3 +73,8 @@ def test_function_returns_expected_result(sample_data):
 def test_function_handles_variants(input, expected):
     assert function_under_test(input) == expected
 ```
+
+## Related
+
+- **code-review** — tests are a core code review dimension; use code-review skill for severity classification when evaluating test quality
+- **documentation-standards** — test files follow the same naming conventions; fixture and coverage documentation follows frontmatter standards
