@@ -1,9 +1,10 @@
 # Module 4: Agentic Delivery Workflows
 
-In this module we upgrade from prompt-driven orchestration to code-driven orchestration.
-We build Python scripts that chain ADW phase commands into resumable, stateful workflows,
-run them against a real task, analyze the session logs, and observe a multi-agent team
-in action.
+In this module you use the orchestration commands from Module 3 to build
+Python orchestrators in parallel worktrees. Two Claude instances run
+simultaneously — one team-based, one single-agent — building the scripts
+that will power future ADW runs. You'll observe the difference in execution
+patterns, compare the output, and analyze the session logs.
 
 ---
 
@@ -11,7 +12,8 @@ in action.
 
 | Term | Definition |
 |------|-----------|
-| **Code-driven orchestration** | Composing a multi-step workflow through a Python script that invokes phase commands via `claude -p /<phase>` and carries state via a JSON file. Robust, resumable, and parallelizable. |
+| **Code-driven orchestration** | Composing a multi-step workflow through a Python script that invokes phase commands via `claude -p /<phase>` and carries state via a JSON file. Sequential, single-agent, robust, and resumable. |
+| **Team orchestration** | Composing a multi-step workflow through an agent team where a leader coordinates specialist workers via `TeamCreate`, `TaskCreate`, and `SendMessage`. Parallel where possible, prompt-driven, and defined in a slash command. |
 | **Worktree** | A git feature that creates a separate working directory linked to the same repository. Each ADW runs in its own worktree so multiple workflows execute in parallel without conflicts. |
 | **State file** | A JSON file at `agents/{adw_id}/state.json` that persists workflow state between phases — completed phases, current phase, issue description, and plan file path. |
 | **Sandboxing** | Isolating agent operations to limit blast radius — worktrees for filesystem isolation, subagents with restricted tools, permission modes that prevent unintended changes. |
@@ -45,92 +47,112 @@ in action.
 
 ---
 
-## 1. Prompt-Driven vs Code-Driven
+## 1. From Building to Running
 
-Module 3 introduced the `/feature` and `/bug` skills — prose-based orchestrators
-that describe the phase sequence in a SKILL.md. This works for simple cases, but
-it has limits: no persistence, no worktree isolation, and no way to resume after
-a failure.
+Module 3 produced four orchestration commands: `/feature`, `/bug`,
+`/team:feature`, and `/team:bug`. These commands compose the ADW phase
+primitives into end-to-end delivery workflows — two single-agent, two
+multi-agent.
 
-Module 4 upgrades to code-driven orchestration: Python scripts that invoke phase
-commands as subprocesses, carry state between phases via a JSON file, and run in
-isolated git worktrees.
+Now you'll use them. Two PRDs describe Python orchestrator scripts that will
+power future ADW runs. Two Claude instances will build them simultaneously in
+separate worktrees: one using the team command, one using the single-agent
+command.
 
-> **From prose to code.** Module 3's `/feature` skill described the phase
-> sequence in prose. This works for simple cases but can't resume after a
-> failure, can't run in parallel, and loses all context between sessions.
-> Code-driven orchestration moves sequencing logic into Python — subprocess
-> control, file I/O, and error handling.
-
----
-
-## 2. Read the Orchestrator PRD
-
-Before entering plan mode, read the PRD that defines what we're building:
-
-```
-Read docs/prds/adw-orchestrators.md
-```
-
-This PRD defines three workflow variants (`adw_feature.py`, `adw_bug.py`,
-`--from-design`), the state schema, phase invocation contract, and worktree
-isolation model.
-
-> **PRDs as agent input.** This is the third PRD you've given Claude across
-> the workshop. Notice the pattern: clear requirements, explicit out-of-scope,
-> usage examples, and just enough implementation guidance to steer without
-> over-constraining. A well-written PRD is one of the most effective forms of
-> context engineering.
+> **The tools build the tools.** Module 3 created orchestration commands.
+> Module 4 feeds them real PRDs. The commands aren't demos — they're the
+> delivery mechanism. What gets built (Python orchestrators) is itself a
+> tool for future workflows. Each layer of tooling enables the next.
 
 ---
 
-## 3. Plan the Orchestrators
+## 2. Read the Orchestrator PRDs
 
-Press `Shift+Tab` twice to enter plan mode, then enter:
+Before launching the runs, read both PRDs so you understand what each
+Claude instance will be building:
 
-```markdown
-Read docs/prds/adw-orchestrators.md and create a plan to implement the ADW
-orchestrator scripts. Research the existing phase commands and agent
-definitions to understand the invocation patterns.
+```
+Read docs/prds/adw-feature.md and docs/prds/adw-bug.md
 ```
 
-Claude will explore the `.claude/commands/` directory, read the phase
-command definitions, and produce a plan before writing any code.
+`adw-feature.md` defines:
+- `adw_feature.py` — 7-phase feature delivery script
+- `adw_core.py` — shared state management, phase invocation, ID generation,
+  and logging module
 
-> **Third time through the cycle.** Module 2: PRD → plan → build (query
-> command). Module 3: PRD → plan → build (skills). Module 4: PRD → plan →
-> build (orchestrators). The cycle is the same but the complexity increases.
-> This is progressive disclosure in your own learning.
+`adw-bug.md` defines:
+- `adw_bug.py` — 6-phase bug fix script (no design phase)
+- Reuses `adw_core.py` from the feature PRD
+
+> **PRDs as work items.** In Modules 2-3 you gave PRDs to Claude directly.
+> Here the PRDs pass through commands — `/team:feature` and `/feature` read
+> the PRD and execute the full delivery workflow against it. The PRD is both
+> the specification and the input.
 
 ---
 
-## 4. How Code-Driven Orchestration Works
+## 3. Launch Two Worktrees
 
-While Claude works on its plan, here's what the orchestrators do and why
-each design decision matters.
+Open two terminal windows. Each runs an independent Claude instance in its
+own worktree:
 
-**State as context bridge.** Each phase runs in a fresh `claude` process with
-a new context window. The state file (`agents/{adw_id}/state.json`) bridges
-them: it records the ADW ID, completed phases, current phase, and the path
-to the plan file produced by the `/plan` phase. The `--resume` flag reads
-this state and restarts from `current_phase`.
+```shell
+# Terminal 1: team-based build of the feature orchestrator
+claude -w adw-feat
+> /team:feature @docs/prds/adw-feature.md
 
-**Subprocess chaining.** Each phase is a separate `claude` process. No
-context rot from accumulating seven phases of tool output. Trade-off: lose
-in-session context; state file compensates.
+# Terminal 2: single-agent build of the bug orchestrator
+claude -w adw-bug
+> /feature @docs/prds/adw-bug.md
+```
 
-**Worktree isolation (sandboxing).** `claude -w {adw_id}` creates an isolated
-worktree at `.claude/worktrees/{adw_id}/`. The agent can't modify files on
-your main branch. If it goes wrong, delete the worktree — nothing is lost.
+> **Why two worktrees?** Each `claude -w <name>` creates an isolated working
+> directory. The team build and single-agent build modify files independently
+> — no merge conflicts, no branch switching. When both finish, you merge the
+> results. This is the practical application of sandboxing: isolate parallel
+> work so failures in one don't affect the other.
 
-**Back pressure at orchestration level.** Non-zero phase exit halts the
-entire workflow. Failed validation stops implementation from starting with a
-flawed plan. This layers on top of the hook-level back pressure from Module 3:
+Once both are running:
+
+> **What's happening now.** Terminal 1: `/team:feature` created a team,
+> spawned 4 Group 1 workers (researcher, designer, planner, validator), and
+> they're working in parallel. Terminal 2: `/feature` is running phases
+> sequentially — research first, then design, then plan. Watch the
+> difference in activity patterns.
+
+Note: if time is tight, launch just one terminal and observe the other via
+instructor demo.
+
+---
+
+## 4. How Worktree Isolation Works
+
+While Claude works, here's what's happening under the hood.
+
+**Worktrees as sandboxes.** `claude -w adw-feat` creates
+`.claude/worktrees/adw-feat/` with its own working directory and branch
+`worktree-adw-feat`. Changes are invisible to the main branch until merged.
+
+**Parallel without conflict.** Two agents modifying different worktrees can
+write to the same file paths without conflict. Git handles the isolation at
+the filesystem level.
+
+**State files bridge context.** Each phase in the orchestrator runs in a
+fresh context window. The state file (`agents/{adw_id}/state.json`) bridges
+them: ADW ID, completed phases, plan file path. `--resume` reads state and
+restarts from `current_phase`.
+
+**Subprocess chaining vs team coordination.** The single-agent command runs
+phases sequentially within one Claude session. The team command spawns
+parallel workers. Both produce the same deliverable (a Python orchestrator)
+but through different execution strategies.
 
 ```
-Back pressure layers:
-  Hook level:  Write .py → lint-check → exit 2 → Claude fixes → retry
-  Phase level: /validation → exit 1 → orchestrator halts → no /implement
+Isolation layers:
+  Worktree:   Filesystem isolation — separate working directories
+  Subagent:   Context isolation — fresh context window per phase
+  Hook:       Quality isolation — lint/type check after every write
+  Permission: Access isolation — restricted tool sets per agent
 ```
 
 > **Sandboxing is defense in depth.** Worktree isolation protects the
@@ -140,98 +162,143 @@ Back pressure layers:
 
 ---
 
-## 5. Review and Build the Orchestrators
+## 5. Monitor the Runs
 
-Review Claude's plan. Verify it includes:
+While both runs execute, observe what each is doing.
 
-- `adw_core.py` with state management, phase invocation, and ADW ID generation
-- `adw_feature.py` with all 7 phases and `--from-design` / `--resume` flags
-- `adw_bug.py` with 6 phases (no design) and `--resume` flag
-- Atomic state writes (temp file + rename)
-- Non-zero exit halts workflow and sets status to `failed`
+**Terminal 1 (team build):** Watch for `TeamCreate`, parallel worker
+activity in Group 1 (researcher, designer, planner, validator working
+simultaneously), `SendMessage` coordination, and leader synthesis before
+Group 2 starts.
 
-Once satisfied, approve the plan.
+**Terminal 2 (single-agent build):** Watch for sequential phase transitions
+— research completes → design starts → plan starts. One phase at a time,
+each building on the previous.
 
-> **What just happened?** Claude read a PRD, planned by researching your
-> existing phase commands and agent definitions, then wrote Python scripts
-> that compose those commands into a delivery pipeline. The orchestrators
-> don't duplicate what phase commands do — they sequence and manage them.
+Check state files as phases complete:
+
+```
+Read .claude/worktrees/adw-feat/agents/*/state.json
+Read .claude/worktrees/adw-bug/agents/*/state.json
+```
+
+> **Observable differences.** The team run shows bursts of parallel activity
+> followed by synthesis pauses. The single-agent run shows steady sequential
+> progress. Both produce status logs to stderr with timestamps — compare the
+> wall-clock time for the analysis phases (Group 1 parallel vs sequential
+> research → design → plan → validation).
+
+Note: if either run hasn't finished, you can `Ctrl+C` and still inspect
+the state files and partial output. The orchestrators being built support
+`--resume` precisely for this case.
 
 ---
 
-## 6. Run a Single-Agent ADW
+## 6. Compare the Output
 
-Run `adw_bug.py` against a real task in the todd codebase:
+Once both runs complete (or after sufficient phases for comparison):
 
-```shell
-!uv run python adw_bug.py "The todd CLI does not display a helpful error
-message when AWS credentials are missing — it shows a raw exception traceback
-instead of a user-friendly message"
+```
+Compare the code produced by the two worktrees. Focus on:
+1. adw_core.py — did both approaches produce similar shared modules?
+2. adw_feature.py vs adw_bug.py — structural differences
+3. Test coverage — did one approach produce more thorough tests?
+4. Code style — any differences in naming, structure, or documentation?
 ```
 
-> **Why a bug fix, not a feature?** A bug fix has 6 phases instead of 7 and
-> tends to produce smaller changes. In a workshop setting this keeps runtime
-> manageable while demonstrating the full orchestration.
-
-Watch the phase transitions log to stderr. Each phase writes its output to
-`agents/{adw_id}/{phase}/raw_output.jsonl` and the state file updates after
-every transition.
-
-> **Observe the output.** Each phase logged its start and completion. The
-> state file tracked progress. If any phase had failed, the orchestrator
-> would have halted and you could resume with `--resume {adw_id}`. This is
-> the practical difference between prompt-driven and code-driven —
-> recoverability.
-
-If time is short, `Ctrl+C` after 2–3 phases and inspect `agents/{adw_id}/state.json`.
-The `--resume` flag means nothing is lost.
+> **Same PRD, different process, comparable output.** Both commands executed
+> the same phase sequence (research through document) against PRDs with
+> similar structure. The team approach had multiple specialist perspectives
+> during analysis; the single-agent approach had one continuous context. The
+> interesting question isn't which is "better" but where the differences
+> appear and what caused them.
 
 ---
 
-## 7. Analyze the Session Log
+## 7. Analyze Session Logs
 
 ```
-Find the most recent Claude session log and analyze it. Show me: how many
-tool calls were made, which tools were used most frequently, and whether any
-tool calls failed. Summarize the agent's decision-making at each phase
-transition.
+Find the session logs from both worktree runs and compare them. Show me:
+1. Total tool calls in each run
+2. Tools used most frequently in each
+3. Any tool call failures
+4. Time spent in each phase
+5. For the team run: how many SendMessage calls, how much coordination
+   overhead between workers
 ```
-
-Claude will locate the JSONL session log, parse the tool calls, and produce
-a behavioral analysis of the ADW run.
 
 > **Session logs as feedback loops.** Three layers of feedback: hooks give
-> immediate feedback (lint errors after each write), orchestrator status gives
-> phase-level feedback (pass/fail per phase), and session logs give post-hoc
-> feedback (full behavioral analysis). The hook tells you *what* went wrong.
-> The orchestrator tells you *when*. The session log tells you *why*.
+> immediate feedback (lint errors after each write), phase transitions give
+> workflow-level feedback (pass/fail per phase), and session logs give
+> post-hoc feedback (full behavioral analysis). The hook tells you *what*
+> went wrong. The phase transition tells you *when*. The session log tells
+> you *why*.
 
 ---
 
-## 8. Agent Teams: Concepts and Architecture
+## 8. What the Orchestrators Do
 
-So far every ADW run has been single-agent: one Claude instance running all
-phases sequentially. Agent teams add a second dimension — parallelism.
+The commands just built Python scripts that implement code-driven
+orchestration. Here's what each component does.
 
-**Leader/worker pattern.** One leader agent breaks work into subtasks, assigns
-them to specialized workers, and synthesises results. Workers operate with
-focused scope and appropriate tool access.
+**`adw_core.py`** — the shared engine:
+- State management: create, read, update `agents/{adw_id}/state.json`
+- Phase invocation: `subprocess.run()` calling `claude -p /<phase>`
+- ADW ID generation: 8-character hex identifier
+- Atomic writes: temp file + rename to guarantee valid JSON at all times
+- Logging: phase transitions to stderr with timestamps
 
-**When to use teams vs single agents.** Sequential workflows stay single-agent
-— each phase depends on the previous. Parallelizable work benefits from teams:
-review and documentation don't depend on each other and can run simultaneously.
+**`adw_feature.py`** — 7-phase feature workflow:
+- Phases: research → design → plan → validation → implement → review → document
+- `--from-design` flag: skip research and design when a spec already exists
+- `--resume` flag: restart from `current_phase` in existing state
+- Worktree isolation: each run in `claude -w {adw_id}`
 
-**Agent design principles.** Defining an agent is like defining an API: clear
-inputs, clear outputs, single responsibility, explicit error handling. The
-three agents from Module 3 (implementation/sonnet, validation/opus,
-documentation/sonnet) are already designed as specialists.
+**`adw_bug.py`** — 6-phase bug fix workflow:
+- Phases: research → plan → validation → implement → review → document
+- Shares `adw_core.py` — no duplication
+- `--resume` flag; no `--from-design` (not needed for bugs)
 
-| | Single Agent | Team |
-|-|-------------|------|
-| **Sequential work** | Natural fit | Overhead without benefit |
-| **Parallel work** | Blocked — must serialize | Natural fit |
-| **Specialization** | One context window | Dedicated context per worker |
-| **Coordination** | None needed | TaskCreate / SendMessage |
+```
+Orchestration hierarchy:
+  /team:feature  →  commands that build orchestrators (M3, prompt-driven)
+  adw_feature.py →  orchestrators that chain phases (M4 output, code-driven)
+  /implement     →  phase commands that do focused work (M3, pre-existing)
+```
+
+> **Three levels of orchestration.** Phase commands (`/implement`, `/review`)
+> do focused single-phase work. Python orchestrators (`adw_feature.py`) chain
+> phases with state persistence and resumability. Delivery commands
+> (`/team:feature`, `/feature`) orchestrate entire builds with team
+> coordination or sequential execution. Each level composes the one below it.
+
+---
+
+## 9. Agent Teams in Practice
+
+A retrospective on what you just observed.
+
+**When teams help.** Parallel analysis (Group 1) produces multiple specialist
+perspectives faster than serial. The overhead of leader synthesis is worth it
+when the analysis phases are independent — researcher, designer, planner, and
+validator can all work from the same PRD simultaneously.
+
+**When single-agent is better.** Sequential dependencies (each phase needs
+the previous output) don't benefit from parallelism. Simpler coordination,
+less overhead, easier to debug.
+
+**Agent design is API design.** Each worker had clear inputs (feature
+description + leader context), clear output (specialist analysis), single
+responsibility, and explicit scope. The better defined the interface, the
+more reliably it composes.
+
+| | Single-Agent (`/feature`) | Team (`/team:feature`) |
+|-|--------------------------|----------------------|
+| **Analysis phases** | Sequential — each waits | Parallel — all four simultaneously |
+| **Implementation** | Sequential | Coordinated — reviewer and documenter act on implementer output |
+| **Coordination** | None (one context) | Leader synthesis + `SendMessage` |
+| **Resumability** | Built into output (`--resume`) | Re-run the command |
+| **Best for** | Simpler tasks, debugging | Complex tasks, time-sensitive delivery |
 
 > **Agent design is API design.** Defining an agent is like defining an API:
 > clear inputs, clear outputs, single responsibility, explicit error handling.
@@ -239,53 +306,27 @@ documentation/sonnet) are already designed as specialists.
 
 ---
 
-## 9. Observe a Multi-Agent Team
-
-Run `/review` and `/document` in parallel on the changes from section 6:
-
-```
-Create an agent team with two workers: one to run /review on the changes from
-the last ADW run, and one to run /document on the same changes. The workers
-should operate in parallel. Summarize both results when they complete.
-```
-
-Watch for:
-- `TeamCreate` establishing the team
-- `TaskCreate` adding work items to the shared task list
-- `SendMessage` coordinating between leader and workers
-- Idle notifications confirming workers finished
-
-> **Observable parallelism.** We're using a small example to see the mechanics:
-> `TeamCreate` establishes the team, `TaskCreate` adds work items, and
-> `SendMessage` coordinates between leader and workers. Watch for idle
-> notifications — that's the system telling you a worker finished.
-
-> **Teams vs sequential.** The two workers ran simultaneously — review and
-> documentation don't depend on each other. This is the same insight behind
-> the ADW phase sequence: dependent phases must be sequential, independent
-> phases can be parallel. Agent teams make parallelism explicit.
-
----
-
 ## 10. Commit and Wrap Up
 
 ```
-Commit the orchestrator scripts (adw_core.py, adw_feature.py, adw_bug.py)
-and any ADW-generated changes.
+Merge the worktree changes and commit the orchestrator scripts
+(adw_core.py, adw_feature.py, adw_bug.py) and any generated changes.
 ```
 
-> **What you built.** Over four modules you went from a bare repository to a
-> fully functional agentic delivery system:
+> **What you built.** Over four modules you went from a bare repository to
+> a fully functional agentic delivery system:
 >
 > - Module 1: Project scaffolding and quality gates
 > - Module 2: CLI tool backed by the Claude Agent SDK
-> - Module 3: ADW foundations — commands, skills, agents, hooks
-> - Module 4: Code-driven orchestration, worktree isolation, and agent teams
+> - Module 3: ADW foundations — phase commands, orchestration commands,
+>   skills, agents, hooks
+> - Module 4: Parallel worktree execution, session log analysis, and
+>   orchestrator scripts built by the commands you created
 >
-> The patterns — PRDs as agent input, plan mode as review gate, hooks as back
-> pressure, state files as persistence, worktrees as sandboxes, teams as
-> parallelism — apply to any project where you want Claude to do sustained,
-> multi-step work reliably.
+> The patterns — PRDs as agent input, plan mode as review gate, hooks as
+> back pressure, commands as composable orchestrators, worktrees as
+> sandboxes, teams as parallelism — apply to any project where you want
+> Claude to do sustained, multi-step work reliably.
 
 ---
 
