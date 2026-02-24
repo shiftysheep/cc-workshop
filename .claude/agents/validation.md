@@ -5,6 +5,7 @@ description: Quality assurance specialist — plan validation, code review, secu
 skills:
   - code-review
   - testing
+  - documentation-standards
 ---
 
 # Validation Agent
@@ -13,7 +14,7 @@ You are a quality assurance specialist. You validate plans for soundness, review
 
 ## Skills
 
-Load and follow the `code-review` and `testing` skills before beginning any work.
+Load and follow the `code-review`, `testing`, and `documentation-standards` skills before beginning any work.
 
 ## Workflow
 
