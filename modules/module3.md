@@ -265,7 +265,52 @@ moments to inject or capture context dynamically.
 
 ---
 
-## 9. Commit and Proceed
+## 9. CLAUDE.md as a Context Engineering Tool
+
+You've now seen CLAUDE.md as project-level configuration. It's also a powerful context
+engineering tool with several advanced features.
+
+**Import syntax** — use `@path/to/file` inside CLAUDE.md to pull in content from other
+files. This lets you maintain shared rules, tech stack details, or architecture decisions
+in separate files while keeping CLAUDE.md as the entry point.
+
+**`.claude/rules/` directory** — path-specific rules that apply only to matching
+directories. For example, a rule for `src/` that enforces typing conventions won't
+fire when Claude is editing test files.
+
+| File | Applies to |
+|------|-----------|
+| `.claude/rules/src.md` | Files under `src/` |
+| `.claude/rules/tests.md` | Files under `tests/` |
+| `.claude/rules/docs.md` | Files under `docs/` |
+
+**`.claude/CLAUDE.md.local`** — personal overrides not committed to git. Use for
+individual editor preferences, personal workflow notes, or debugging flags that
+shouldn't affect teammates.
+
+**`settings.local.json`** — the same pattern for settings. Local overrides that don't
+affect the team configuration.
+
+**Team conventions** — the project CLAUDE.md serves as a team contract. Shared standards
+(tech stack, commit conventions, code style) go in the committed CLAUDE.md. Personal
+preferences (verbosity, editor, shortcuts) go in `.claude/CLAUDE.md.local`.
+
+> **Exercise:**
+> 1. Create `.claude/rules/src.md` with a rule about type annotations for `src/` files
+>    (e.g., "All functions in src/ must have complete type annotations including return types")
+> 2. Add an `@docs/adr/adw.md` import to the project CLAUDE.md so Claude always has the
+>    ADW architecture reference
+> 3. Create a `.claude/CLAUDE.md.local` with a personal preference (e.g., preferred
+>    verbosity level or a debugging note)
+
+> **Callout:** CLAUDE.md, skills, hooks, and `rules/` form a four-layer context system.
+> CLAUDE.md is always-on, `rules/` are path-scoped, skills are task-scoped, and hooks are
+> event-scoped. Together they let you shape Claude's behavior precisely without
+> overloading any single mechanism.
+
+---
+
+## 10. Commit and Proceed
 
 Ask Claude to commit the changes, then advance to the next module:
 
@@ -275,4 +320,4 @@ Commit the new command files and then run /module to proceed to module 4.
 
 ---
 
-[← Module 2](module2.md)
+[← Module 2](module2.md) | [Module 4 →](module4.md)
