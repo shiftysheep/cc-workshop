@@ -34,12 +34,15 @@ repos:
     rev: v2.14
     hooks:
       - id: vulture
-        args: ["--min-confidence", "80", "src/"]
+        args: ["--min-confidence", "80", "."]
+        exclude: '^(\.claude/|docs/)'
   # Check for security issues
   - repo: https://github.com/PyCQA/bandit
     rev: 1.9.3
     hooks:
       - id: bandit
+        args: ["--exclude", "tests"]
+        exclude: '^\.claude/'
   # Check for type checking issues
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.19.1
