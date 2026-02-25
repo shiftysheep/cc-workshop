@@ -77,7 +77,7 @@ SLIDES: list[SlideData] = [
     # Slide 1: Title slide
     TitleSlide(
         title="Claude Code in Depth",
-        subtitle="From Scaffolding to Agentic Delivery",
+        subtitle="Totally not a chat bot: harness your context for increased velocity",
         notes="Welcome to the Claude Code workshop. This session takes you from zero to a fully operational agentic delivery system in five progressive modules. Each module builds on the last — by the end, you'll have working orchestration commands, agent teams, and CI/CD integration. The focus is on principles of agentic coding, not just the project we build.",
     ),
     # Slide 2: Prerequisites
@@ -93,7 +93,7 @@ SLIDES: list[SlideData] = [
                 0,
             ),
         ],
-        notes="These should all be installed before the workshop begins. Git ships with macOS and most Linux distros — Windows users need to install it (git-scm.com). uv replaces pip/venv for this workshop. Claude Code requires Node.js 18+. AWS Bedrock access is required — participants should have an SSO profile configured with InvokeModel and InvokeModelWithResponseStream permissions. Next slide covers the exact Bedrock configuration.",
+        notes="These should all be installed before the workshop begins. If you need help you can reach out in the meeting chat or flag down an assistant. ",
     ),
     # Slide 3: Bedrock Configuration
     ContentSlide(
@@ -109,19 +109,19 @@ SLIDES: list[SlideData] = [
             {"text": "Opus: us.anthropic.claude-opus-4-6-v1", "level": 1},
             'awsAuthRefresh: "aws sso login --profile=${AWS_PROFILE}"',
         ],
-        notes="Walk through the settings.json structure. CLAUDE_CODE_USE_BEDROCK=1 switches from Anthropic API to Bedrock. AWS_REGION is required — Claude Code does NOT read from ~/.aws/config. AWS_PROFILE points to their SSO profile. Model pinning is critical: without it, deployments break when Anthropic releases new models. The us. prefix enables cross-region inference. awsAuthRefresh is the key convenience setting — Claude Code will automatically run this command when credentials expire, so participants never have to manually re-login mid-session. /login and /logout are disabled when using Bedrock — auth is via AWS credentials. Transition: Here's the workshop flow.",
+        notes="If you have used the configure.py this was done behind the scenes.",
     ),
     # Slide 4: Workshop Flow
     ContentSlide(
         title="What We'll Build",
         bullets=[
             "M1: Scaffold a Typer CLI app from a natural language prompt",
-            "M2: Write a PRD, plan implementation, execute with subagents",
+            "M2: Build a simple CLI LLM tool called todd",
             "M3: Build orchestration commands, agents, hooks, and skills",
             "M4: Run parallel agent teams in isolated worktrees",
             "M5: Wire agents into CI/CD and run headless reviews",
         ],
-        notes="Frame this as a hands-on journey. Module 1: they'll say 'Create a Typer CLI app named todd' and watch Claude scaffold the entire project. Module 2: they write a real PRD, use plan mode, and see subagent delegation live. Module 3: they build the .claude/ extensibility layer — commands, agents, hooks, skills — all in markdown. Module 4: they run /feature and /team:feature against real PRDs and compare sequential vs parallel execution. Module 5: they wire their agents into GitHub Actions and run headless code reviews. Each module produces working artifacts. Transition: Let's start with what Claude Code actually is.",
+        notes="Frame this as a hands-on journey. Where we'll progressively build up capabilities and complexity. Transition: Let's start with what Claude Code actually is.",
     ),
     # Slide 5: What Is Claude Code?
     ContentSlide(
@@ -162,7 +162,7 @@ SLIDES: list[SlideData] = [
             ("Context Poisoning", " — Bad info corrupts reasoning", 0),
         ],
         right=["These concepts thread through every module."],
-        notes="These concepts are about managing what Claude can see and when. Context engineering is the overarching discipline. Rot and poisoning are the failure modes. Progressive disclosure and dynamic injection are the mitigation strategies. Emphasize: context is finite and precious. Everything we build in the workshop is designed to manage it well. Transition: The next five concepts are about how we structure agent work.",
+        notes="Context is finite and precious. Everything we build in the workshop is designed to manage it well. Transition: The next concepts are about how we structure agent work.",
     ),
     # Slide 7: Core Concepts (2/2)
     TwoColumnSlide(
@@ -174,7 +174,7 @@ SLIDES: list[SlideData] = [
             ("Agent Teams", " — Leader/worker coordination", 0),
         ],
         right=["These concepts define how agents work at scale."],
-        notes="Skills vs commands is the key design decision in Module 3. Agent design applies everywhere — every subagent, every custom agent, every worker in a team. Back pressure is what makes the system self-correcting (hooks, pre-commit, plan mode). Sandboxing layers up (worktrees + subagents + hooks + permissions). Agent teams are the Module 4 capstone. Transition: Let's start building. Module 1.",
+        notes="These concepts define how agents work at scale. We'll see each one in practice as we progress through the modules. Transition: Let's start building. Module 1.",
     ),
     # Slide 8: Module 1 Section Header
     SectionSlide(
@@ -183,21 +183,15 @@ SLIDES: list[SlideData] = [
     ),
     # Slide 9: M1 What We Do
     ContentSlide(
-        title="M1: What We Do",
+        title="Let's get to work",
         bullets=[
-            "Clone repo, launch Claude Code in the project directory",
-            "Natural language scaffold: 'Create a Typer CLI app named todd'",
-            "CLI shortcuts: ! shell prefix, @ file refs, Shift+Tab permissions",
-            "/statusline for persistent HUD (model, context, git status)",
-            "/context, /cost, /compact, /clear — session management",
-            "Create and structure project CLAUDE.md (3 scopes)",
-            "Commit with pre-commit hooks enforcing quality",
+            "Open `modules/module1.md` for our list of tasks",
         ],
-        notes="Demo the ! prefix early — it's the fastest way to verify things work. The statusline is a one-time setup that pays off in every module. Permission modes become critical in Module 2 (plan mode). The CLAUDE.md exercise is the most important action in this module — emphasize the three scopes: global (~/.claude/CLAUDE.md), project (./CLAUDE.md), personal (.claude/CLAUDE.md.local). Pre-commit hooks mean quality is enforced from the very first commit. Transition: Why do these things matter?",
+        notes="Participants follow the steps in module1.md at their own pace. Flag down an assistant if you get stuck.",
     ),
     # Slide 10: M1 Why It Matters
     ContentSlide(
-        title="M1: Why It Matters",
+        title="Summarizing what we have seen",
         bullets=[
             (
                 "Claude as scaffolding tool: ",
@@ -220,7 +214,7 @@ SLIDES: list[SlideData] = [
                 0,
             ),
         ],
-        notes="The scaffolding pattern is powerful: Claude handles boilerplate, you focus on intent. Pre-commit is back pressure before we even name it — the system resists bad code automatically. CLAUDE.md is the single most impactful Claude Code feature. A well-written CLAUDE.md eliminates repeating context in every prompt. It's compound interest for AI-assisted development. Transition: Module 2 introduces context management and planning.",
+        notes="Scaffolding lets you focus on intent while Claude handles boilerplate. Pre-commit hooks are back pressure before we even name it. CLAUDE.md shaped everything Claude just did. Transition: Module 2 introduces context management and planning.",
     ),
     # Slide 11: Module 2 Section Header
     SectionSlide(
