@@ -107,7 +107,42 @@ with your own workflows.
 
 ---
 
-## 1. Install the Context7 MCP Server
+## 1. Context From the Previous Module
+
+Your session still carries context from Module 1 — every prompt, tool call, and
+response is still in the window. Let's see what that looks like.
+
+In the chat box, run:
+
+```
+/context
+```
+
+Note the grid — a portion is already filled from the work you did in Module 1.
+
+Now clear the context to start fresh:
+
+```
+/clear
+```
+
+Run `/context` again:
+
+```
+/context
+```
+
+The grid is nearly empty. The only context remaining is the system prompt and
+CLAUDE.md — everything from Module 1 is gone.
+
+> **Why this matters:** `/clear` is the hard reset. Use it between unrelated tasks
+> to reclaim the full context window. `/compact` (which you saw in Module 1) is the
+> soft version — it summarizes rather than discards. Knowing when to use each is a
+> core context management skill.
+
+---
+
+## 2. Install the Context7 MCP Server
 
 Context7 is an MCP server that injects live, version-specific library documentation
 into Claude's context on demand. Instead of relying on potentially outdated training
@@ -129,10 +164,10 @@ Browse to the **Discover** tab, find **context7**, and install it at **user** sc
 
 ---
 
-## 2. Examine Context Utilization
+## 3. Examine Context Utilization
 
 MCP servers add tools to Claude's context window on every request. Let's see what
-that looks like before we start building.
+that looks like now that Context7 is installed.
 
 In the chat box, run:
 
@@ -140,17 +175,18 @@ In the chat box, run:
 /context
 ```
 
-The colored grid shows how much of your context window is currently in use. Note the
-baseline now that Context7 is installed — tool definitions for MCP servers consume
-tokens even when the tools aren't called.
+Compare this grid to the empty one you saw after `/clear`. The difference is the
+tool definitions that Context7 added — they consume tokens even when the tools
+aren't called.
 
-> **Why this matters:** Context is finite. Knowing your utilization helps you decide
-> when to use subagents (which get their own fresh context window) versus working
-> directly in the main conversation.
+> **Why this matters:** Context is finite. Every MCP server you install adds baseline
+> cost to your context window. Knowing your utilization helps you decide when to use
+> subagents (which get their own fresh context window) versus working directly in the
+> main conversation.
 
 ---
 
-## 3. Switch to Opus + Plan Mode
+## 4. Switch to Opus + Plan Mode
 
 For the next task we're going to ask Claude to architect and implement a new feature.
 This is exactly the kind of consequential, multi-step work that benefits from a more
@@ -174,7 +210,7 @@ In the chat box, run:
 
 ---
 
-## 4. Activate Plan Mode and Note the Status Line
+## 5. Activate Plan Mode and Note the Status Line
 
 Activate plan mode by pressing `Shift+Tab` twice. You'll see the status line update
 to show `⏸ plan mode on`.
@@ -188,7 +224,7 @@ to show `⏸ plan mode on`.
 
 ---
 
-## 5. Build the todd Query Command
+## 6. Build the todd Query Command
 
 Now let's put it to work. We have a requirements document ready at
 `docs/prds/todd-query.md`. Enter this prompt in the chat box:
@@ -202,7 +238,7 @@ touching any code.
 
 ---
 
-## 6. Understanding Subagents and Context
+## 7. Understanding Subagents and Context
 
 While Claude is working on the plan, here's what's happening under the hood.
 
@@ -241,7 +277,7 @@ goes wrong, you restart that subagent — not your entire session.
 
 ---
 
-## 7. Review and Approve the Plan
+## 8. Review and Approve the Plan
 
 Claude will present a plan showing:
 
@@ -260,7 +296,7 @@ Read it carefully. You can:
 
 ---
 
-## 8. Implement the Plan
+## 9. Implement the Plan
 
 Once you're satisfied with the plan, confirm it. Claude will switch from Opus to
 Sonnet and begin implementing — creating files, updating `pyproject.toml`, and
@@ -268,7 +304,7 @@ writing the code described in the plan.
 
 ---
 
-## 9. Test the New Command
+## 10. Test the New Command
 
 Once Claude is done, verify it works directly from the chat box:
 
@@ -280,7 +316,7 @@ You should see a response from Claude describing which model is active.
 
 ---
 
-## 10. Commit and Proceed
+## 11. Commit and Proceed
 
 Ask Claude to commit the changes, then advance to the next module:
 
@@ -290,4 +326,4 @@ Commit the changes and then run /module to proceed to module 3.
 
 ---
 
-[← Module 1](module1.md)
+[← Module 1](module1.md) | [Module 3 →](module3.md)

@@ -96,9 +96,93 @@ terminal. In the chat box, run:
 
 ---
 
-## 5. Commit and Proceed
+## 5. CLI Navigation Essentials
 
-Ask Claude to commit the changes, then advance to the next module:
+Now that the project is scaffolded, let's learn the shortcuts you'll use every day.
+
+**`@` file references** — type `@pyproject.toml` in the chat box to reference a file
+without copying its full content. Claude reads the file on demand.
+
+**`!` bash mode** — prefix with `!` to run shell commands directly (you already used
+this in step 3). It's shorthand for asking Claude to run a Bash tool call.
+
+**Multiline input** — `\` + Enter for a quick line continuation, or `Shift+Enter` for
+a new line in the prompt.
+
+**`Ctrl+G`** — open the current prompt in your default text editor for longer edits.
+
+> **Exercise:** Type `@src/todd/__init__.py` to reference the init file, then run
+> `!uv run todd hello` to verify the CLI still works.
+
+---
+
+## 6. Permission Modes
+
+Claude Code has three permission modes, cycled with `Shift+Tab`:
+
+| Mode | Status line | Behavior |
+|------|-------------|----------|
+| **Normal** (default) | No indicator | Prompts for confirmation on file edits and shell commands |
+| **Auto-Accept** | `⚡ auto-accept` | Skips file edit confirmations; still prompts for shell commands |
+| **Plan** | `⏸ plan mode` | Read-only — Claude explores and plans but cannot write or edit files |
+
+> **Callout:** You'll use Plan mode extensively in Module 2. For now, cycle through the
+> modes with `Shift+Tab` to see the status line update.
+
+---
+
+## 7. Essential Commands
+
+Claude Code ships with built-in slash commands. Here are the ones you'll use most:
+
+| Command | What it does |
+|---------|-------------|
+| `/context` | Visual grid showing context window usage |
+| `/cost` | Token usage and cost for this session |
+| `/compact` | Compress conversation to free context — use when responses degrade |
+| `/clear` | Reset context entirely between unrelated tasks |
+| `/help` | Full command list |
+
+> **Exercise:** Run `/context` and `/cost` to see your current session state.
+> You'll revisit these throughout the workshop as context management becomes critical.
+
+---
+
+## 8. Your First CLAUDE.md
+
+CLAUDE.md is the single most impactful Claude Code feature. It provides persistent
+project instructions that load automatically every session.
+
+**Three scopes:**
+
+| Scope | File | Shared via git? |
+|-------|------|----------------|
+| Global (all projects) | `~/.claude/CLAUDE.md` | No |
+| Project (team-wide) | `./CLAUDE.md` | Yes |
+| Personal (local only) | `./CLAUDE.md.local` | No (gitignored) |
+
+**Exercise:** Update the project `CLAUDE.md` with proper structure:
+
+```markdown
+Update the project CLAUDE.md to include:
+- Project description: todd is a Typer CLI application built as part of the Claude Code workshop
+- Tech stack: Python 3.13+, uv, pytest, Typer
+- How to run tests: uv run pytest
+- How to run the CLI: uv run todd
+- Coding standards: ruff (rules E, W, F, I, N, UP, B, C4, PLC, PLE, PLW, RUF), mypy strict
+- Commit conventions: conventional commits
+```
+
+> **Callout:** This CLAUDE.md will shape Claude's behavior for the rest of the workshop.
+> Every module builds on it. A well-written CLAUDE.md eliminates the need to repeat
+> project context in every prompt.
+
+---
+
+## 9. Commit and Proceed
+
+Ask Claude to commit the changes (including the CLAUDE.md update), then advance to
+the next module:
 
 ```markdown
 Commit the changes and then run /module to proceed to module 2.
