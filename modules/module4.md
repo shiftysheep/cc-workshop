@@ -342,4 +342,4 @@ Merge the worktree changes and commit the orchestrator scripts
 
 ---
 
-[← Module 3](module3.md)
+[← Module 3](module3.md) | [Module 5 →](module5.md)
