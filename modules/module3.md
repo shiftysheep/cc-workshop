@@ -133,7 +133,63 @@ Browse to the **Discover** tab, find **document-skills** from the
 
 ---
 
-## 4. Plan the Orchestration Commands
+## 4. Custom Subagents
+
+In Module 2 you saw built-in subagents (Explore, Plan, General-purpose). Now you'll
+create your own.
+
+**Anatomy of a custom subagent.** Each agent lives at `.claude/agents/<name>.md` and
+consists of YAML frontmatter plus a system prompt body:
+
+```yaml
+---
+name: code-reviewer
+description: Read-only code reviewer using Haiku for fast, cheap analysis
+model: haiku
+tools:
+  - Read
+  - Glob
+  - Grep
+permissionMode: default
+maxTurns: 10
+skills:
+  - code-review
+---
+
+You are a code reviewer. Analyze the provided code for:
+- Correctness and potential bugs
+- Style consistency with project conventions
+- Type annotation completeness
+- Test coverage gaps
+
+Report findings as a structured list with file:line references.
+Do not suggest fixes — only identify issues.
+```
+
+**Frontmatter fields:**
+
+| Field | Purpose | Example values |
+|-------|---------|---------------|
+| `name` | Display name | `code-reviewer` |
+| `description` | When Claude should delegate to this agent | Free text |
+| `model` | Which model to use | `sonnet`, `opus`, `haiku` |
+| `tools` | Allowlist of available tools | `[Read, Glob, Grep]` |
+| `permissionMode` | Permission level | `default`, `bypassPermissions` |
+| `maxTurns` | Maximum agentic turns | `10`, `20` |
+| `skills` | Skills to preload | `[code-review]` |
+| `memory` | Memory scope | `user`, `project`, `local` |
+| `isolation` | Execution isolation | `worktree` |
+
+> **Exercise:** Create `.claude/agents/code-reviewer.md` with the configuration above.
+> Then ask Claude to "review the todd query command" and observe it delegating to your
+> custom subagent.
+
+You'll see three more agents (implementation.md, validation.md, documentation.md)
+when you explore the `.claude/` scaffolding in the next section.
+
+---
+
+## 5. Plan the Orchestration Commands
 
 Now activate plan mode and give Claude the PRD. Claude will research the
 existing scaffolding to understand what it's composing before proposing a plan.
@@ -160,7 +216,7 @@ planning.
 
 ---
 
-## 5. How Claude Researches the Scaffolding
+## 6. How Claude Researches the Scaffolding
 
 While Claude works on its plan, here's what it's exploring and why it matters.
 
@@ -199,7 +255,7 @@ orchestration starts.
 
 ---
 
-## 6. Review and Build
+## 7. Review and Build
 
 Claude will present a plan for the four command files. Review it, then confirm.
 
@@ -221,7 +277,7 @@ Once satisfied, approve the plan. Claude will create the command files in
 
 ---
 
-## 7. Explore the Lint Check Hook
+## 8. Explore the Lint Check Hook
 
 Hooks run at Claude Code lifecycle events. A `PostToolUse` hook fires after every
 `Write` or `Edit` tool call — the right moment to validate what Claude just wrote
@@ -243,7 +299,7 @@ fails.
 
 ---
 
-## 8. Understanding Dynamic Context Injection
+## 9. Understanding Dynamic Context Injection
 
 You've now explored three mechanisms for injecting context into Claude:
 
@@ -265,7 +321,7 @@ moments to inject or capture context dynamically.
 
 ---
 
-## 9. CLAUDE.md as a Context Engineering Tool
+## 10. CLAUDE.md as a Context Engineering Tool
 
 You've now seen CLAUDE.md as project-level configuration. It's also a powerful context
 engineering tool with several advanced features.
@@ -310,7 +366,7 @@ preferences (verbosity, editor, shortcuts) go in `.claude/CLAUDE.md.local`.
 
 ---
 
-## 10. Commit and Proceed
+## 11. Commit and Proceed
 
 Ask Claude to commit the changes, then advance to the next module:
 
