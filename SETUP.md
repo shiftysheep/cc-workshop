@@ -5,7 +5,7 @@
 Run the automated configuration script:
 
 ```shell
-uv run configure.py
+uv run setup/configure.py
 ```
 
 The script will:
@@ -23,7 +23,7 @@ Options:
 To test the configuration script:
 
 ```shell
-uv run --with pytest --with typer --with textual pytest tests/test_configure.py -v
+uv run --with pytest --with typer --with textual pytest setup/test_configure.py -v
 ```
 
 ## Manual Setup
