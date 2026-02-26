@@ -22,6 +22,12 @@ As we progress through the course we will use the `/module` command in Claude to
 This will allow us to slowly introduce topics and focus on key aspects of the tool and agentic coding as we progress.
 
 
+## How Modules Work
+
+Each module lives in `modules/moduleN.md` and walks you through the exercises for that milestone.
+When you finish a module, run `/module` in Claude Code — it merges your current branch forward into the next module branch, carrying everything you've built with it.
+This keeps each module self-contained while letting your work accumulate naturally across the workshop.
+
 ## Get Started
 
 When you're ready proceed to [Module1](modules/module1.md).
