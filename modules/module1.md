@@ -132,7 +132,7 @@ In the chat box, run:
 > You'll see the active model, how much of the context window is in use, your working directory, and the git status.
 > This HUD becomes more useful in later modules as context management and model switching become part of your workflow.
 > There are many other built-in slash commands you can see if you just type `/` in the chat window.
-> For a full list, see the [Anthropic docs on slash commands](https://docs.anthropic.com/en/docs/claude-code/cli-usage#slash-commands).
+> For a full list, see the [Anthropic docs on slash commands](https://code.claude.com/docs/en/interactive-mode#built-in-commands).
 
 ---
 
