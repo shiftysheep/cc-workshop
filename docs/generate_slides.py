@@ -247,7 +247,7 @@ SLIDES: list[SlideData] = [
     # Slide 12: Module 2 Section Header
     SectionSlide(
         title="Module 2: MCP, Plan Mode, and Agent SDK",
-        notes="Module 2 introduces the critical concept of context as a finite resource. You'll install your first MCP server, see how it affects context usage, switch models for planning, and build a real feature through plan mode. The key progression: Module 1 was about Claude doing things for you. Module 2 is about Claude thinking before doing. Transition: What we do in this module.",
+        notes="Module 2 introduces the critical concept of context as a finite resource. You'll install your first MCP server, see how MCP tools load on demand via ToolSearch, switch models for planning, and build a real feature through plan mode. The key progression: Module 1 was about Claude doing things for you. Module 2 is about Claude thinking before doing. Transition: What we do in this module.",
     ),
     # Slide 13: M2 What We Do
     ContentSlide(
@@ -261,7 +261,7 @@ SLIDES: list[SlideData] = [
     ImageSlide(
         title="The Context Window",
         image="images/context_window_utilization.png",
-        notes="This is the most important conceptual slide. Walk through each layer. System prompt and CLAUDE.md are always present — they're the 'tax' on every interaction. Tool definitions from MCP servers add up (Context7 alone adds several hundred tokens). Conversation history is the biggest consumer — this is why /compact and /clear matter. File contents are loaded on demand but can be huge. The 'available space' is what Claude has for actual reasoning. When it shrinks too much, that's context rot in action. Transition: Now let's see how subagents protect this window.",
+        notes="This is the most important conceptual slide. Walk through each layer. System prompt and CLAUDE.md are always present — they're the 'tax' on every interaction. MCP tool definitions are deferred via ToolSearch — they load into context only when Claude discovers them. This is progressive disclosure at the tool level. Conversation history is the biggest consumer — this is why /compact and /clear matter. File contents are loaded on demand but can be huge. The 'available space' is what Claude has for actual reasoning. When it shrinks too much, that's context rot in action. Transition: Now let's see how subagents protect this window.",
     ),
     # Slide 15: Subagent Context Isolation (with image)
     ImageSlide(
@@ -279,8 +279,8 @@ SLIDES: list[SlideData] = [
                 0,
             ),
             (
-                "MCP tools cost tokens idle: ",
-                "Every server adds baseline context overhead",
+                "MCP tools load on demand: ",
+                "ToolSearch defers definitions until needed — no idle cost",
                 0,
             ),
             (
@@ -295,7 +295,7 @@ SLIDES: list[SlideData] = [
             ),
             ("Model selection: ", "Opus / Sonnet / Haiku for different task types", 0),
         ],
-        notes="Context is finite and precious. Rot happens gradually (long sessions). Poisoning happens suddenly (one bad assumption). Subagents are the primary defense against both — each gets a fresh context window. MCP token cost is a real tradeoff: more tools = more capability but less context space. Model selection is about cost-quality tradeoffs, not just 'use the best model.' Transition: Module 3 builds the orchestration layer.",
+        notes="Context is finite and precious. Rot happens gradually (long sessions). Poisoning happens suddenly (one bad assumption). Subagents are the primary defense against both — each gets a fresh context window. MCP tools are deferred via ToolSearch — no idle context cost. Once loaded, definitions do consume context, so selective loading matters. This is progressive disclosure at the tool level. Model selection is about cost-quality tradeoffs, not just 'use the best model.' Transition: Module 3 builds the orchestration layer.",
     ),
     # Slide 17: Module 3 Section Header
     SectionSlide(
