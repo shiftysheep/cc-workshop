@@ -1,8 +1,8 @@
 # Module 5: Operations & Maintenance
 
-This module covers operational skills for sustained Claude Code usage — creating
-custom subagents, running Claude headlessly in scripts and CI, managing sessions
-and costs, and maintaining the CLAUDE.md that shapes everything.
+This module covers operational skills for sustained Claude Code usage — running
+Claude headlessly in scripts and CI, managing sessions and costs, and maintaining
+the CLAUDE.md that shapes everything.
 
 ---
 
@@ -10,7 +10,6 @@ and costs, and maintaining the CLAUDE.md that shapes everything.
 
 | Term | Definition |
 |------|-----------|
-| **Custom subagent** | A user-defined agent in `.claude/agents/<name>.md` with YAML frontmatter controlling model, tools, permissions, and memory scope. |
 | **Headless mode** | Running Claude non-interactively with `claude -p "prompt"`. Outputs text, JSON, or streaming JSON. Used in scripts, CI pipelines, and batch operations. |
 | **Session persistence** | Claude Code saves all sessions locally. Resume with `--continue` (most recent) or `--resume` (pick by ID/name). |
 | **Effort level** | Controls how much reasoning Claude applies. Low/medium/high. Affects cost and quality. Set via `/model`. |
@@ -34,64 +33,7 @@ and costs, and maintaining the CLAUDE.md that shapes everything.
 
 ---
 
-## 1. Custom Subagents
-
-In Module 2 you saw built-in subagents (Explore, Plan, General-purpose). Now you'll
-create your own.
-
-**Anatomy of a custom subagent.** Each agent lives at `.claude/agents/<name>.md` and
-consists of YAML frontmatter plus a system prompt body:
-
-```yaml
----
-name: code-reviewer
-description: Read-only code reviewer using Haiku for fast, cheap analysis
-model: haiku
-tools:
-  - Read
-  - Glob
-  - Grep
-permissionMode: default
-maxTurns: 10
-skills:
-  - code-review
----
-
-You are a code reviewer. Analyze the provided code for:
-- Correctness and potential bugs
-- Style consistency with project conventions
-- Type annotation completeness
-- Test coverage gaps
-
-Report findings as a structured list with file:line references.
-Do not suggest fixes — only identify issues.
-```
-
-**Frontmatter fields:**
-
-| Field | Purpose | Example values |
-|-------|---------|---------------|
-| `name` | Display name | `code-reviewer` |
-| `description` | When Claude should delegate to this agent | Free text |
-| `model` | Which model to use | `sonnet`, `opus`, `haiku` |
-| `tools` | Allowlist of available tools | `[Read, Glob, Grep]` |
-| `permissionMode` | Permission level | `default`, `bypassPermissions` |
-| `maxTurns` | Maximum agentic turns | `10`, `20` |
-| `skills` | Skills to preload | `[code-review]` |
-| `memory` | Memory scope | `user`, `project`, `local` |
-| `isolation` | Execution isolation | `worktree` |
-
-> **Exercise:** Create `.claude/agents/code-reviewer.md` with the configuration above.
-> Then ask Claude to "review the todd query command" and observe it delegating to your
-> custom subagent.
-
-Review the existing agents in `.claude/agents/` (implementation.md, validation.md,
-documentation.md) and compare their configurations — model choices, tool access,
-permission modes. Notice how each agent is scoped to a specific responsibility.
-
----
-
-## 2. Headless Mode & Scripting
+## 1. Headless Mode & Scripting
 
 Headless mode runs Claude non-interactively — no chat box, no confirmation prompts.
 The command runs, produces output, and exits.
@@ -139,7 +81,7 @@ a schema you define.
 
 ---
 
-## 3. CI/CD Integration
+## 2. CI/CD Integration
 
 Headless mode is what makes Claude useful in pipelines. The pattern is simple:
 feed context in, get analysis out, gate on the result.
@@ -183,13 +125,13 @@ It's named that way intentionally: in CI there's no human to confirm, but you're
 removing a safety layer. Only use it in controlled environments with restricted tool
 access.
 
-> **Callout:** CI integration is where headless mode, custom subagents, and CLAUDE.md
-> converge — the agent runs autonomously, shaped only by configuration. The CLAUDE.md
-> you maintain is the only instruction set the CI agent receives.
+> **Callout:** CI integration is where headless mode and CLAUDE.md converge — the
+> agent runs autonomously, shaped only by configuration. The CLAUDE.md you maintain
+> is the only instruction set the CI agent receives.
 
 ---
 
-## 4. Session Management
+## 3. Session Management
 
 Claude Code saves every session locally. You can resume, rename, and export them.
 
@@ -219,7 +161,7 @@ Claude loads the PR context automatically.
 
 ---
 
-## 5. Cost & Extended Thinking
+## 4. Cost & Extended Thinking
 
 Understanding cost helps you choose the right model and effort level for each task.
 
@@ -258,7 +200,7 @@ architecture decisions with multiple trade-offs, multi-step reasoning across man
 
 ---
 
-## 6. Checkpointing & Recovery
+## 5. Checkpointing & Recovery
 
 Claude Code automatically snapshots your codebase before every action. If something
 goes wrong, you can rewind without losing your session.
@@ -284,7 +226,7 @@ goes wrong, you can rewind without losing your session.
 
 ---
 
-## 7. CLAUDE.md Maintenance
+## 6. CLAUDE.md Maintenance
 
 A CLAUDE.md that drifts out of date is worse than no CLAUDE.md — it actively misleads
 Claude with stale instructions.
@@ -321,7 +263,7 @@ other config file: it needs maintenance.
 
 ---
 
-## 8. Further Reading
+## 7. Further Reading
 
 These features extend Claude Code beyond what we've covered in the workshop.
 
