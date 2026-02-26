@@ -429,24 +429,39 @@ SLIDES: list[SlideData] = [
         image="images/progression.png",
         notes="This is the retrospective view. Each module builds on the previous. Module 1 gives you the foundation (project + CLAUDE.md). Module 2 adds context awareness and planning discipline. Module 3 builds the orchestration primitives. Module 4 puts them together with parallel execution. Module 5 adds the operational practices for sustained use. The progression mirrors how you'd adopt Claude Code in practice: start with scaffolding, add planning, build workflows, scale with teams, operationalize. Transition: Let's recap the core concepts.",
     ),
-    # Slide 31: 10 Core Concepts Recap
-    TwoColumnSlide(
-        title="10 Core Concepts Recap",
-        left=[
-            "1. Context Engineering",
-            "2. Context Rot",
-            "3. Context Poisoning",
-            "4. Progressive Disclosure",
-            "5. Dynamic Context Injection",
+    # Slide 31: Tenets of Quality Output
+    ContentSlide(
+        title="Tenets of Quality Output",
+        bullets=[
+            ("1. Verify your work: ", "Tests + expected outputs — 'the single highest-leverage thing' (Anthropic)", 0),
+            ("2. Be specific: ", "Reference files, constraints, patterns — vague prompts = vague output (Anthropic)", 0),
+            ("3. CLAUDE.md + hooks: ", "Persistent memory + automated gates — 'deterministic quality' (Anthropic)", 0),
+            ("4. Context is finite: ", "Manage aggressively — 'performance degrades as it fills' (Anthropic)", 0),
+            ("5. Explore → Plan → Code: ", "Separate thinking from doing — 'code is cheap now' (Willison)", 0),
+            ("6. Progressive disclosure: ", "Right context, right scope, right time — @import + links", 0),
+            ("7. Agent design: ", "Composable workers with model, tools, and scope (Anthropic)", 0),
+            ("8. Scale with isolation: ", "Worktrees + teams + headless + sandboxing (Anthropic)", 0),
         ],
-        right=[
-            "6. Skills vs Commands",
-            "7. Agent Design",
-            "8. Back Pressure",
-            "9. Sandboxing",
-            "10. Agent Teams",
-        ],
-        notes="Quick recap of all ten concepts. Ask participants to call out which modules demonstrated each concept. Context Engineering: every module. Context Rot: Module 2. Context Poisoning: Module 2. Progressive Disclosure: Modules 3-4. Dynamic Context Injection: Module 3. Skills vs Commands: Module 3. Agent Design: Modules 4-5. Back Pressure: Modules 1, 3. Sandboxing: Module 4. Agent Teams: Module 4. Transition: Questions?",
+        notes=(
+            "Walk through basics to advanced. Each tenet cites its source.\n\n"
+            "FOUNDATIONAL (1-3): Verification is Anthropic's official #1 best practice. "
+            "Simon Willison reinforces: 'automated tests are no longer optional with coding agents.' "
+            "Specificity comes from Anthropic BP #3 and their Prompt Engineering course Ch.2. "
+            "CLAUDE.md + hooks combine persistent memory (BP #4) with deterministic gates — "
+            "unlike CLAUDE.md which is advisory, hooks guarantee the action happens.\n\n"
+            "INTERMEDIATE (4-6): Context is the core constraint — Anthropic's opening statement "
+            "in their best practices. Willison's 'code is cheap now' reframes priorities: "
+            "design and testing matter more than implementation speed. Progressive disclosure "
+            "connects Anthropic's skills system ('load on demand') with our workshop's "
+            "@import (eager) vs links (lazy) pattern.\n\n"
+            "ADVANCED (7-8): Agent design maps to Anthropic's subagent guidance — 'run in their "
+            "own context with their own set of allowed tools.' Scaling combines Anthropic's "
+            "'multiply output with parallel sessions' with workshop defense-in-depth: "
+            "worktree + subagent + hook + permission (4 isolation layers).\n\n"
+            "Sources: code.claude.com/docs/en/best-practices, "
+            "simonwillison.net (agentic engineering), "
+            "github.com/anthropics/prompt-eng-interactive-tutorial"
+        ),
     ),
     # Slide 32: Closing
     SectionSlide(
