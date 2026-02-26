@@ -68,6 +68,15 @@ Browse to the **Discover** tab, find **context7**, and install it at **user** sc
 > `query-docs`. Any time you ask about a library, Claude can pull current docs
 > rather than relying on training data.
 
+> **What is a plugin?** A plugin is a packaged bundle of Claude Code extensions —
+> commands, skills, agents, hooks, and MCP servers — that you can install in one
+> step. The `/plugin` command connects to **marketplaces** (public or enterprise)
+> where teams publish and discover these packages. Context7 is a community plugin
+> from the public marketplace. In Module 3, we'll install a plugin from our
+> enterprise marketplace that adds document authoring skills.
+>
+> Think of it like npm or pip, but for Claude Code capabilities.
+
 ---
 
 ## 2. Examine Context Utilization
@@ -133,6 +142,12 @@ Read docs/prds/todd-query.md and create a plan to implement the todd query comma
 
 Claude will read the PRD, explore the existing codebase, and return a plan before
 touching any code.
+
+> **Tenet 2: Be specific.** Compare this prompt to a vague "build me a query
+> command." The PRD references exact files (`src/todd/`), specifies dependencies
+> (`claude-agent-sdk`), defines expected output, and lists what's out of scope.
+> Each constraint reduces the space Claude has to guess — and guessing wastes
+> context tokens on clarification loops.
 
 ---
 
@@ -236,7 +251,35 @@ You should see a response from Claude describing which model is active.
 
 ---
 
-## 11. Commit and Proceed
+## 11. Write a Verification Test
+
+Before committing, let's verify the feature with an automated test — not just a
+manual check.
+
+In the chat box, enter:
+
+```markdown
+Write a test for the todd query command in tests/test_query.py.
+The test should verify that the query function returns a non-empty string
+when given a simple prompt. Use pytest and mock the Claude Agent SDK call
+so the test runs without Bedrock credentials.
+```
+
+After Claude creates the test, run it:
+
+```shell
+!uv run pytest tests/ -v
+```
+
+> **Tenet 1: Verify your work.** The `!uv run todd` check from the previous step
+> was a manual spot-check — it proves the feature works *right now*, but it won't
+> catch regressions. An automated test locks in the expected behavior permanently.
+> This is Anthropic's #1 best practice: "Tests and expected outputs are the single
+> highest-leverage thing you can provide."
+
+---
+
+## 12. Commit and Proceed
 
 Ask Claude to commit the changes, then advance to the next module:
 

@@ -147,8 +147,13 @@ SLIDES: list[SlideData] = [
                 "commands, skills, hooks, agents — all defined in .claude/",
                 0,
             ),
+            (
+                "Plugin marketplace: ",
+                "Discover, install, and share packaged extensions via /plugin",
+                0,
+            ),
         ],
-        notes="Claude Code is not a chatbot — it's an agentic tool that operates on your codebase. It reads files, writes code, runs commands, and manages its own workflow through subagents. The extensibility layers — MCP, commands, skills, hooks, agents — are what make it a platform, not just a tool. Each of these extension points will get dedicated coverage in later modules. Transition: Before diving into the modules, let's establish the vocabulary.",
+        notes="Claude Code is not a chatbot — it's an agentic tool that operates on your codebase. It reads files, writes code, runs commands, and manages its own workflow through subagents. The extensibility layers — MCP, commands, skills, hooks, agents — are what make it a platform, not just a tool. Plugins package these extensions for distribution: a single plugin can bundle commands, skills, agents, and hooks into one installable unit. Plugin marketplaces — both the public Anthropic marketplace and private enterprise ones — let teams share and discover these packages. Each extension point gets dedicated coverage in later modules. Transition: Before diving into the modules, let's establish the vocabulary.",
     ),
     # Slide 6: Core Concepts (1/2)
     TwoColumnSlide(
@@ -161,7 +166,7 @@ SLIDES: list[SlideData] = [
             ("Context Rot", " — Quality degrades as context fills", 0),
             ("Context Poisoning", " — Bad info corrupts reasoning", 0),
         ],
-        right=["These concepts thread through every module."],
+        right=["These concepts thread through every module.", "By the end, each becomes an actionable practice."],
         notes="Context is finite and precious. Everything we build in the workshop is designed to manage it well. Transition: The next concepts are about how we structure agent work.",
     ),
     # Slide 7: Core Concepts (2/2)
@@ -174,7 +179,7 @@ SLIDES: list[SlideData] = [
             ("Delegation", " - Offload work to subagents for context savings", 0),
             ("Agent Teams", " — Leader/worker coordination", 0),
         ],
-        right=["These concepts define how agents work at scale."],
+        right=["These concepts define how agents work at scale.", "We'll revisit them as actionable tenets at the end."],
         notes="These concepts define how agents work at scale. We'll see each one in practice as we progress through the modules. Transition: Let's start building. Module 1.",
     ),
     # Slide 8: Module 1 Section Header
@@ -195,8 +200,8 @@ SLIDES: list[SlideData] = [
         title="Summarizing what we have seen",
         bullets=[
             (
-                "Describe intent, get results: ",
-                "Natural language prompts produce working structure with quality gates",
+                "Describe intent, verify results: ",
+                "Natural language prompts produce working structure — hooks verify it automatically",
                 0,
             ),
             (
@@ -215,7 +220,7 @@ SLIDES: list[SlideData] = [
                 0,
             ),
         ],
-        notes="Describe what you want, Claude handles the rest. Pre-commit hooks are back pressure before we even name it. CLAUDE.md shaped everything Claude just did. Transition: Module 2 introduces context management and planning.",
+        notes="Describe what you want, Claude handles the rest. Pre-commit hooks are back pressure before we even name it. CLAUDE.md shaped everything Claude just did. Transition: Module 2 introduces context management and planning.\n\nTenet tracker: #3 (CLAUDE.md + hooks) is the headline. #1 (verify) is partially covered through pre-commit — automated tests come in Module 2.",
     ),
     # Slide 11: Module 2 Section Header
     SectionSlide(
@@ -268,7 +273,7 @@ SLIDES: list[SlideData] = [
             ),
             ("Model selection: ", "Opus / Sonnet / Haiku for different task types", 0),
         ],
-        notes="Context is finite and precious. Rot happens gradually (long sessions). Poisoning happens suddenly (one bad assumption). Subagents are the primary defense against both — each gets a fresh context window. MCP token cost is a real tradeoff: more tools = more capability but less context space. Model selection is about cost-quality tradeoffs, not just 'use the best model.' Transition: Module 3 builds the orchestration layer.",
+        notes="Context is finite and precious. Rot happens gradually (long sessions). Poisoning happens suddenly (one bad assumption). Subagents are the primary defense against both — each gets a fresh context window. MCP token cost is a real tradeoff: more tools = more capability but less context space. Model selection is about cost-quality tradeoffs, not just 'use the best model.' Transition: Module 3 builds the orchestration layer.\n\nTenet tracker: #4 (context is finite) and #5 (explore-plan-code) are the headlines. #1 (verify) gets its first test exercise. #2 (be specific) is demonstrated through the PRD workflow.",
     ),
     # Slide 16: Module 3 Section Header
     SectionSlide(
@@ -281,7 +286,7 @@ SLIDES: list[SlideData] = [
         bullets=[
             "Open `modules/module3.md` for our list of tasks",
         ],
-        notes="Participants follow the steps in module3.md at their own pace. Flag down an assistant if you get stuck.\n\nPresenter talking points:\n- Generate Architecture Reference Document with Mermaid diagrams — Claude as documentation tool, no code written, just analysis\n- Install document-skills plugin from the marketplace\n- Plan orchestration commands from PRD (docs/prds/adw-commands.md) — Claude reads .claude/ scaffolding to understand patterns, explores phase commands, skills, agents before planning\n- Build 4 orchestration commands from PRD: /feature (single-agent, 7 sequential phases), /bug (single-agent, 6 phases), /team:feature (multi-agent, parallel analysis + coordinated implementation), /team:bug (multi-agent, parallel analysis, 6 phases)\n- Create custom agents (.claude/agents/ + YAML frontmatter)\n- Explore PostToolUse lint hook — back pressure after every write\n- Create .claude/rules/ for path-scoped context",
+        notes="Participants follow the steps in module3.md at their own pace. Flag down an assistant if you get stuck.\n\nPresenter talking points:\n- Generate Architecture Reference Document with Mermaid diagrams — Claude as documentation tool, no code written, just analysis\n- Install document-skills plugin from the marketplace\n- Plan orchestration commands from PRD (docs/prds/adw-commands.md) — Claude reads .claude/ scaffolding to understand patterns, explores phase commands, skills, agents before planning\n- Build 4 orchestration commands from PRD: /feature (single-agent, 7 sequential phases), /bug (single-agent, 6 phases), /team:feature (multi-agent, parallel analysis + coordinated implementation), /team:bug (multi-agent, parallel analysis, 6 phases)\n- Create custom agents (.claude/agents/ + YAML frontmatter)\n- Explore PostToolUse lint hook — back pressure after every write",
     ),
     # Slide 18: The Four-Layer Context System (with image)
     ImageSlide(
@@ -329,7 +334,7 @@ SLIDES: list[SlideData] = [
                 0,
             ),
         ],
-        notes="The commands-vs-skills distinction is a key design decision. Commands are explicit — the user or orchestrator invokes them. Skills are implicit — Claude loads them when the task matches. Custom agents are the third extensibility primitive — each scoped with its own model, tools, and constraints. Back pressure via hooks closes the loop immediately: write bad code, get feedback instantly, fix before moving on. The entire system is defined in markdown — no Python, no YAML, just prose. Transition: Module 4 puts it all together.",
+        notes="The commands-vs-skills distinction is a key design decision. Commands are explicit — the user or orchestrator invokes them. Skills are implicit — Claude loads them when the task matches. Custom agents are the third extensibility primitive — each scoped with its own model, tools, and constraints. Back pressure via hooks closes the loop immediately: write bad code, get feedback instantly, fix before moving on. The entire system is defined in markdown — no Python, no YAML, just prose. Transition: Module 4 puts it all together.\n\nTenet tracker: #6 (progressive disclosure) and #7 (agent design) are the headlines. #3 (hooks) deepens with PostToolUse. All foundational tenets (1-3) now have hands-on coverage.",
     ),
     # Slide 23: Module 4 Section Header
     SectionSlide(
@@ -380,7 +385,7 @@ SLIDES: list[SlideData] = [
                 0,
             ),
         ],
-        notes="Two orchestration patterns: code-driven (Python script chains phases via subprocess) and team-driven (leader coordinates workers via SendMessage). Worktrees are the filesystem isolation layer. State files carry ADW ID, completed phases, plan file path, and issue description between phases — making each phase independently resumable. Sandboxing layers up: worktrees protect the filesystem, subagents protect the context window, hooks protect code quality, permission modes protect system access. Agent design is API design — the better defined the interface, the more reliably agents compose. Transition: Module 5 covers the operational side.",
+        notes="Two orchestration patterns: code-driven (Python script chains phases via subprocess) and team-driven (leader coordinates workers via SendMessage). Worktrees are the filesystem isolation layer. State files carry ADW ID, completed phases, plan file path, and issue description between phases — making each phase independently resumable. Sandboxing layers up: worktrees protect the filesystem, subagents protect the context window, hooks protect code quality, permission modes protect system access. Agent design is API design — the better defined the interface, the more reliably agents compose. Transition: Module 5 covers the operational side.\n\nTenet tracker: #8 (scale with isolation) is the headline. All 8 tenets now have coverage. Module 5 reinforces #3, #7, and #8 with operational practices.",
     ),
     # Slide 27: Module 5 Section Header
     SectionSlide(
@@ -421,7 +426,7 @@ SLIDES: list[SlideData] = [
                 0,
             ),
         ],
-        notes="In CI/CD, Claude runs headless with only CLAUDE.md for guidance — the agents defined in Module 3 power this. This is why CLAUDE.md maintenance matters so much. Session persistence means you can pick up where you left off across days. Cost awareness prevents surprise bills — match the model to the task. Checkpointing is the ultimate safety net for experimentation. CLAUDE.md maintenance is ongoing: stale references, contradictory instructions, and vague directives all degrade Claude's performance. Transition: Let's see the big picture.",
+        notes="In CI/CD, Claude runs headless with only CLAUDE.md for guidance — the agents defined in Module 3 power this. This is why CLAUDE.md maintenance matters so much. Session persistence means you can pick up where you left off across days. Cost awareness prevents surprise bills — match the model to the task. Checkpointing is the ultimate safety net for experimentation. CLAUDE.md maintenance is ongoing: stale references, contradictory instructions, and vague directives all degrade Claude's performance. Transition: Let's see the big picture.\n\nTenet tracker: Reinforces #3 (CLAUDE.md maintenance), #7 (custom agents), #8 (headless/CI). Full tenet alignment follows on the next slide.",
     ),
     # Slide 30: The Progression (with image)
     ImageSlide(
@@ -443,6 +448,9 @@ SLIDES: list[SlideData] = [
             ("8. Scale with isolation: ", "Worktrees + teams + headless + sandboxing (Anthropic)", 0),
         ],
         notes=(
+            "Remember slides 6-7? Those defined the vocabulary. These tenets are the practices "
+            "built on that vocabulary. 'Context Window' was the concept; 'Context is finite — "
+            "manage aggressively' is the practice.\n\n"
             "Walk through basics to advanced. Each tenet cites its source.\n\n"
             "FOUNDATIONAL (1-3): Verification is Anthropic's official #1 best practice. "
             "Simon Willison reinforces: 'automated tests are no longer optional with coding agents.' "
