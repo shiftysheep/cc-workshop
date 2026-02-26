@@ -1,19 +1,13 @@
-This repository contains a structure Claude Code workshop. 
-The repository contains branches for each module that will progressively introduce further agentic configuration components. 
-As we build out our application the user will merge the changes from the lower module into the higher modules allowing the agentic features we have configured to be utilized on the applications that are being built. 
+# Todd — Claude Code Workshop
 
-# Quick start
-
-*TBD*
-
-
-# Tech Stack
+## Tech Stack
 
 - Python: 3.13+
-- Package Management: uv
+- Package management: uv
+- CLI framework: Typer
 - Tests: pytest
 - Hooks: pre-commit (ruff, mypy strict, bandit, vulture, xenon)
 
-# Ruff: 
-    
-- rules: E, W, F, I, N, UP,  B, C4, PLC, PLE, PLW, RUF
+## Pre-execution Checklist
+
+Before building or running any code, verify that pre-commit hooks are configured and installed. If no `.pre-commit-config.yaml` exists, create one. Always run `uv run pre-commit install` to ensure hooks are active before the first commit.
