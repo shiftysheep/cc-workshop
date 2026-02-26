@@ -1,9 +1,5 @@
 # Todd — Claude Code Workshop
 
-Todd is a Typer CLI application built progressively through a structured Claude Code
-workshop. Each module introduces new agentic capabilities — from project scaffolding
-to parallel agent teams.
-
 ## Tech Stack
 
 - Python: 3.13+
@@ -12,7 +8,7 @@ to parallel agent teams.
 - Tests: pytest
 - Hooks: pre-commit (ruff, mypy strict, bandit, vulture, xenon)
 
-## Development Commands
+## Pre-execution Checklist
 
 ```shell
 # Run the CLI
