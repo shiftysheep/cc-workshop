@@ -1,6 +1,6 @@
 # Module 2: MCP, Plan Mode, and the Claude Agent SDK
 
-In this module we'll install our first MCP server, explore how it affects context,
+In this module we'll install our first MCP server, explore how tools load on demand via ToolSearch,
 switch to a more capable model for planning, and build a real feature using the
 Claude Agent SDK.
 
@@ -81,8 +81,7 @@ Browse to the **Discover** tab, find **context7**, and install it at **user** sc
 
 ## 2. Examine Context Utilization
 
-MCP servers add tools to Claude's context window on every request. Let's see what
-that looks like before we start building.
+MCP servers register tools that Claude discovers on demand via ToolSearch. Let's see what your context looks like before we start building.
 
 In the chat box, run:
 
@@ -91,12 +90,9 @@ In the chat box, run:
 ```
 
 The colored grid shows how much of your context window is currently in use. Note the
-baseline now that Context7 is installed — tool definitions for MCP servers consume
-tokens even when the tools aren't called.
+baseline now that Context7 is installed — MCP tool definitions are deferred via ToolSearch and only load into context when Claude needs them. This keeps your idle context lean.
 
-> **Why this matters:** Context is finite. Knowing your utilization helps you decide
-> when to use subagents (which get their own fresh context window) versus working
-> directly in the main conversation.
+> **Why this matters:** Context is finite. With ToolSearch, MCP tools no longer add idle overhead — but once loaded, they stay in context for the session. Subagents remain valuable because each gets a fresh context window with only the tools it needs.
 
 ---
 
