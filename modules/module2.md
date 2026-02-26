@@ -48,65 +48,6 @@ one does:
 
 ---
 
-## Built-in Slash Commands
-
-Claude Code ships with a set of built-in slash commands. You'll use several of them
-in this module. Custom commands — which we'll build in Module 3 — extend this list
-with your own workflows.
-
-**Session & model**
-
-| Command | Description |
-|---------|-------------|
-| `/model` | Switch the active model |
-| `/resume` | Resume a previous session by ID, name, or picker |
-| `/rename` | Rename the current session |
-| `/clear` | Clear conversation history |
-| `/compact` | Compact conversation to free context, with optional focus instructions |
-| `/rewind` | Rewind conversation and/or code to a previous point |
-
-**Context & visibility**
-
-| Command | Description |
-|---------|-------------|
-| `/context` | Visualize context window usage as a colored grid |
-| `/cost` | Show token usage for the current session |
-| `/stats` | Show daily usage, session history, and model preferences |
-| `/usage` | Show plan limits and rate limit status |
-| `/tasks` | List and manage background tasks |
-| `/todos` | List current TODO items |
-
-**Configuration**
-
-| Command | Description |
-|---------|-------------|
-| `/plugin` | Browse and install plugins from the marketplace |
-| `/mcp` | Manage MCP server connections |
-| `/permissions` | View or update tool permissions |
-| `/memory` | Edit CLAUDE.md memory files |
-| `/init` | Initialize a project with a CLAUDE.md |
-| `/statusline` | Configure the status line |
-| `/config` | Open settings |
-| `/theme` | Change the color theme |
-| `/vim` | Enable vim-style editing |
-
-**Utilities**
-
-| Command | Description |
-|---------|-------------|
-| `/plan` | Enter plan mode |
-| `/export` | Export the conversation to a file or clipboard |
-| `/copy` | Copy the last response to clipboard |
-| `/debug` | Read the session debug log |
-| `/doctor` | Check Claude Code installation health |
-| `/help` | Show usage help |
-| `/exit` | Exit the session |
-
-> **Note:** MCP servers can also expose prompts that appear as slash commands in the
-> format `/mcp__<server>__<prompt_name>`.
-
----
-
 ## 1. Install the Context7 MCP Server
 
 Context7 is an MCP server that injects live, version-specific library documentation
@@ -150,7 +91,7 @@ tokens even when the tools aren't called.
 
 ---
 
-## 3. Switch to Opus + Plan Mode
+## 3. Switch to Opus Plan Mode
 
 For the next task we're going to ask Claude to architect and implement a new feature.
 This is exactly the kind of consequential, multi-step work that benefits from a more
@@ -162,15 +103,8 @@ In the chat box, run:
 /model opusplan
 ```
 
-> **What is `opusplan`?** It's a hybrid model alias:
->
-> | Phase | Model | Purpose |
-> |-------|-------|---------|
-> | Planning | Opus 4.6 | Deep reasoning, architecture decisions |
-> | Execution | Sonnet 4.6 | Code generation, implementation |
->
-> Compare to `/model opus` which uses Opus for everything (higher cost). `opusplan`
-> gives you Opus reasoning where it matters most and Sonnet speed for the rest.
+> Run `/model opusplan` to switch. We'll explain what this model alias does after
+> you've seen it in action during plan mode.
 
 ---
 
@@ -268,7 +202,29 @@ writing the code described in the plan.
 
 ---
 
-## 9. Test the New Command
+## 9. Understanding Model Selection
+
+Claude Code supports multiple models, each suited to different tasks:
+
+| Model | Strengths | Typical use |
+|-------|-----------|-------------|
+| **Opus 4.6** | Deep reasoning, architecture, complex analysis | Planning, code review, design decisions |
+| **Sonnet 4.6** | Fast, capable code generation | Implementation, refactoring, most daily work |
+| **Haiku 4.5** | Lightweight, very fast | Exploration subagents, simple searches |
+
+The `opusplan` alias you used earlier is a hybrid mode:
+
+| Phase | Model | Purpose |
+|-------|-------|---------|
+| Planning | Opus 4.6 | Deep reasoning, architecture decisions |
+| Execution | Sonnet 4.6 | Code generation, implementation |
+
+Compare to `/model opus` which uses Opus for everything (higher cost). `opusplan`
+gives you Opus reasoning where it matters most and Sonnet speed for the rest.
+
+---
+
+## 10. Test the New Command
 
 Once Claude is done, verify it works directly from the chat box:
 
@@ -280,7 +236,7 @@ You should see a response from Claude describing which model is active.
 
 ---
 
-## 10. Commit and Proceed
+## 11. Commit and Proceed
 
 Ask Claude to commit the changes, then advance to the next module:
 
