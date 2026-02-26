@@ -208,3 +208,10 @@ __marimo__/
 *.local.*
 docs/plans/
 docs/specs/
+
+# Workshop slide outputs
+docs/workshop-slides.pptx
+docs/~$*.pptx
+workshop-slides.pdf
+*.potx
+.DS_Store
