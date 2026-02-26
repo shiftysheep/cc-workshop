@@ -77,7 +77,7 @@ SLIDES: list[SlideData] = [
     # Slide 1: Title slide
     TitleSlide(
         title="Claude Code in Depth",
-        subtitle="Totally not a chat bot: harness your context for increased velocity",
+        subtitle="Totally not a chat bot:\nharness your context for increased velocity",
         notes="Welcome to the Claude Code workshop. This session takes you from zero to a fully operational agentic delivery system in five progressive modules. Each module builds on the last — by the end, you'll have working orchestration commands, agent teams, and CI/CD integration. The focus is on principles of agentic coding, not just the project we build.",
     ),
     # Slide 2: Prerequisites
@@ -171,6 +171,7 @@ SLIDES: list[SlideData] = [
             ("Progressive Disclosure", " — Reveal info incrementally", 0),
             ("Back Pressure", " — Resist bad output via hooks", 0),
             ("Sandboxing", " — Isolation limits blast radius", 0),
+            ("Delegation", " - Offload work to subagents for context savings", 0),
             ("Agent Teams", " — Leader/worker coordination", 0),
         ],
         right=["These concepts define how agents work at scale."],
@@ -179,7 +180,7 @@ SLIDES: list[SlideData] = [
     # Slide 8: Module 1 Section Header
     SectionSlide(
         title="Module 1: Project Scaffolding",
-        notes="Module 1 establishes the foundation. Everything built here — the project structure, quality gates, CLAUDE.md — persists through all subsequent modules. The key insight is that Claude is a scaffolding tool: describe what you want in natural language, get a working project with quality enforcement from commit one. Transition: Here's what we actually do.",
+        notes="Module 1 establishes the foundation. Everything built here — the project structure, quality gates, CLAUDE.md — persists through all subsequent modules. The key insight is that Claude is a general-purpose agentic tool: describe what you want in natural language, get a working project with quality enforcement from commit one. Transition: Here's what we actually do.",
     ),
     # Slide 9: M1 What We Do
     ContentSlide(
@@ -194,8 +195,8 @@ SLIDES: list[SlideData] = [
         title="Summarizing what we have seen",
         bullets=[
             (
-                "Claude as scaffolding tool: ",
-                "Describe intent, get working structure with quality gates",
+                "Describe intent, get results: ",
+                "Natural language prompts produce working structure with quality gates",
                 0,
             ),
             (
@@ -214,7 +215,7 @@ SLIDES: list[SlideData] = [
                 0,
             ),
         ],
-        notes="Scaffolding lets you focus on intent while Claude handles boilerplate. Pre-commit hooks are back pressure before we even name it. CLAUDE.md shaped everything Claude just did. Transition: Module 2 introduces context management and planning.",
+        notes="Describe what you want, Claude handles the rest. Pre-commit hooks are back pressure before we even name it. CLAUDE.md shaped everything Claude just did. Transition: Module 2 introduces context management and planning.",
     ),
     # Slide 11: Module 2 Section Header
     SectionSlide(

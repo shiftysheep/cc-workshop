@@ -26,6 +26,9 @@ uv run mypy src/
 
 # Linting
 uv run ruff check src/ tests/
+
+# Install pre-commit hooks (run once after clone)
+uv run pre-commit install
 ```
 
 ## Coding Standards
