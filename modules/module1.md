@@ -58,97 +58,27 @@ Claude will create the project structure: `pyproject.toml`, the `src/todd/` pack
 a `hello` command wired up with Typer, and code quality tooling (ruff, mypy,
 pre-commit).
 
-> **What just happened?** Claude used `Write` and `Bash` to build the entire project
-> structure — no manual file creation needed. This is Claude Code as a scaffolding
-> tool: describe what you want, get a working foundation. Notice the pre-commit hooks
-> in the output — every commit from here will run linting and type checking
-> automatically, enforcing quality from the start.
+> **What just happened?** Claude used `Write` and `Bash` to build the entire project structure — no manual file creation needed.
+> Claude harnessed our existing tooling to respond to our natural language request.
+> Notice the pre-commit hooks in the output — these instructions came from our CLAUDE.md that was predefined.
+> Now every commit from here will run linting and type checking automatically, enforcing quality from the start.
+> This is one form of back pressure we can utilize to drive quality output.
 
 ---
 
 ## 3. Verify the Setup
 
-Test the new command directly from the chat box using the `!` prefix to run shell
-commands:
+Test the new command directly from the chat box using the `!` prefix to run shell commands:
 
 ```shell
 !uv run todd hello
 ```
 
-You should see `Hello from todd.` (or similar) printed to the terminal.
+You should see `Hello. How can I assist?` (or similar) printed to the terminal.
 
 ---
 
-## 4. Configure the Status Line
-
-The status line gives you a persistent heads-up display at the bottom of the
-terminal. In the chat box, run:
-
-```markdown
-/statusline Show {model short name} | {context}% context | {cwd} | {git_status} | {branch} where git status is green "clean" or yellow "modified" using ANSI colors, and omit git fields if not in a repo.
-```
-
-> **What just happened?** `/statusline` is a built-in Claude Code slash command that
-> configures a persistent display at the bottom of your terminal. You'll see the
-> active model, how much of the context window is in use, your working directory, and
-> the git status. This HUD becomes more useful in later modules as context management
-> and model switching become part of your workflow.
-
----
-
-## 5. CLI Navigation Essentials
-
-Now that the project is scaffolded, let's learn the shortcuts you'll use every day.
-
-**`@` file references** — type `@pyproject.toml` in the chat box to reference a file
-without copying its full content. Claude reads the file on demand.
-
-**`!` bash mode** — prefix with `!` to run shell commands directly (you already used
-this in step 3). It's shorthand for asking Claude to run a Bash tool call.
-
-**Multiline input** — `\` + Enter for a quick line continuation, or `Shift+Enter` for
-a new line in the prompt.
-
-**`Ctrl+G`** — open the current prompt in your default text editor for longer edits.
-
-> **Exercise:** Type `@src/todd/__init__.py` to reference the init file, then run
-> `!uv run todd hello` to verify the CLI still works.
-
----
-
-## 6. Permission Modes
-
-Claude Code has three permission modes, cycled with `Shift+Tab`:
-
-| Mode | Status line | Behavior |
-|------|-------------|----------|
-| **Normal** (default) | No indicator | Prompts for confirmation on file edits and shell commands |
-| **Auto-Accept** | `⚡ auto-accept` | Skips file edit confirmations; still prompts for shell commands |
-| **Plan** | `⏸ plan mode` | Read-only — Claude explores and plans but cannot write or edit files |
-
-> **Callout:** You'll use Plan mode extensively in Module 2. For now, cycle through the
-> modes with `Shift+Tab` to see the status line update.
-
----
-
-## 7. Essential Commands
-
-Claude Code ships with built-in slash commands. Here are the ones you'll use most:
-
-| Command | What it does |
-|---------|-------------|
-| `/context` | Visual grid showing context window usage |
-| `/cost` | Token usage and cost for this session |
-| `/compact` | Compress conversation to free context — use when responses degrade |
-| `/clear` | Reset context entirely between unrelated tasks |
-| `/help` | Full command list |
-
-> **Exercise:** Run `/context` and `/cost` to see your current session state.
-> You'll revisit these throughout the workshop as context management becomes critical.
-
----
-
-## 8. Your First CLAUDE.md
+## 4. Your First CLAUDE.md
 
 CLAUDE.md is the single most impactful Claude Code feature. It provides persistent
 project instructions that load automatically every session.
@@ -179,7 +109,44 @@ Update the project CLAUDE.md to include:
 
 ---
 
-## 9. Commit and Proceed
+## 5. Configure the Status Line
+
+The status line gives you a persistent heads-up display at the bottom of the terminal.
+In the chat box, run:
+
+```markdown
+/statusline Show {model short name} | {context}% context | {cwd} | {git_status} | {branch} where git status is green "clean" or yellow "modified" using ANSI colors, and omit git fields if not in a repo.
+```
+
+> **What just happened?** `/statusline` is a built-in Claude Code slash command that configures a persistent display at the bottom of your terminal.
+> You'll see the active model, how much of the context window is in use, your working directory, and the git status.
+> This HUD becomes more useful in later modules as context management and model switching become part of your workflow.
+> There are many other built-in slash commands you can see if you just type `/` in the chat window.
+> For a full list, see the [Anthropic docs on slash commands](https://docs.anthropic.com/en/docs/claude-code/cli-usage#slash-commands).
+
+---
+
+## 6. CLI Navigation Essentials
+
+Now that the project is scaffolded, let's learn the shortcuts you'll use every day.
+
+**`@` file references** — type `@pyproject.toml` in the chat box to reference a file
+without copying its full content. Claude reads the file on demand.
+
+**`!` bash mode** — prefix with `!` to run shell commands directly (you already used
+this in step 3). It's shorthand for asking Claude to run a Bash tool call.
+
+**Multiline input** — `\` + Enter for a quick line continuation, or `Shift+Enter` for
+a new line in the prompt.
+
+**`Ctrl+G`** — open the current prompt in your default text editor for longer edits.
+
+> **Exercise:** Type `@src/todd/__init__.py` to reference the init file, then run
+> `!uv run todd hello` to verify the CLI still works.
+
+---
+
+## 7. Commit and Proceed
 
 Ask Claude to commit the changes (including the CLAUDE.md update), then advance to
 the next module:
