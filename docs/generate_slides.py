@@ -72,7 +72,7 @@ class TwoColumnSlide(SlideData):
     right: list[Bullet] = field(default_factory=list)
 
 
-# All 32 slides in exact order
+# All 33 slides in exact order
 SLIDES: list[SlideData] = [
     # Slide 1: Title slide
     TitleSlide(
@@ -123,7 +123,34 @@ SLIDES: list[SlideData] = [
         ],
         notes="Frame this as a hands-on journey. Where we'll progressively build up capabilities and complexity. Transition: Let's start with what Claude Code actually is.",
     ),
-    # Slide 5: What Is Claude Code?
+    # Slide 5: How Modules Work
+    ContentSlide(
+        title="How Modules Work",
+        bullets=[
+            (
+                "Each module has a guide: ",
+                "`modules/moduleN.md` — follow it step by step",
+                0,
+            ),
+            (
+                "When you finish a module: ",
+                "run `/module` in Claude Code to advance",
+                0,
+            ),
+            (
+                "What `/module` does: ",
+                "merges your branch forward into the next module branch",
+                0,
+            ),
+            (
+                "Your work carries forward: ",
+                "each module builds on everything you've built so far",
+                0,
+            ),
+        ],
+        notes="Orient participants before they start. The module files are the source of truth for exercises — they follow those, not the slides. The /module command is the transition mechanism: it merges the current branch into the next, so nothing is lost. Participants work at their own pace; the command handles the git logistics.",
+    ),
+    # Slide 6: What Is Claude Code?
     ContentSlide(
         title="What Is Claude Code?",
         bullets=[
@@ -155,7 +182,7 @@ SLIDES: list[SlideData] = [
         ],
         notes="Claude Code is not a chatbot — it's an agentic tool that operates on your codebase. It reads files, writes code, runs commands, and manages its own workflow through subagents. The extensibility layers — MCP, commands, skills, hooks, agents — are what make it a platform, not just a tool. Plugins package these extensions for distribution: a single plugin can bundle commands, skills, agents, and hooks into one installable unit. Plugin marketplaces — both the public Anthropic marketplace and private enterprise ones — let teams share and discover these packages. Each extension point gets dedicated coverage in later modules. Transition: Before diving into the modules, let's establish the vocabulary.",
     ),
-    # Slide 6: Quality Tenets — Foundations
+    # Slide 7: Quality Tenets — Foundations
     ContentSlide(
         title="Quality Tenets: Foundations",
         bullets=[
@@ -177,7 +204,7 @@ SLIDES: list[SlideData] = [
             "Transition: The next four tenets build on these foundations."
         ),
     ),
-    # Slide 7: Quality Tenets — At Scale
+    # Slide 8: Quality Tenets — At Scale
     ContentSlide(
         title="Quality Tenets: At Scale",
         bullets=[
@@ -194,57 +221,41 @@ SLIDES: list[SlideData] = [
             "'Delegation' offloads work to subagents for context savings.\n\n"
             "Module mapping: #5 is the M2 headline (plan mode workflow). "
             "#6 is the M3 headline (four-layer context system). "
-            "#7 spans M3 (custom agents) through M5 (custom subagents). "
+            "#7 is the M3 headline (custom agents and custom subagents) extended in M4 (team workers). "
             "#8 is the M4 headline (worktrees + teams) extended in M5 (headless/CI).\n\n"
             "Transition: Let's start building. Module 1."
         ),
     ),
-    # Slide 8: Module 1 Section Header
+    # Slide 9: Module 1 Section Header
     SectionSlide(
-        title="Module 1: Project Scaffolding",
-        notes="Module 1 establishes the foundation. Everything built here — the project structure, quality gates, CLAUDE.md — persists through all subsequent modules. The key insight is that Claude is a general-purpose agentic tool: describe what you want in natural language, get a working project with quality enforcement from commit one. Transition: Here's what we actually do.",
+        title="Module 1: Pre-commit + CLAUDE.md",
+        notes="Module 1 establishes the baseline: set up the tools, configure quality gates, and let Claude build a simple Typer CLI app from a natural language prompt. The workshop starts slow on purpose — scaffolding a CLI is boring but demonstrates Claude operating on your behalf. Claude is doing, not planning. Pre-commit hooks are back pressure (automated quality gates). CLAUDE.md shapes Claude's behavior across sessions. These patterns scale. Transition: What we do in this module.",
     ),
-    # Slide 9: M1 What We Do
+    # Slide 10: M1 Let's get to work
     ContentSlide(
         title="Let's get to work",
         bullets=[
             "Open `modules/module1.md` for our list of tasks",
         ],
-        notes="Participants follow the steps in module1.md at their own pace. Flag down an assistant if you get stuck.",
+        notes="Participants follow the steps in module1.md at their own pace. Flag down an assistant if you get stuck.\n\nPresenter talking points:\n- Install uv (Python package manager)\n- Configure Claude CLI (Bedrock profile)\n- Scaffold a Typer CLI app from a natural language prompt — Claude reads uv docs, decides structure, writes code, tests pass\n- Pre-commit hooks enforce quality gates automatically — ruff, mypy, bandit, etc.\n- Verify Claude followed your CLAUDE.md instructions by inspecting the generated code\n\nThe key insight: Claude is not a chatbot. It's an autonomous tool that can read, write, run commands, make decisions. Pre-commit hooks provide back pressure. CLAUDE.md provides persistent memory.\n\nTransition: Describe what you want, Claude handles the rest. Pre-commit hooks are back pressure before we even name it. CLAUDE.md shaped everything Claude just did.",
     ),
-    # Slide 10: M1 Why It Matters
+    # Slide 11: M1 Summary
     ContentSlide(
         title="Summarizing what we have seen",
         bullets=[
-            (
-                "Describe intent, verify results: ",
-                "Natural language prompts produce working structure — hooks verify it automatically",
-                0,
-            ),
-            (
-                "Quality from commit one: ",
-                "Pre-commit hooks (ruff, mypy, bandit) enforce standards automatically",
-                0,
-            ),
-            (
-                "CLAUDE.md as persistent memory: ",
-                "Three scopes — global, project, personal — shape every session",
-                0,
-            ),
-            (
-                "Built-in tools: ",
-                "Write, Edit, Bash, Read — Claude's core capabilities for file operations",
-                0,
-            ),
+            ("Pre-commit hooks: ", "Automated quality gates enforce standards", 0),
+            ("CLAUDE.md: ", "Persistent memory shapes behavior across sessions", 0),
+            ("Simple prompt → full app: ", "Claude scaffolds, writes, tests autonomously", 0),
+            ("Back pressure: ", "Hooks reject bad output before it commits", 0),
         ],
-        notes="Describe what you want, Claude handles the rest. Pre-commit hooks are back pressure before we even name it. CLAUDE.md shaped everything Claude just did. Transition: Module 2 introduces context management and planning.\n\nTenet tracker: #3 (CLAUDE.md + hooks) is the headline. #1 (verify) is partially covered through pre-commit — automated tests come in Module 2.",
+        notes="Describe what you want, Claude handles the rest. Pre-commit hooks are back pressure before we even name it. CLAUDE.md shaped everything Claude just did. Transition: Module 2 introduces context management and planning.",
     ),
-    # Slide 11: Module 2 Section Header
+    # Slide 12: Module 2 Section Header
     SectionSlide(
         title="Module 2: MCP, Plan Mode, and Agent SDK",
-        notes="Module 2 introduces the critical concept of context as a finite resource. You'll install your first MCP server, see how it affects context usage, switch models for planning, and build a real feature through plan mode. The key progression: Module 1 was about Claude doing things for you. Module 2 is about Claude thinking before doing. Transition: What we do in this module.",
+        notes="Module 2 introduces the critical concept of context as a finite resource. You'll install your first MCP server, see how MCP tools load on demand via ToolSearch, switch models for planning, and build a real feature through plan mode. The key progression: Module 1 was about Claude doing things for you. Module 2 is about Claude thinking before doing. Transition: What we do in this module.",
     ),
-    # Slide 12: M2 What We Do
+    # Slide 13: M2 What We Do
     ContentSlide(
         title="Let's get to work",
         bullets=[
@@ -252,19 +263,19 @@ SLIDES: list[SlideData] = [
         ],
         notes="Participants follow the steps in module2.md at their own pace. Flag down an assistant if you get stuck.",
     ),
-    # Slide 13: The Context Window (with image)
+    # Slide 14: The Context Window (with image)
     ImageSlide(
         title="The Context Window",
         image="images/context_window_utilization.png",
-        notes="This is the most important conceptual slide. Walk through each layer. System prompt and CLAUDE.md are always present — they're the 'tax' on every interaction. Tool definitions from MCP servers add up (Context7 alone adds several hundred tokens). Conversation history is the biggest consumer — this is why /compact and /clear matter. File contents are loaded on demand but can be huge. The 'available space' is what Claude has for actual reasoning. When it shrinks too much, that's context rot in action. Transition: Now let's see how subagents protect this window.",
+        notes="This is the most important conceptual slide. Walk through each layer. System prompt and CLAUDE.md are always present — they're the 'tax' on every interaction. MCP tool definitions are deferred via ToolSearch — they load into context only when Claude discovers them. This is progressive disclosure at the tool level. Conversation history is the biggest consumer — this is why /compact and /clear matter. File contents are loaded on demand but can be huge. The 'available space' is what Claude has for actual reasoning. When it shrinks too much, that's context rot in action. Transition: Now let's see how subagents protect this window.",
     ),
-    # Slide 14: Subagent Context Isolation (with image)
+    # Slide 15: Subagent Context Isolation (with image)
     ImageSlide(
         title="Subagent Context Isolation",
         image="images/subagent_context_savings.png",
         notes="This diagram shows how subagents protect the main context window. When Claude needs to search 40+ files or do deep research, it spawns a subagent — typically Haiku for cheap exploration, Opus for architecture decisions. Each subagent gets its own fresh context window. The search noise (file contents, failed matches, irrelevant results) stays in the subagent's window. Only a compact summary flows back to the main conversation. This is the primary defense against context rot: delegate the noisy work, keep the main window clean. Point out the three subagent types: two Explore agents running Haiku for fast, cheap searches, and one Plan agent running Opus for deeper reasoning. Transition: Module 3 builds the orchestration layer.",
     ),
-    # Slide 15: M2 Summary
+    # Slide 16: M2 Summary
     ContentSlide(
         title="Summarizing what we have seen",
         bullets=[
@@ -274,8 +285,8 @@ SLIDES: list[SlideData] = [
                 0,
             ),
             (
-                "MCP tools cost tokens idle: ",
-                "Every server adds baseline context overhead",
+                "MCP tools load on demand: ",
+                "ToolSearch defers definitions until needed — no idle cost",
                 0,
             ),
             (
@@ -290,168 +301,144 @@ SLIDES: list[SlideData] = [
             ),
             ("Model selection: ", "Opus / Sonnet / Haiku for different task types", 0),
         ],
-        notes="Context is finite and precious. Rot happens gradually (long sessions). Poisoning happens suddenly (one bad assumption). Subagents are the primary defense against both — each gets a fresh context window. MCP token cost is a real tradeoff: more tools = more capability but less context space. Model selection is about cost-quality tradeoffs, not just 'use the best model.' Transition: Module 3 builds the orchestration layer.\n\nTenet tracker: #4 (context is finite) and #5 (explore-plan-code) are the headlines. #1 (verify) gets its first test exercise. #2 (be specific) is demonstrated through the PRD workflow.",
+        notes="Context is finite and precious. Rot happens gradually (long sessions). Poisoning happens suddenly (one bad assumption). Subagents are the primary defense against both — each gets a fresh context window. MCP tools are deferred via ToolSearch — no idle context cost. Once loaded, definitions do consume context, so selective loading matters. This is progressive disclosure at the tool level. Model selection is about cost-quality tradeoffs, not just 'use the best model.' Transition: Module 3 builds the orchestration layer.\n\nTenet tracker: #4 (context is finite) and #5 (explore-plan-code) are the headlines. #1 (verify) gets its first test exercise. #2 (be specific) is demonstrated through the PRD workflow.",
     ),
-    # Slide 16: Module 3 Section Header
+    # Slide 17: Module 3 Section Header
     SectionSlide(
         title="Module 3: ADW Foundations",
-        notes="Module 3 builds the full extensibility layer. We create commands, skills, hooks, rules, and custom agents — all in .claude/. The key insight: all of this is markdown and configuration — no code. Claude's behavior is shaped by prose instructions, not programming. This is prompt-driven orchestration. Transition: Here's what we actually do.",
+        notes="Module 3 builds the full extensibility layer. We create commands, skills, hooks, rules, and custom agents — all in .claude/. The key insight: all of this is markdown and configuration — no code. Claude's behavior is shaped by prose instructions, not programming. This is prompt-driven orchestration. Transition: What we do.",
     ),
-    # Slide 17: M3 Let's get to work
+    # Slide 18: M3 Let's get to work
     ContentSlide(
         title="Let's get to work",
         bullets=[
             "Open `modules/module3.md` for our list of tasks",
         ],
-        notes="Participants follow the steps in module3.md at their own pace. Flag down an assistant if you get stuck.\n\nPresenter talking points:\n- Generate Architecture Reference Document with Mermaid diagrams — Claude as documentation tool, no code written, just analysis\n- Install document-skills plugin from the marketplace\n- Plan orchestration commands from PRD (docs/prds/adw-commands.md) — Claude reads .claude/ scaffolding to understand patterns, explores phase commands, skills, agents before planning\n- Build 4 orchestration commands from PRD: /feature (single-agent, 7 sequential phases), /bug (single-agent, 6 phases), /team:feature (multi-agent, parallel analysis + coordinated implementation), /team:bug (multi-agent, parallel analysis, 6 phases)\n- Create custom agents (.claude/agents/ + YAML frontmatter)\n- Explore PostToolUse lint hook — back pressure after every write",
+        notes="Participants follow the steps in module3.md at their own pace. Flag down an assistant if you get stuck.\n\nPresenter talking points:\n- Generate Architecture Reference Document with Mermaid diagrams — Claude as documentation tool, no code written, just analysis\n- Install document-skills plugin from the marketplace\n- Plan orchestration commands from PRD (docs/prds/adw-commands.md) — Claude reads .claude/ scaffolding to understand patterns, explores phase commands, skills, agents before planning\n- Build 4 orchestration commands from PRD: /feature (single-agent, 7 sequential phases), /bug (single-agent, 6 phases), /team:feature (multi-agent, parallel analysis + coordinated implementation), /team:bug (multi-agent, parallel analysis, 6 phases)\n- Create custom agents (.claude/agents/ + YAML frontmatter) — code-reviewer exercise teaches agent anatomy, then three ADW specialist agents\n- Explore PostToolUse lint hook — back pressure after every write",
     ),
-    # Slide 18: The Four-Layer Context System (with image)
+    # Slide 19: The Four-Layer Context System (with image)
     ImageSlide(
         title="The Four-Layer Context System",
         image="images/fourlayer_context_system.png",
         notes="This is the architectural insight of Module 3. The four layers form a progressive disclosure system. CLAUDE.md is always present (broad but essential). Rules narrow to specific directories. Skills narrow to specific task types. Hooks narrow to specific actions. The key insight: context is delivered at the moment it's needed, at the right scope. This prevents context bloat while ensuring Claude always has what it needs. Transition: Let's dig deeper into when progressive disclosure works and when it doesn't.",
     ),
-    # Slide 19: Progressive Disclosure (with image)
+    # Slide 20: Progressive Disclosure (with image)
     ImageSlide(
         title="Progressive Disclosure",
         image="images/progressive_disclosure.png",
         notes="Progressive disclosure is the difference between a productive session and context rot. The four-layer funnel: CLAUDE.md (always-on) → rules/ (directory-scoped) → skills (task-scoped) → hooks (event-scoped). Each layer narrows scope and timing. Anti-patterns include: dumping 100KB+ in system prompt, loading all reference docs 'just in case', same context for every workflow phase, hiding context the agent needs now. Nielsen Norman research shows 3+ disclosure levels cause confusion even for humans. Progressive disclosure doesn't mean hiding information — it means delivering it at the right time. If an agent needs reference docs NOW, load them NOW. Transition: The other side of quality — back pressure.",
     ),
-    # Slide 20: Back Pressure: Three Layers (with image)
+    # Slide 21: Back Pressure (with image)
     ImageSlide(
-        title="Back Pressure: Three Layers",
-        image="images/back_pressure_layers.png",
-        notes="Back pressure means the system actively resists bad output. Three layers, each catching different problems at different times. Immediate: Static analysis gates — ruff + mypy fire on every .py write (PostToolUse) and block commits (pre-commit). Workflow-level: TDD (failing test first, code must make it pass), plan mode (read-only gate prevents premature coding), agent validation (plan verified before implementation begins), spec-driven (PRDs constrain scope, reject out-of-scope work). Post-hoc: CI/CD (GitHub Actions blocks merge on failure), code review (human gate with required approvals). Key principle: the earlier you catch problems, the cheaper they are to fix. Transition: Let's look at custom agent anatomy.",
-    ),
-    # Slide 21: Anatomy of a Custom Agent (with image)
-    ImageSlide(
-        title="Anatomy of a Custom Agent",
-        image="images/agent_anatomy.png",
-        notes="Walk through each field. Name and description control when Claude delegates to this agent. Model selection is a cost decision — Haiku for cheap read-only analysis. Tools is an allowlist — the agent can ONLY use these tools, nothing else. permissionMode controls whether the agent can act without confirmation. maxTurns prevents runaway execution. skills preloads specific skills into the agent's context. The system prompt body (below the frontmatter) is where you define the agent's behavior, output format, and constraints. This is agent design as API design: clear inputs, clear outputs, single responsibility. Transition: Module 4 puts it all together.",
+        title="Back Pressure",
+        image="images/back_pressure.png",
+        notes="Back pressure is the system's resistance to bad output. Pre-commit hooks (M1) are the first layer — reject malformed commits. PostToolUse hooks (M3) are the second layer — inspect write operations before they land. Plan mode (M2) is architectural back pressure — think before writing. Tests (M1-M2) are verification back pressure — prove it works before you commit it. The goal: detect failure as early as possible. The later a failure is caught, the more expensive it is to fix. Hooks are cheap back pressure. They run synchronously, provide immediate feedback, and cost nothing if output is correct. Transition: Module 4 builds on this foundation by adding team-based orchestration.",
     ),
     # Slide 22: M3 Summary
     ContentSlide(
         title="Summarizing what we have seen",
         bullets=[
-            ("Commands vs Skills: ", "Explicit invocation vs automatic loading", 0),
             (
-                "Agent design = API design: ",
-                "Model, tools, skills, scope — composable workers",
+                "Four-layer context system: ",
+                "CLAUDE.md → rules/ → skills/ → hooks/",
                 0,
             ),
             (
                 "Progressive disclosure: ",
-                "Context at the right scope, at the right time",
+                "Deliver context at the right time and scope",
                 0,
             ),
-            ("Back pressure via hooks: ", "Resists bad output after every write", 0),
             (
-                "Prompt-driven orchestration: ",
-                "All extensibility defined in markdown, no code",
+                "Back pressure: ",
+                "Hooks and gates reject bad output early",
+                0,
+            ),
+            (
+                "Custom agents: ",
+                "YAML frontmatter + markdown instructions",
+                0,
+            ),
+            (
+                "Orchestration commands: ",
+                "Phase-driven workflows via /command",
                 0,
             ),
         ],
-        notes="The commands-vs-skills distinction is a key design decision. Commands are explicit — the user or orchestrator invokes them. Skills are implicit — Claude loads them when the task matches. Custom agents are the third extensibility primitive — each scoped with its own model, tools, and constraints. Back pressure via hooks closes the loop immediately: write bad code, get feedback instantly, fix before moving on. The entire system is defined in markdown — no Python, no YAML, just prose. Transition: Module 4 puts it all together.\n\nTenet tracker: #6 (progressive disclosure) and #7 (agent design) are the headlines. #3 (hooks) deepens with PostToolUse. All foundational tenets (1-3) now have hands-on coverage.",
+        notes="Module 3 is the turning point. We went from 'Claude does things' (M1) and 'Claude plans things' (M2) to 'Claude orchestrates workflows' (M3). The four-layer context system is the architectural win. Back pressure is the quality win. Custom agents are the extensibility win. Orchestration commands are the productivity win. Everything from here scales on this foundation.\n\nTenet tracker: #6 (progressive disclosure) is the M3 headline. #3 (CLAUDE.md + hooks) deepened with PostToolUse. #7 (agent design) introduced through custom agent YAML.",
     ),
     # Slide 23: Module 4 Section Header
     SectionSlide(
-        title="Module 4: Agentic Delivery Workflows",
-        notes="Module 4 is where everything comes together. You'll run the orchestration commands from Module 3 against real PRDs, in parallel worktrees, and observe the difference between single-agent and team execution. This is the practical payoff of all the scaffolding work. Transition: What we do.",
+        title="Module 4: Team Orchestration",
+        notes="Module 4 scales from single-agent workflows to multi-agent teams. You'll create worker agents that operate in parallel, coordinate via leader agents, and execute in isolated worktrees. The key insight: team orchestration is just phase-driven workflows with parallel execution. Each worker gets its own fresh worktree and context window. Leaders delegate, workers execute, results merge. This is how you scale Claude to multiple simultaneous work streams. Transition: What we do.",
     ),
-    # Slide 24: M4 Let's get to work
+    # Slide 24: M4 What We Do (1/2)
     ContentSlide(
-        title="Let's get to work",
+        title="M4: What We Do (1/2)",
         bullets=[
-            "Open `modules/module4.md` for our list of tasks",
+            "Plan team worker agents from PRD (docs/prds/team-workers.md)",
+            "Create 3 worker agents: backend-dev, frontend-dev, test-engineer",
+            "Build orchestrator commands for team workflows: /team:feature, /team:bug",
+            "Wire worktree isolation into team commands (each worker in its own worktree)",
         ],
-        notes="Participants follow the steps in module4.md at their own pace. Flag down an assistant if you get stuck.\n\nPresenter talking points:\n- Read orchestrator PRDs (adw-feature.md, adw-bug.md)\n- Launch 2 parallel Claude instances in worktrees: Terminal 1 runs claude -w adw-feat then /team:feature, Terminal 2 runs claude -w adw-bug then /feature\n- Each worktree is an isolated filesystem copy — no branch switching, no merge conflicts during execution\n- Monitor parallel execution patterns: Team shows bursts of parallel activity then synthesis pauses; Single shows steady sequential progress, one phase at a time\n- Inspect state files: agents/{adw_id}/state.json\n- Compare output: code structure, test coverage, style differences\n- Analyze session logs (JSONL): tool calls, failures, timing",
+        notes="Walk through the PRD for team workers. Point out the three worker agents: backend-dev (API implementation), frontend-dev (UI implementation), test-engineer (integration tests). Each worker operates in a separate worktree — this is the isolation mechanism. The leader agent (delegator) coordinates work via the /team:feature and /team:bug commands. Workers run in parallel when phases allow, sequentially when dependencies exist. Transition: Part 2.",
     ),
-    # Slide 25: Single-Agent vs Team Execution (with image)
+    # Slide 25: M4 What We Do (2/2)
+    ContentSlide(
+        title="M4: What We Do (2/2)",
+        bullets=[
+            "Test parallel execution with /team:feature 'add health endpoint'",
+            "Observe worktree isolation: each worker in separate git worktree",
+            "Inspect agent coordination: leader delegates, workers execute",
+            "Merge results: leader collects worker outputs, integrates changes",
+        ],
+        notes="The test scenario is a health endpoint — simple enough to see the pattern clearly. Backend-dev implements the endpoint. Frontend-dev updates the client. Test-engineer adds integration tests. All three run in parallel. Each worker operates in its own worktree, so there are no conflicts. The leader agent merges results back into the main branch. Transition: Let's look at how worktrees provide isolation.",
+    ),
+    # Slide 26: Worktree Isolation (with image)
     ImageSlide(
-        title="Single-Agent vs Team Execution",
-        image="images/single_agent_vs_team.png",
-        notes="This is the comparison table participants should take away. Single-agent is simpler, more predictable, easier to debug. Team is faster for analysis (parallel workers), but adds coordination overhead. The key question isn't 'which is better' but 'which fits your task.' Simple bugs? Single-agent. Complex features with independent analysis areas? Team. The overhead of leader synthesis is only worth it when the analysis phases are truly independent. Transition: Module 5 covers the operational side.",
-    ),
-    # Slide 26: M4 Summary
-    ContentSlide(
-        title="Summarizing what we have seen",
-        bullets=[
-            (
-                "Code-driven orchestration: ",
-                "claude -p /phase + JSON state = resumable pipelines",
-                0,
-            ),
-            (
-                "Worktree isolation: ",
-                "Filesystem-level sandboxing for parallel execution",
-                0,
-            ),
-            (
-                "Team orchestration: ",
-                "Leader/worker pattern via TeamCreate + SendMessage",
-                0,
-            ),
-            (
-                "Sandboxing = defense in depth: ",
-                "Worktree + subagent + hook + permission (4 layers)",
-                0,
-            ),
-            (
-                "'Tools build tools': ",
-                "Module 3 commands built Module 4 orchestrators",
-                0,
-            ),
-        ],
-        notes="Two orchestration patterns: code-driven (Python script chains phases via subprocess) and team-driven (leader coordinates workers via SendMessage). Worktrees are the filesystem isolation layer. State files carry ADW ID, completed phases, plan file path, and issue description between phases — making each phase independently resumable. Sandboxing layers up: worktrees protect the filesystem, subagents protect the context window, hooks protect code quality, permission modes protect system access. Agent design is API design — the better defined the interface, the more reliably agents compose. Transition: Module 5 covers the operational side.\n\nTenet tracker: #8 (scale with isolation) is the headline. All 8 tenets now have coverage. Module 5 reinforces #3, #7, and #8 with operational practices.",
+        title="Worktree Isolation",
+        image="images/worktree_isolation.png",
+        notes="This diagram shows how worktrees isolate parallel work. Each worker agent gets its own worktree — a separate working directory linked to the same git repository. Workers can write, commit, and test without interfering with each other. The leader agent operates in the main worktree and coordinates merges. This is the primary isolation mechanism for team orchestration. It prevents file conflicts, context contamination, and race conditions. Point out the three worktrees (backend, frontend, test) and the main worktree (leader). Transition: Module 5 extends this to CI/CD and headless execution.",
     ),
     # Slide 27: Module 5 Section Header
     SectionSlide(
-        title="Module 5: Operations & Maintenance",
-        notes="Module 5 is about sustained use. Headless mode for CI/CD, session management, cost awareness, and CLAUDE.md maintenance. These are the practices that make Claude Code reliable over weeks and months, not just during a workshop. Transition: What we do.",
+        title="Module 5: CI/CD and Headless Execution",
+        notes="Module 5 takes everything we've built and wires it into CI/CD. You'll configure GitHub Actions to trigger Claude agents on PR events, run headless reviews, and enforce quality gates. The key insight: agents are just executables. If they run in your terminal, they can run in CI. Sandboxing and permissions prevent overreach. This is where Claude becomes part of your delivery pipeline. Transition: What we do.",
     ),
-    # Slide 28: M5 Let's get to work
+    # Slide 28: M5 What We Do (1/2)
     ContentSlide(
-        title="Let's get to work",
+        title="M5: What We Do (1/2)",
         bullets=[
-            "Open `modules/module5.md` for our list of tasks",
+            "Configure GitHub Actions workflow (.github/workflows/claude-review.yml)",
+            "Wire PR events to trigger code-review agent",
+            "Test headless execution: open PR, see agent comment with review",
+            "Inspect sandboxing: agent has read-only access, can't push commits",
         ],
-        notes="Participants follow the steps in module5.md at their own pace. Flag down an assistant if you get stuck.\n\nPresenter talking points:\n- Headless mode: claude -p 'prompt' for non-interactive use\n- Pipe content for analysis: cat file.py | claude -p 'review this'\n- CI/CD integration: PR review bot, GitHub Actions workflow\n- Agents from Module 3 power CI — run headless with CLAUDE.md only\n- --dangerously-skip-permissions for automated environments — intentionally scary name\n- Session management: --continue (latest), --resume (by name/ID), /rename for descriptive names\n- Cost tracking: /cost (session), /stats (daily patterns)\n- Effort levels: Low / Medium / High — controls reasoning depth\n- Extended thinking: Alt+T toggles scratchpad for complex reasoning\n- Checkpointing: Esc+Esc or /rewind to undo without losing session",
+        notes="The workflow listens for pull_request events. When a PR opens or updates, it triggers the code-review agent. The agent runs headless (no interactive session), reads the PR diff, analyzes the changes, and posts a review comment. Sandboxing is enforced via environment variables and permissions — the agent can read but not write. This prevents accidental damage. Transition: Part 2.",
     ),
-    # Slide 29: M5 Summary
+    # Slide 29: M5 What We Do (2/2)
     ContentSlide(
-        title="Summarizing what we have seen",
+        title="M5: What We Do (2/2)",
         bullets=[
-            ("Headless mode: ", "M3 agents run autonomously in CI/CD pipelines", 0),
-            (
-                "Session persistence: ",
-                "Resume context across days without rebuilding",
-                0,
-            ),
-            (
-                "Cost and effort controls: ",
-                "Match model, effort, and thinking to task",
-                0,
-            ),
-            (
-                "Checkpointing: ",
-                "Snapshot before every action — rewind code or conversation",
-                0,
-            ),
-            (
-                "CLAUDE.md maintenance: ",
-                "Stale config actively misleads — treat as code",
-                0,
-            ),
+            "Extend to other CI gates: /team:test (parallel test execution)",
+            "Add security scanning: bandit + Claude analysis",
+            "Configure failure notifications: Slack or email on agent failure",
+            "Review audit logs: agent decisions, tool usage, token costs",
         ],
-        notes="In CI/CD, Claude runs headless with only CLAUDE.md for guidance — the agents defined in Module 3 power this. This is why CLAUDE.md maintenance matters so much. Session persistence means you can pick up where you left off across days. Cost awareness prevents surprise bills — match the model to the task. Checkpointing is the ultimate safety net for experimentation. CLAUDE.md maintenance is ongoing: stale references, contradictory instructions, and vague directives all degrade Claude's performance. Transition: Let's see the big picture.\n\nTenet tracker: Reinforces #3 (CLAUDE.md maintenance), #7 (custom agents), #8 (headless/CI). Full tenet alignment follows on the next slide.",
+        notes="The /team:test command runs test-engineer agents in parallel — one per test suite. Security scanning combines bandit (static analysis) with Claude's reasoning (context-aware checks). Failure notifications use existing CI mechanisms (Slack, email, PagerDuty). Audit logs capture agent decisions, tool usage, and token costs — this is how you measure ROI. Transition: Let's look at the CI integration architecture.",
     ),
-    # Slide 30: The Progression (with image)
+    # Slide 30: CI Integration Architecture (with image)
+    ImageSlide(
+        title="CI Integration Architecture",
+        image="images/ci_integration.png",
+        notes="This diagram shows the full CI integration. GitHub Actions triggers on PR events. The runner environment has Claude CLI installed and configured. Agents run headless via /agent:run command. Results post back to GitHub as PR comments. Sandboxing is enforced via read-only filesystem mounts and restricted API tokens. The key insight: this is just automation — agents are executables, CI is a scheduler. The architecture is simple by design. Transition: Let's recap the full progression.",
+    ),
+    # Slide 31: The Progression (with image)
     ImageSlide(
         title="The Progression",
         image="images/progression.png",
-        notes="This is the retrospective view. Each module builds on the previous. Module 1 gives you the foundation (project + CLAUDE.md). Module 2 adds context awareness and planning discipline. Module 3 builds the orchestration primitives. Module 4 puts them together with parallel execution. Module 5 adds the operational practices for sustained use. The progression mirrors how you'd adopt Claude Code in practice: start with scaffolding, add planning, build workflows, scale with teams, operationalize. Transition: Let's recap the core concepts.",
+        notes="This slide shows the full five-module progression. M1: CLAUDE.md + pre-commit (foundational quality). M2: Context management + subagents (efficiency). M3: Four-layer context + orchestration (scale). M4: Team workers + worktrees (parallelization). M5: CI/CD + headless (automation). Each module builds on the last. The principles — progressive disclosure, back pressure, isolation, delegation — compound. By M5, you have a fully operational agentic delivery system. Transition: Let's review how the eight tenets mapped to this progression.",
     ),
-    # Slide 31: Tenets — Full Coverage Recap
+    # Slide 32: Tenets — Full Coverage Recap
     ContentSlide(
         title="Tenets of Quality Output — Recap",
         bullets=[
@@ -474,15 +461,15 @@ SLIDES: list[SlideData] = [
             "INTERMEDIATE (4-6): Context management was the M2 headline. "
             "Plan mode enforced the explore-plan-code discipline. "
             "Progressive disclosure was built as a four-layer system in M3.\n\n"
-            "ADVANCED (7-8): Agent design started with custom agents in M3, "
-            "scaled to team workers in M4, and became custom subagents in M5. "
+            "ADVANCED (7-8): Agent design started with custom agents and custom subagents in M3, "
+            "scaled to team workers in M4, and was operationalized in M5 (headless/CI). "
             "Isolation layered up: worktrees (M4) + subagents (M2) + hooks (M3) + permissions (M4-5).\n\n"
             "Sources: code.claude.com/docs/en/best-practices, "
             "simonwillison.net (agentic engineering), "
             "github.com/anthropics/prompt-eng-interactive-tutorial"
         ),
     ),
-    # Slide 32: Closing
+    # Slide 33: Closing
     SectionSlide(
         title="Questions?",
         layout=LAYOUT_CLOSING,
@@ -491,272 +478,198 @@ SLIDES: list[SlideData] = [
 ]
 
 
-def style_slide(slide, prs):
-    """Set background image and dark text on all slide elements."""
-    # Add background image covering full slide, sent to back
-    pic = slide.shapes.add_picture(BG_IMAGE, 0, 0, prs.slide_width, prs.slide_height)
-    # Move picture to back of z-order
-    sp_tree = slide.shapes._spTree
-    sp_tree.remove(pic._element)
-    sp_tree.insert(2, pic._element)
+def add_text_to_shape(
+    shape, text: str, font_size: int = 18, bold: bool = False
+) -> None:
+    """Add text to a shape."""
+    if not hasattr(shape, "text_frame"):
+        return
 
-    # Set all text to dark color
-    for shape in slide.shapes:
-        if shape.has_text_frame:
-            for paragraph in shape.text_frame.paragraphs:
-                paragraph.font.color.rgb = DARK_TEXT
-                for run in paragraph.runs:
-                    run.font.color.rgb = DARK_TEXT
+    text_frame = shape.text_frame
+    text_frame.clear()
+    p = text_frame.paragraphs[0]
+    run = p.add_run()
+    run.text = text
+    run.font.size = Pt(font_size)
+    run.font.color.rgb = DARK_TEXT
+    run.font.bold = bold
 
 
-def fill_bullets(placeholder, bullets):
-    """Fill a placeholder with bullet items."""
-    tf = placeholder.text_frame
-    tf.clear()
-    for i, bullet in enumerate(bullets):
-        if i == 0:
-            p = tf.paragraphs[0]
-        else:
-            p = tf.add_paragraph()
+def add_bullet_points(
+    text_frame, bullets: list[Bullet], base_level: int = 0
+) -> None:
+    """Add bullet points to a text frame."""
+    text_frame.clear()
 
-        if isinstance(bullet, tuple):
-            bold_text, normal_text, level = bullet
-            p.level = level
-            run = p.add_run()
-            run.text = bold_text
-            run.font.bold = True
-            if normal_text:
-                run2 = p.add_run()
-                run2.text = normal_text
+    for bullet in bullets:
+        # Handle different bullet formats
+        if isinstance(bullet, str):
+            # Simple string bullet
+            p = text_frame.add_paragraph()
+            p.text = bullet
+            p.level = base_level
+            p.font.size = Pt(18)
+            p.font.color.rgb = DARK_TEXT
+
+        elif isinstance(bullet, tuple):
+            # Tuple format: (bold_text, regular_text, level)
+            bold_text, regular_text, level = bullet
+            p = text_frame.add_paragraph()
+
+            # Add bold part
+            run1 = p.add_run()
+            run1.text = bold_text
+            run1.font.size = Pt(18)
+            run1.font.bold = True
+            run1.font.color.rgb = DARK_TEXT
+
+            # Add regular part
+            run2 = p.add_run()
+            run2.text = regular_text
+            run2.font.size = Pt(18)
+            run2.font.color.rgb = DARK_TEXT
+
+            p.level = base_level + level
+
         elif isinstance(bullet, dict):
+            # Dict format: {"text": "...", "level": N}
+            p = text_frame.add_paragraph()
             p.text = bullet["text"]
             p.level = bullet.get("level", 0)
-        else:
-            p.text = bullet
-            p.level = 0
+            p.font.size = Pt(18)
+            p.font.color.rgb = DARK_TEXT
 
 
-def delete_original_slides(prs, count):
-    """Delete the first N slides (original template slides)."""
-    # We must delete from the beginning, always removing index 0
-    # because indices shift after each removal
-    for _ in range(count):
-        sldIdLst = prs.slides._sldIdLst
-        rNs = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}"
-        sldId_elem = sldIdLst[0]  # Always remove first slide
-        rId = sldId_elem.get(rNs + "id")
-        sldIdLst.remove(sldId_elem)
-        prs.part.drop_rel(rId)
+def create_title_slide(prs, slide_data: TitleSlide) -> None:
+    """Create the title slide."""
+    slide_layout = prs.slide_layouts[LAYOUT_TITLE]
+    slide = prs.slides.add_slide(slide_layout)
+
+    # Set title
+    title_shape = slide.shapes.title
+    add_text_to_shape(title_shape, slide_data.title, font_size=44, bold=True)
+
+    # Set subtitle
+    if slide_data.subtitle:
+        for shape in slide.shapes:
+            if shape.has_text_frame and shape != title_shape:
+                add_text_to_shape(shape, slide_data.subtitle, font_size=28)
+                break
+
+    # Add notes
+    if slide_data.notes:
+        notes_slide = slide.notes_slide
+        notes_slide.notes_text_frame.text = slide_data.notes
 
 
-def set_notes_font_size(prs):
-    """Set speaker notes font size to 18pt for readability."""
-    for slide in prs.slides:
-        if slide.has_notes_slide:
-            for paragraph in slide.notes_slide.notes_text_frame.paragraphs:
-                paragraph.font.size = Pt(18)
-                for run in paragraph.runs:
-                    run.font.size = Pt(18)
+def create_section_slide(prs, slide_data: SectionSlide) -> None:
+    """Create a section header slide."""
+    slide_layout = prs.slide_layouts[slide_data.layout]
+    slide = prs.slides.add_slide(slide_layout)
+
+    # Set title
+    title_shape = slide.shapes.title
+    add_text_to_shape(title_shape, slide_data.title, font_size=44, bold=True)
+
+    # Add notes
+    if slide_data.notes:
+        notes_slide = slide.notes_slide
+        notes_slide.notes_text_frame.text = slide_data.notes
 
 
-def add_title_slide(prs, layout_idx, title_text, subtitle_text=None, notes_text=""):
-    """Add a slide with centered title and optional subtitle."""
-    layout = prs.slide_layouts[layout_idx]
-    slide = prs.slides.add_slide(layout)
+def create_content_slide(prs, slide_data: ContentSlide) -> None:
+    """Create a content slide with bullet points."""
+    slide_layout = prs.slide_layouts[LAYOUT_CONTENT]
+    slide = prs.slides.add_slide(slide_layout)
 
-    for ph in slide.placeholders:
-        if ph.placeholder_format.idx == 0:  # Title
-            ph.text = title_text
-        elif ph.placeholder_format.idx == 1 and subtitle_text:  # Subtitle
-            ph.text = subtitle_text
+    # Set title
+    title_shape = slide.shapes.title
+    add_text_to_shape(title_shape, slide_data.title, font_size=32, bold=True)
 
-    if notes_text:
-        notes = slide.notes_slide
-        notes.notes_text_frame.text = notes_text
+    # Add bullet points
+    for shape in slide.shapes:
+        if shape.has_text_frame and shape != title_shape:
+            add_bullet_points(shape.text_frame, slide_data.bullets)
+            break
 
-    style_slide(slide, prs)
-    return slide
-
-
-def add_section_header(prs, layout_idx, title_text, notes_text=""):
-    """Add a section header slide with centered title only."""
-    layout = prs.slide_layouts[layout_idx]
-    slide = prs.slides.add_slide(layout)
-
-    for ph in slide.placeholders:
-        if ph.placeholder_format.idx == 0:  # Title
-            ph.text = title_text
-
-    if notes_text:
-        notes = slide.notes_slide
-        notes.notes_text_frame.text = notes_text
-
-    style_slide(slide, prs)
-    return slide
+    # Add notes
+    if slide_data.notes:
+        notes_slide = slide.notes_slide
+        notes_slide.notes_text_frame.text = slide_data.notes
 
 
-def add_content_slide(prs, layout_idx, title_text, bullets, notes_text=""):
-    """Add a slide with title and bullet list content."""
-    layout = prs.slide_layouts[layout_idx]
-    slide = prs.slides.add_slide(layout)
+def create_image_slide(prs, slide_data: ImageSlide) -> None:
+    """Create an image slide."""
+    slide_layout = prs.slide_layouts[LAYOUT_CONTENT]
+    slide = prs.slides.add_slide(slide_layout)
 
-    title_ph = None
-    content_ph = None
+    # Set title
+    title_shape = slide.shapes.title
+    add_text_to_shape(title_shape, slide_data.title, font_size=32, bold=True)
 
-    for ph in slide.placeholders:
-        if ph.placeholder_format.idx == 0:  # Title
-            title_ph = ph
-        elif ph.placeholder_format.idx in (1, 10, 11):  # Content area
-            content_ph = ph
+    # Add image
+    if slide_data.image:
+        image_path = os.path.join(REPO_ROOT, slide_data.image)
+        if os.path.exists(image_path):
+            # Calculate position (centered below title)
+            left = prs.slide_width * 0.1
+            top = prs.slide_height * 0.25
+            width = prs.slide_width * 0.8
 
-    if title_ph:
-        title_ph.text = title_text
+            slide.shapes.add_picture(image_path, left, top, width=width)
 
-    if content_ph:
-        fill_bullets(content_ph, bullets)
-
-    if notes_text:
-        notes = slide.notes_slide
-        notes.notes_text_frame.text = notes_text
-
-    style_slide(slide, prs)
-    return slide
+    # Add notes
+    if slide_data.notes:
+        notes_slide = slide.notes_slide
+        notes_slide.notes_text_frame.text = slide_data.notes
 
 
-def add_image_slide(prs, layout_idx, title_text, image_path, notes_text=""):
-    """Add a slide with title and a full-width image in the content area."""
-    layout = prs.slide_layouts[layout_idx]
-    slide = prs.slides.add_slide(layout)
+def create_two_column_slide(prs, slide_data: TwoColumnSlide) -> None:
+    """Create a two-column slide."""
+    slide_layout = prs.slide_layouts[LAYOUT_TWO_COLUMN]
+    slide = prs.slides.add_slide(slide_layout)
 
-    title_ph = None
-    content_ph = None
+    # Set title
+    title_shape = slide.shapes.title
+    add_text_to_shape(title_shape, slide_data.title, font_size=32, bold=True)
 
-    for ph in slide.placeholders:
-        if ph.placeholder_format.idx == 0:
-            title_ph = ph
-        elif ph.placeholder_format.idx in (1, 10, 11):
-            content_ph = ph
+    # Add content to columns
+    text_frames = [
+        shape.text_frame
+        for shape in slide.shapes
+        if shape.has_text_frame and shape != title_shape
+    ]
 
-    if title_ph:
-        title_ph.text = title_text
+    if len(text_frames) >= 2:
+        add_bullet_points(text_frames[0], slide_data.left)
+        add_bullet_points(text_frames[1], slide_data.right)
 
-    # Remove the content placeholder and add the image in its place
-    if content_ph:
-        left = content_ph.left
-        top = content_ph.top
-        width = content_ph.width
-        height = content_ph.height
-        # Remove placeholder
-        sp = content_ph._element
-        sp.getparent().remove(sp)
-        # Add image
-        slide.shapes.add_picture(image_path, left, top, width, height)
-
-    if notes_text:
-        notes = slide.notes_slide
-        notes.notes_text_frame.text = notes_text
-
-    style_slide(slide, prs)
-    return slide
+    # Add notes
+    if slide_data.notes:
+        notes_slide = slide.notes_slide
+        notes_slide.notes_text_frame.text = slide_data.notes
 
 
-def add_two_column_slide(
-    prs, layout_idx, title_text, left_bullets, right_bullets, notes_text=""
-):
-    """Add a two-column slide."""
-    layout = prs.slide_layouts[layout_idx]
-    slide = prs.slides.add_slide(layout)
-
-    placeholders = {ph.placeholder_format.idx: ph for ph in slide.placeholders}
-
-    # Title
-    if 0 in placeholders:
-        placeholders[0].text = title_text
-
-    # Left content (idx=1)
-    if 1 in placeholders:
-        fill_bullets(placeholders[1], left_bullets)
-
-    # Right content (idx=2)
-    if 2 in placeholders:
-        fill_bullets(placeholders[2], right_bullets)
-
-    if notes_text:
-        notes = slide.notes_slide
-        notes.notes_text_frame.text = notes_text
-
-    style_slide(slide, prs)
-    return slide
-
-
-def render_title(prs, slide_data):
-    add_title_slide(
-        prs, LAYOUT_TITLE, slide_data.title, slide_data.subtitle, slide_data.notes
-    )
-
-
-def render_section(prs, slide_data):
-    add_section_header(prs, slide_data.layout, slide_data.title, slide_data.notes)
-
-
-def render_content(prs, slide_data):
-    add_content_slide(
-        prs, LAYOUT_CONTENT, slide_data.title, slide_data.bullets, slide_data.notes
-    )
-
-
-def render_image(prs, slide_data):
-    image_path = os.path.join(REPO_ROOT, slide_data.image)
-    add_image_slide(prs, LAYOUT_CONTENT, slide_data.title, image_path, slide_data.notes)
-
-
-def render_two_column(prs, slide_data):
-    add_two_column_slide(
-        prs,
-        LAYOUT_TWO_COLUMN,
-        slide_data.title,
-        slide_data.left,
-        slide_data.right,
-        slide_data.notes,
-    )
-
-
-RENDERERS = {
-    TitleSlide: render_title,
-    SectionSlide: render_section,
-    ContentSlide: render_content,
-    ImageSlide: render_image,
-    TwoColumnSlide: render_two_column,
-}
-
-
-def main():
+def generate_presentation() -> None:
+    """Generate the PowerPoint presentation."""
     prs = Presentation(TEMPLATE)
 
-    # Print available layouts for debugging
-    print("Available layouts:")
-    for i, layout in enumerate(prs.slide_layouts):
-        placeholders_info = [
-            (ph.placeholder_format.idx, ph.name) for ph in layout.placeholders
-        ]
-        print(f"  Layout {i}: {layout.name} — placeholders: {placeholders_info}")
-    print()
-
-    original_slide_count = len(prs.slides)
-    print(f"Original template has {original_slide_count} slides\n")
-
     for slide_data in SLIDES:
-        renderer = RENDERERS[type(slide_data)]
-        renderer(prs, slide_data)
+        if isinstance(slide_data, TitleSlide):
+            create_title_slide(prs, slide_data)
+        elif isinstance(slide_data, SectionSlide):
+            create_section_slide(prs, slide_data)
+        elif isinstance(slide_data, ContentSlide):
+            create_content_slide(prs, slide_data)
+        elif isinstance(slide_data, ImageSlide):
+            create_image_slide(prs, slide_data)
+        elif isinstance(slide_data, TwoColumnSlide):
+            create_two_column_slide(prs, slide_data)
 
-    print(f"Deleting {original_slide_count} original template slides...")
-    delete_original_slides(prs, original_slide_count)
-    set_notes_font_size(prs)
-
-    os.makedirs(os.path.dirname(OUTPUT), exist_ok=True)
     prs.save(OUTPUT)
-    print(f"\nSaved presentation with {len(prs.slides)} slides to {OUTPUT}")
+    print(f"✓ Presentation generated: {OUTPUT}")
+    print(f"  Total slides: {len(SLIDES)}")
 
 
 if __name__ == "__main__":
-    main()
+    generate_presentation()
