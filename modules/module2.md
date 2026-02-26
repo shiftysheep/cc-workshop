@@ -48,101 +48,7 @@ one does:
 
 ---
 
-## Built-in Slash Commands
-
-Claude Code ships with a set of built-in slash commands. You'll use several of them
-in this module. Custom commands — which we'll build in Module 3 — extend this list
-with your own workflows.
-
-**Session & model**
-
-| Command | Description |
-|---------|-------------|
-| `/model` | Switch the active model |
-| `/resume` | Resume a previous session by ID, name, or picker |
-| `/rename` | Rename the current session |
-| `/clear` | Clear conversation history |
-| `/compact` | Compact conversation to free context, with optional focus instructions |
-| `/rewind` | Rewind conversation and/or code to a previous point |
-
-**Context & visibility**
-
-| Command | Description |
-|---------|-------------|
-| `/context` | Visualize context window usage as a colored grid |
-| `/cost` | Show token usage for the current session |
-| `/stats` | Show daily usage, session history, and model preferences |
-| `/usage` | Show plan limits and rate limit status |
-| `/tasks` | List and manage background tasks |
-| `/todos` | List current TODO items |
-
-**Configuration**
-
-| Command | Description |
-|---------|-------------|
-| `/plugin` | Browse and install plugins from the marketplace |
-| `/mcp` | Manage MCP server connections |
-| `/permissions` | View or update tool permissions |
-| `/memory` | Edit CLAUDE.md memory files |
-| `/init` | Initialize a project with a CLAUDE.md |
-| `/statusline` | Configure the status line |
-| `/config` | Open settings |
-| `/theme` | Change the color theme |
-| `/vim` | Enable vim-style editing |
-
-**Utilities**
-
-| Command | Description |
-|---------|-------------|
-| `/plan` | Enter plan mode |
-| `/export` | Export the conversation to a file or clipboard |
-| `/copy` | Copy the last response to clipboard |
-| `/debug` | Read the session debug log |
-| `/doctor` | Check Claude Code installation health |
-| `/help` | Show usage help |
-| `/exit` | Exit the session |
-
-> **Note:** MCP servers can also expose prompts that appear as slash commands in the
-> format `/mcp__<server>__<prompt_name>`.
-
----
-
-## 1. Context From the Previous Module
-
-Your session still carries context from Module 1 — every prompt, tool call, and
-response is still in the window. Let's see what that looks like.
-
-In the chat box, run:
-
-```
-/context
-```
-
-Note the grid — a portion is already filled from the work you did in Module 1.
-
-Now clear the context to start fresh:
-
-```
-/clear
-```
-
-Run `/context` again:
-
-```
-/context
-```
-
-The grid is nearly empty. The only context remaining is the system prompt and
-CLAUDE.md — everything from Module 1 is gone.
-
-> **Why this matters:** `/clear` is the hard reset. Use it between unrelated tasks
-> to reclaim the full context window. `/compact` (which you saw in Module 1) is the
-> soft version — it summarizes rather than discards. Knowing when to use each is a
-> core context management skill.
-
----
-
-## 2. Install the Context7 MCP Server
+## 1. Install the Context7 MCP Server
 
 Context7 is an MCP server that injects live, version-specific library documentation
 into Claude's context on demand. Instead of relying on potentially outdated training
@@ -162,12 +68,21 @@ Browse to the **Discover** tab, find **context7**, and install it at **user** sc
 > `query-docs`. Any time you ask about a library, Claude can pull current docs
 > rather than relying on training data.
 
+> **What is a plugin?** A plugin is a packaged bundle of Claude Code extensions —
+> commands, skills, agents, hooks, and MCP servers — that you can install in one
+> step. The `/plugin` command connects to **marketplaces** (public or enterprise)
+> where teams publish and discover these packages. Context7 is a community plugin
+> from the public marketplace. In Module 3, we'll install a plugin from our
+> enterprise marketplace that adds document authoring skills.
+>
+> Think of it like npm or pip, but for Claude Code capabilities.
+
 ---
 
-## 3. Examine Context Utilization
+## 2. Examine Context Utilization
 
 MCP servers add tools to Claude's context window on every request. Let's see what
-that looks like now that Context7 is installed.
+that looks like before we start building.
 
 In the chat box, run:
 
@@ -175,18 +90,17 @@ In the chat box, run:
 /context
 ```
 
-Compare this grid to the empty one you saw after `/clear`. The difference is the
-tool definitions that Context7 added — they consume tokens even when the tools
-aren't called.
+The colored grid shows how much of your context window is currently in use. Note the
+baseline now that Context7 is installed — tool definitions for MCP servers consume
+tokens even when the tools aren't called.
 
-> **Why this matters:** Context is finite. Every MCP server you install adds baseline
-> cost to your context window. Knowing your utilization helps you decide when to use
-> subagents (which get their own fresh context window) versus working directly in the
-> main conversation.
+> **Why this matters:** Context is finite. Knowing your utilization helps you decide
+> when to use subagents (which get their own fresh context window) versus working
+> directly in the main conversation.
 
 ---
 
-## 4. Switch to Opus + Plan Mode
+## 3. Switch to Opus Plan Mode
 
 For the next task we're going to ask Claude to architect and implement a new feature.
 This is exactly the kind of consequential, multi-step work that benefits from a more
@@ -198,19 +112,12 @@ In the chat box, run:
 /model opusplan
 ```
 
-> **What is `opusplan`?** It's a hybrid model alias:
->
-> | Phase | Model | Purpose |
-> |-------|-------|---------|
-> | Planning | Opus 4.6 | Deep reasoning, architecture decisions |
-> | Execution | Sonnet 4.6 | Code generation, implementation |
->
-> Compare to `/model opus` which uses Opus for everything (higher cost). `opusplan`
-> gives you Opus reasoning where it matters most and Sonnet speed for the rest.
+> Run `/model opusplan` to switch. We'll explain what this model alias does after
+> you've seen it in action during plan mode.
 
 ---
 
-## 5. Activate Plan Mode and Note the Status Line
+## 4. Activate Plan Mode and Note the Status Line
 
 Activate plan mode by pressing `Shift+Tab` twice. You'll see the status line update
 to show `⏸ plan mode on`.
@@ -224,7 +131,7 @@ to show `⏸ plan mode on`.
 
 ---
 
-## 6. Build the todd Query Command
+## 5. Build the todd Query Command
 
 Now let's put it to work. We have a requirements document ready at
 `docs/prds/todd-query.md`. Enter this prompt in the chat box:
@@ -236,9 +143,15 @@ Read docs/prds/todd-query.md and create a plan to implement the todd query comma
 Claude will read the PRD, explore the existing codebase, and return a plan before
 touching any code.
 
+> **Tenet 2: Be specific.** Compare this prompt to a vague "build me a query
+> command." The PRD references exact files (`src/todd/`), specifies dependencies
+> (`claude-agent-sdk`), defines expected output, and lists what's out of scope.
+> Each constraint reduces the space Claude has to guess — and guessing wastes
+> context tokens on clarification loops.
+
 ---
 
-## 7. Understanding Subagents and Context
+## 6. Understanding Subagents and Context
 
 While Claude is working on the plan, here's what's happening under the hood.
 
@@ -277,7 +190,7 @@ goes wrong, you restart that subagent — not your entire session.
 
 ---
 
-## 8. Review and Approve the Plan
+## 7. Review and Approve the Plan
 
 Claude will present a plan showing:
 
@@ -296,11 +209,33 @@ Read it carefully. You can:
 
 ---
 
-## 9. Implement the Plan
+## 8. Implement the Plan
 
 Once you're satisfied with the plan, confirm it. Claude will switch from Opus to
 Sonnet and begin implementing — creating files, updating `pyproject.toml`, and
 writing the code described in the plan.
+
+---
+
+## 9. Understanding Model Selection
+
+Claude Code supports multiple models, each suited to different tasks:
+
+| Model | Strengths | Typical use |
+|-------|-----------|-------------|
+| **Opus 4.6** | Deep reasoning, architecture, complex analysis | Planning, code review, design decisions |
+| **Sonnet 4.6** | Fast, capable code generation | Implementation, refactoring, most daily work |
+| **Haiku 4.5** | Lightweight, very fast | Exploration subagents, simple searches |
+
+The `opusplan` alias you used earlier is a hybrid mode:
+
+| Phase | Model | Purpose |
+|-------|-------|---------|
+| Planning | Opus 4.6 | Deep reasoning, architecture decisions |
+| Execution | Sonnet 4.6 | Code generation, implementation |
+
+Compare to `/model opus` which uses Opus for everything (higher cost). `opusplan`
+gives you Opus reasoning where it matters most and Sonnet speed for the rest.
 
 ---
 
@@ -316,7 +251,35 @@ You should see a response from Claude describing which model is active.
 
 ---
 
-## 11. Commit and Proceed
+## 11. Write a Verification Test
+
+Before committing, let's verify the feature with an automated test — not just a
+manual check.
+
+In the chat box, enter:
+
+```markdown
+Write a test for the todd query command in tests/test_query.py.
+The test should verify that the query function returns a non-empty string
+when given a simple prompt. Use pytest and mock the Claude Agent SDK call
+so the test runs without Bedrock credentials.
+```
+
+After Claude creates the test, run it:
+
+```shell
+!uv run pytest tests/ -v
+```
+
+> **Tenet 1: Verify your work.** The `!uv run todd` check from the previous step
+> was a manual spot-check — it proves the feature works *right now*, but it won't
+> catch regressions. An automated test locks in the expected behavior permanently.
+> This is Anthropic's #1 best practice: "Tests and expected outputs are the single
+> highest-leverage thing you can provide."
+
+---
+
+## 12. Commit and Proceed
 
 Ask Claude to commit the changes, then advance to the next module:
 
@@ -326,4 +289,4 @@ Commit the changes and then run /module to proceed to module 3.
 
 ---
 
-[← Module 1](module1.md) | [Module 3 →](module3.md)
+[← Module 1](module1.md)
