@@ -64,6 +64,12 @@ pre-commit).
 > Now every commit from here will run linting and type checking automatically, enforcing quality from the start.
 > This is one form of back pressure we can utilize to drive quality output.
 
+> **Tenet 3: CLAUDE.md + hooks.** Pre-commit hooks enforce quality from the
+> first commit — this is *deterministic* quality. Unlike asking Claude to "be
+> careful," a hook guarantees the check runs every time. CLAUDE.md provided the
+> project instructions that shaped everything Claude just built. Together, they
+> form persistent memory (CLAUDE.md) plus automated gates (hooks).
+
 ---
 
 ## 3. Verify the Setup
@@ -75,6 +81,10 @@ Test the new command directly from the chat box using the `!` prefix to run shel
 ```
 
 You should see `Hello. How can I assist?` (or similar) printed to the terminal.
+
+> **Tenet 1: Verify your work.** This manual test is a spot-check — it proves
+> the CLI works *right now*. In Module 2, we'll upgrade from manual verification
+> to automated tests that catch regressions permanently.
 
 ---
 

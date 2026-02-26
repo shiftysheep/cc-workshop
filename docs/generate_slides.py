@@ -155,32 +155,49 @@ SLIDES: list[SlideData] = [
         ],
         notes="Claude Code is not a chatbot — it's an agentic tool that operates on your codebase. It reads files, writes code, runs commands, and manages its own workflow through subagents. The extensibility layers — MCP, commands, skills, hooks, agents — are what make it a platform, not just a tool. Plugins package these extensions for distribution: a single plugin can bundle commands, skills, agents, and hooks into one installable unit. Plugin marketplaces — both the public Anthropic marketplace and private enterprise ones — let teams share and discover these packages. Each extension point gets dedicated coverage in later modules. Transition: Before diving into the modules, let's establish the vocabulary.",
     ),
-    # Slide 6: Core Concepts (1/2)
-    TwoColumnSlide(
-        title="Core Concepts (1/2)",
-        left=[
-            ("Model", " - Different capabilities for different tasks", 0),
-            ("Context Window", " - Finite space for prompts, tools, history", 0),
-            ("Tools", " - Gives the model agency, but consume context", 0),
-            ("Context Engineering", " — Shape what's in the context window", 0),
-            ("Context Rot", " — Quality degrades as context fills", 0),
-            ("Context Poisoning", " — Bad info corrupts reasoning", 0),
+    # Slide 6: Quality Tenets — Foundations
+    ContentSlide(
+        title="Quality Tenets: Foundations",
+        bullets=[
+            ("1. Verify your work: ", "Tests and expected outputs are the single highest-leverage thing you can provide", 0),
+            ("2. Be specific: ", "Reference files, constraints, patterns — vague prompts produce vague output", 0),
+            ("3. CLAUDE.md + hooks: ", "Persistent memory plus automated gates — deterministic quality from commit one", 0),
+            ("4. Context is finite: ", "Manage aggressively — performance degrades as the window fills", 0),
         ],
-        right=["These concepts thread through every module.", "By the end, each becomes an actionable practice."],
-        notes="Context is finite and precious. Everything we build in the workshop is designed to manage it well. Transition: The next concepts are about how we structure agent work.",
+        notes=(
+            "These four tenets are foundational — they apply from your very first Claude session. "
+            "Each one maps to concepts you'll learn hands-on:\n\n"
+            "Vocabulary preview: 'Context window' is the finite space for prompts, tools, and history. "
+            "'Context rot' is quality degradation as this fills. 'Context poisoning' is when bad info "
+            "enters and corrupts reasoning. These failure modes are why Tenet 4 matters.\n\n"
+            "Module mapping: #1 starts in M1 (manual check) and deepens in M2 (automated test). "
+            "#2 is demonstrated through PRD-driven workflows starting in M2. "
+            "#3 is the M1 headline (CLAUDE.md + pre-commit) and deepens in M3 (PostToolUse hooks). "
+            "#4 is the M2 headline (context visualization, subagent isolation).\n\n"
+            "Transition: The next four tenets build on these foundations."
+        ),
     ),
-    # Slide 7: Core Concepts (2/2)
-    TwoColumnSlide(
-        title="Core Concepts (2/2)",
-        left=[
-            ("Progressive Disclosure", " — Reveal info incrementally", 0),
-            ("Back Pressure", " — Resist bad output via hooks", 0),
-            ("Sandboxing", " — Isolation limits blast radius", 0),
-            ("Delegation", " - Offload work to subagents for context savings", 0),
-            ("Agent Teams", " — Leader/worker coordination", 0),
+    # Slide 7: Quality Tenets — At Scale
+    ContentSlide(
+        title="Quality Tenets: At Scale",
+        bullets=[
+            ("5. Explore → Plan → Code: ", "Separate thinking from doing — read the codebase before writing to it", 0),
+            ("6. Progressive disclosure: ", "Right context, right scope, right time — don't front-load everything", 0),
+            ("7. Agent design: ", "Composable workers with model, tools, scope — agent design is API design", 0),
+            ("8. Scale with isolation: ", "Worktrees, teams, headless, sandboxing — isolate to scale safely", 0),
         ],
-        right=["These concepts define how agents work at scale.", "We'll revisit them as actionable tenets at the end."],
-        notes="These concepts define how agents work at scale. We'll see each one in practice as we progress through the modules. Transition: Let's start building. Module 1.",
+        notes=(
+            "These four tenets emerge as you move from individual use to team-scale orchestration.\n\n"
+            "Vocabulary preview: 'Progressive disclosure' means surfacing information incrementally. "
+            "'Back pressure' means the system actively resists bad output (hooks, TDD, plan mode). "
+            "'Sandboxing' isolates agent operations to limit blast radius. "
+            "'Delegation' offloads work to subagents for context savings.\n\n"
+            "Module mapping: #5 is the M2 headline (plan mode workflow). "
+            "#6 is the M3 headline (four-layer context system). "
+            "#7 spans M3 (custom agents) through M5 (custom subagents). "
+            "#8 is the M4 headline (worktrees + teams) extended in M5 (headless/CI).\n\n"
+            "Transition: Let's start building. Module 1."
+        ),
     ),
     # Slide 8: Module 1 Section Header
     SectionSlide(
@@ -434,38 +451,32 @@ SLIDES: list[SlideData] = [
         image="images/progression.png",
         notes="This is the retrospective view. Each module builds on the previous. Module 1 gives you the foundation (project + CLAUDE.md). Module 2 adds context awareness and planning discipline. Module 3 builds the orchestration primitives. Module 4 puts them together with parallel execution. Module 5 adds the operational practices for sustained use. The progression mirrors how you'd adopt Claude Code in practice: start with scaffolding, add planning, build workflows, scale with teams, operationalize. Transition: Let's recap the core concepts.",
     ),
-    # Slide 31: Tenets of Quality Output
+    # Slide 31: Tenets — Full Coverage Recap
     ContentSlide(
-        title="Tenets of Quality Output",
+        title="Tenets of Quality Output — Recap",
         bullets=[
-            ("1. Verify your work: ", "Tests + expected outputs — 'the single highest-leverage thing' (Anthropic)", 0),
-            ("2. Be specific: ", "Reference files, constraints, patterns — vague prompts = vague output (Anthropic)", 0),
-            ("3. CLAUDE.md + hooks: ", "Persistent memory + automated gates — 'deterministic quality' (Anthropic)", 0),
-            ("4. Context is finite: ", "Manage aggressively — 'performance degrades as it fills' (Anthropic)", 0),
-            ("5. Explore → Plan → Code: ", "Separate thinking from doing — 'code is cheap now' (Willison)", 0),
-            ("6. Progressive disclosure: ", "Right context, right scope, right time — @import + links", 0),
-            ("7. Agent design: ", "Composable workers with model, tools, and scope (Anthropic)", 0),
-            ("8. Scale with isolation: ", "Worktrees + teams + headless + sandboxing (Anthropic)", 0),
+            ("1. Verify: ", "M1 manual check → M2 automated test → M3 lint hooks → M4 CI gates", 0),
+            ("2. Be specific: ", "M2 PRD workflow → M3 orchestration PRDs → M4 orchestrator PRDs", 0),
+            ("3. CLAUDE.md + hooks: ", "M1 CLAUDE.md + pre-commit → M3 PostToolUse → M5 maintenance", 0),
+            ("4. Context is finite: ", "M2 /context viz + subagent isolation → M3 progressive disclosure", 0),
+            ("5. Explore → Plan → Code: ", "M2 plan mode → M3 plan-before-build → M4 phase sequences", 0),
+            ("6. Progressive disclosure: ", "M3 four-layer system → M3 skills auto-load → M4 state files", 0),
+            ("7. Agent design: ", "M3 custom agents → M4 team workers → M5 custom subagents", 0),
+            ("8. Scale with isolation: ", "M4 worktrees + teams → M5 headless/CI + sandboxing", 0),
         ],
         notes=(
-            "Remember slides 6-7? Those defined the vocabulary. These tenets are the practices "
-            "built on that vocabulary. 'Context Window' was the concept; 'Context is finite — "
-            "manage aggressively' is the practice.\n\n"
-            "Walk through basics to advanced. Each tenet cites its source.\n\n"
-            "FOUNDATIONAL (1-3): Verification is Anthropic's official #1 best practice. "
-            "Simon Willison reinforces: 'automated tests are no longer optional with coding agents.' "
-            "Specificity comes from Anthropic BP #3 and their Prompt Engineering course Ch.2. "
-            "CLAUDE.md + hooks combine persistent memory (BP #4) with deterministic gates — "
-            "unlike CLAUDE.md which is advisory, hooks guarantee the action happens.\n\n"
-            "INTERMEDIATE (4-6): Context is the core constraint — Anthropic's opening statement "
-            "in their best practices. Willison's 'code is cheap now' reframes priorities: "
-            "design and testing matter more than implementation speed. Progressive disclosure "
-            "connects Anthropic's skills system ('load on demand') with our workshop's "
-            "@import (eager) vs links (lazy) pattern.\n\n"
-            "ADVANCED (7-8): Agent design maps to Anthropic's subagent guidance — 'run in their "
-            "own context with their own set of allowed tools.' Scaling combines Anthropic's "
-            "'multiply output with parallel sessions' with workshop defense-in-depth: "
-            "worktree + subagent + hook + permission (4 isolation layers).\n\n"
+            "This is the payoff slide. Walk through each tenet and ask participants to recall "
+            "the specific exercises. Every tenet from slides 6-7 now has hands-on coverage.\n\n"
+            "FOUNDATIONAL (1-3): Verification progressed from manual spot-check (M1) through "
+            "automated test (M2) to automated hooks (M3) to CI gates (M4-5). "
+            "Specificity was demonstrated every time a PRD drove the work. "
+            "CLAUDE.md + hooks threaded from M1 through M5 — the longest-running tenet.\n\n"
+            "INTERMEDIATE (4-6): Context management was the M2 headline. "
+            "Plan mode enforced the explore-plan-code discipline. "
+            "Progressive disclosure was built as a four-layer system in M3.\n\n"
+            "ADVANCED (7-8): Agent design started with custom agents in M3, "
+            "scaled to team workers in M4, and became custom subagents in M5. "
+            "Isolation layered up: worktrees (M4) + subagents (M2) + hooks (M3) + permissions (M4-5).\n\n"
             "Sources: code.claude.com/docs/en/best-practices, "
             "simonwillison.net (agentic engineering), "
             "github.com/anthropics/prompt-eng-interactive-tutorial"
