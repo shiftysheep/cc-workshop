@@ -1,10 +1,10 @@
-# PRD: todd query command
+# PRD: todd CLI
 
 ## Overview
 
-Add a default command to the `todd` CLI that accepts a natural language prompt as a
-positional argument, sends it to Claude via the Claude Agent SDK, and prints the
-result to stdout.
+`todd` is a single-purpose CLI that accepts a natural language prompt as a positional
+argument, sends it to Claude via the Claude Agent SDK, and prints the result to
+stdout.
 
 ## Usage
 
@@ -29,7 +29,7 @@ I'm running claude-sonnet-4-6.
 
 ### Non-Functional
 
-- Fail with a clear error message if AWS credentials are not configured
+- Authentication issues are surfaced by the agent SDK's built-in guardrails — no additional handling is needed
 - No streaming output; print the complete result once available
 
 ## Dependencies
@@ -45,6 +45,11 @@ Add to `pyproject.toml`:
 ```shell
 export CLAUDE_CODE_USE_BEDROCK=1
 # AWS credentials via standard chain (profile, instance role, env vars, etc.)
+
+# Unset CLAUDE_CODE so the agent SDK can spawn its own Claude instance.
+# When running inside Claude Code, this env var is set and can interfere
+# with a nested agent SDK session.
+unset CLAUDE_CODE
 ```
 
 ## Implementation Notes
