@@ -374,9 +374,10 @@ Merge the worktree changes and commit the orchestrator scripts
 
 **Take it home.** Module 5 is a capstone project: extend todd from a single-shot
 CLI into a Claude Code clone with interactive chat, tool use, and session management.
-Use the ADW commands you built in Module 3 to drive the development. Open
-[modules/module5.md](module5.md) when you're ready.
+Use the ADW commands you built in Module 3 to drive the development.
+
+Run `/module` to switch to the module-5 branch and open the capstone instructions.
 
 ---
 
-[← Module 3](module3.md) | [Module 5 (Take-home) →](module5.md)
+[← Module 3](module3.md)
