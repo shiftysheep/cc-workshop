@@ -15,7 +15,7 @@ by using session logs to analyze agent behavior and improve ADW velocity.
 | **Mermaid** | A text-based diagramming syntax that renders inside Markdown. Write diagram definitions as code; get flowcharts, sequence diagrams, and state machines as output. |
 | **Custom slash command** | A user-defined command stored in `.claude/commands/<name>.md`. Explicitly invoked with `/<name>`. Claude executes the markdown as a prompt template. |
 | **Skill** | A reusable capability stored in `.claude/skills/<name>/SKILL.md`. Claude loads it automatically when the task matches the skill's description — no explicit invocation needed. |
-| **Hook** | A script that runs at a Claude Code lifecycle event (e.g. `PostToolUse`, `Stop`, `PreToolUse`). Configured in `.claude/settings.json`. Used for validation, logging, and back pressure. |
+| **Hook** | A script that runs at a Claude Code lifecycle event (e.g. `PreToolUse`, `PostToolUse`, `Stop`). Configured in `.claude/settings.json`. Used for validation, logging, and back pressure. See [hook events](https://code.claude.com/docs/en/hooks#hook-events). |
 | **Context engineering** | Intentionally shaping what's in the context window to improve Claude's output — what to include, what to exclude, and when to reset. CLAUDE.md, skills, hooks, and subagents are all context engineering tools. |
 | **Dynamic context injection** | Providing Claude with relevant context at the moment it's needed — via hooks, skills, or CLAUDE.md — rather than up front in every prompt. A specific context engineering technique. |
 | **Progressive disclosure** | Surfacing information incrementally: start with a summary, reveal detail on demand. Prevents overwhelming agents and users with irrelevant context. |
@@ -73,23 +73,43 @@ module and the next.
 
 ## 2. Skills vs Commands
 
-Before exploring the `.claude/` scaffolding, it's worth understanding the difference
-between the two primary extension mechanisms.
+Before exploring the `.claude/` scaffolding, it's worth understanding the structural
+difference between the two primary extension mechanisms.
 
-**Commands** are explicit. You invoke them directly with `/<name>` or an orchestrator
-calls them via `claude -p /<name>`. They're good for defined workflows and phase
-execution — tasks with a clear start and finish.
+**Skills are capability bundles.** A skill is a directory — `.claude/skills/<name>/` —
+containing a `SKILL.md` file with YAML frontmatter and instructions, plus optional
+`references/` subdirectory, scripts, and templates. Claude loads a skill automatically
+when the current task matches the skill's description. Think of them as "know this when
+relevant": coding standards, domain knowledge, architectural context, or how to operate
+a tool. In this repo:
 
-**Skills** are implicit. Claude loads them automatically when the current task matches
-the skill's description. They're good for cross-cutting concerns — coding standards,
-context management guidelines, domain knowledge — that should influence Claude's
-behaviour across many tasks without being explicitly called every time.
+- `.claude/skills/code-review/SKILL.md` — auto-loaded when Claude is doing code review
+- `.claude/skills/documentation-standards/` — has a `references/templates.md` file with doc templates
+
+> **Skills are the right place to teach Claude how to use CLI tools.** When your project
+> uses a custom CLI (like `todd`, `bb.py`, or a deployment tool), a skill can bundle the
+> command reference, common flags, and usage patterns that Claude needs to operate it
+> correctly. Because skills load automatically when the task matches, Claude gets the
+> tool knowledge exactly when it's about to use it — not on every turn.
+
+**Commands are focused workflows.** A command is a single markdown file at
+`.claude/commands/<name>.md`. It acts as a prompt template for a reproducible action.
+You invoke it explicitly with `/<name>`. Think of them as "do this specific thing":
+implement a feature, research a topic, run a phase. In this repo:
+
+- `.claude/commands/implement.md` — the explicit `/implement` workflow
+
+> **Commands and skills have merged.** A file at `.claude/commands/review.md` and a
+> file at `.claude/skills/review/SKILL.md` both create a `/review` command. Commands
+> still work, but skills are the superset — they can do everything a command can, plus
+> bundle supporting files, reference material, and scripts alongside the instructions.
 
 The distinction in practice:
 
 | | Command | Skill |
 |-|---------|-------|
 | **Invocation** | Explicit (`/research`, `/implement`) | Automatic (description match) |
+| **Structure** | Single `.md` file | Directory (`SKILL.md` + optional `references/`, scripts) |
 | **Use case** | Phase execution, defined workflows | Standards, guidelines, domain knowledge |
 | **Location** | `.claude/commands/<name>.md` | `.claude/skills/<name>/SKILL.md` |
 | **Good for** | "Do this specific thing" | "Know this when doing related things" |
@@ -144,8 +164,8 @@ consists of YAML frontmatter plus a system prompt body:
 ```yaml
 ---
 name: code-reviewer
-description: Read-only code reviewer using Haiku for fast, cheap analysis
-model: haiku
+description: Read-only code reviewer for style and correctness analysis
+model: sonnet
 tools:
   - Read
   - Glob
@@ -165,6 +185,11 @@ You are a code reviewer. Analyze the provided code for:
 Report findings as a structured list with file:line references.
 Do not suggest fixes — only identify issues.
 ```
+
+> **Model selection matters.** Haiku is fast and cheap but designed for
+> exploration and search — not analysis. Code review requires reasoning about
+> correctness, patterns, and edge cases. Use sonnet or opus for analytical
+> agents. Reserve haiku for agents that primarily search and retrieve.
 
 **Frontmatter fields:**
 
@@ -283,6 +308,12 @@ Hooks run at Claude Code lifecycle events. A `PostToolUse` hook fires after ever
 `Write` or `Edit` tool call — the right moment to validate what Claude just wrote
 before it moves on.
 
+> **Available hook events** include `PreToolUse` (block before execution),
+> `PostToolUse` (validate after execution), `Notification`, `Stop`,
+> `SubagentStart`/`SubagentStop`, `SessionStart`, and more. See the
+> [hook events reference](https://code.claude.com/docs/en/hooks#hook-events)
+> for the complete list.
+
 Enter this prompt:
 
 ```markdown
@@ -330,6 +361,18 @@ engineering tool with several advanced features.
 files. This lets you maintain shared rules, tech stack details, or architecture decisions
 in separate files while keeping CLAUDE.md as the entry point.
 
+> **Markdown links for progressive disclosure.** Instead of inlining all context,
+> use markdown links to reference deeper documentation:
+> ```markdown
+> # Architecture
+> See [ADW Architecture](docs/adr/adw.md) for the full architecture reference.
+> See [API Conventions](docs/api-conventions.md) for endpoint patterns.
+> ```
+> Claude follows links when the current task needs that context — it won't load
+> the architecture reference when fixing a typo. This keeps CLAUDE.md concise
+> while making deep context available on demand. The `@import` syntax always
+> includes content inline; markdown links let Claude choose when to drill down.
+
 **`.claude/rules/` directory** — path-specific rules that apply only to matching
 directories. For example, a rule for `src/` that enforces typing conventions won't
 fire when Claude is editing test files.
@@ -352,8 +395,10 @@ affect the team configuration.
 preferences (verbosity, editor, shortcuts) go in `.claude/CLAUDE.md.local`.
 
 > **Exercise:**
-> 1. Create `.claude/rules/src.md` with a rule about type annotations for `src/` files
->    (e.g., "All functions in src/ must have complete type annotations including return types")
+> 1. Create `.claude/rules/src.md` with a rule about error handling for `src/`
+>    files (e.g., "Functions in src/ should raise `TypeError` or `ValueError`
+>    for invalid arguments — never silently return `None`. Use the patterns
+>    established in existing modules.")
 > 2. Add an `@docs/adr/adw.md` import to the project CLAUDE.md so Claude always has the
 >    ADW architecture reference
 > 3. Create a `.claude/CLAUDE.md.local` with a personal preference (e.g., preferred

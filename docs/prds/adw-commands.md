@@ -73,6 +73,8 @@ research + plan + validation (parallel) → implement + review + document
 
 - Each command lives at `.claude/commands/<name>.md`
 - All commands accept `$ARGUMENTS` (description or `@file` PRD reference)
+- Commands MUST NOT set `context: fork` in frontmatter — all four commands
+  run in the primary context so team activity remains visible to the user
 - Single-agent commands execute phases sequentially with context handoff
 - Team commands use `TeamCreate` for setup, `TaskCreate` for work items,
   `SendMessage` for coordination
