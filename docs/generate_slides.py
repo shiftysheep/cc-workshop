@@ -119,7 +119,7 @@ SLIDES: list[SlideData] = [
             "M2: Build a simple CLI LLM tool called todd",
             "M3: Build orchestration commands, agents, hooks, and skills",
             "M4: Run parallel agent teams in isolated worktrees",
-            "M5: Wire agents into CI/CD and run headless reviews",
+            "M5 (Take-home): Build todd into a Claude Code clone",
         ],
         notes="Frame this as a hands-on journey. Where we'll progressively build up capabilities and complexity. Transition: Let's start with what Claude Code actually is.",
     ),
