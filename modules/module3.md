@@ -364,6 +364,27 @@ preferences (verbosity, editor, shortcuts) go in `.claude/CLAUDE.md.local`.
 > event-scoped. Together they let you shape Claude's behavior precisely without
 > overloading any single mechanism.
 
+**Anti-patterns to watch for:**
+
+| Anti-pattern | Problem |
+|-------------|---------|
+| Too long (>200 lines) | Noise drowns out signal; Claude gives less weight to each instruction |
+| Contradictory instructions | Claude picks one arbitrarily; behavior becomes unpredictable |
+| Stale file references | Claude tries to read files that no longer exist |
+| Vague directives ("be careful") | No actionable constraint; Claude ignores them |
+
+**Maintenance checklist** — run through this after significant project changes:
+
+- [ ] Are all referenced files still present?
+- [ ] Are tool and command names current?
+- [ ] Are there conflicting instructions?
+- [ ] Is the tech stack accurate?
+- [ ] Are test commands still correct?
+- [ ] Do coding standards match what's actually enforced?
+
+Treat CLAUDE.md like any other config file: small investments in accuracy pay off
+across every session.
+
 ---
 
 ## 11. Commit and Proceed
