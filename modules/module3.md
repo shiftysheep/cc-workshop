@@ -113,6 +113,13 @@ The distinction in practice:
 | **Use case** | Phase execution, defined workflows | Standards, guidelines, domain knowledge |
 | **Location** | `.claude/commands/<name>.md` | `.claude/skills/<name>/SKILL.md` |
 | **Good for** | "Do this specific thing" | "Know this when doing related things" |
+| **Frontmatter** | N/A (just markdown) | `disable-model-invocation`, `context: fork`, `allowed-tools` |
+
+> **Skills can behave exactly like commands.** Set `disable-model-invocation: true`
+> in a skill's frontmatter to prevent auto-loading — it will only run when the user
+> invokes it via `/skill-name`. Add `context: fork` to run it in an isolated subagent
+> (useful for workflows that shouldn't pollute the main context). This gives you
+> command-style explicit invocation with skill-level bundled references and scripts.
 
 > **Four ways to deliver work.** The phase commands are reusable primitives.
 > You can compose them in four ways — two single-agent, two multi-agent:
@@ -357,6 +364,10 @@ moments to inject or capture context dynamically.
 You've now seen CLAUDE.md as project-level configuration. It's also a powerful context
 engineering tool with several advanced features.
 
+> **Tip:** Use `/memory` to see all loaded memory files and their sources. Auto-memory
+> (`~/.claude/projects/<project>/memory/`) stores Claude's learnings across sessions —
+> the first 200 lines of `MEMORY.md` load automatically at startup.
+
 **Import syntax** — use `@path/to/file` inside CLAUDE.md to pull in content from other
 files. This lets you maintain shared rules, tech stack details, or architecture decisions
 in separate files while keeping CLAUDE.md as the entry point.
@@ -383,7 +394,7 @@ fire when Claude is editing test files.
 | `.claude/rules/tests.md` | Files under `tests/` |
 | `.claude/rules/docs.md` | Files under `docs/` |
 
-**`.claude/CLAUDE.md.local`** — personal overrides not committed to git. Use for
+**`CLAUDE.local.md`** — personal overrides not committed to git. Use for
 individual editor preferences, personal workflow notes, or debugging flags that
 shouldn't affect teammates.
 
@@ -392,7 +403,7 @@ affect the team configuration.
 
 **Team conventions** — the project CLAUDE.md serves as a team contract. Shared standards
 (tech stack, commit conventions, code style) go in the committed CLAUDE.md. Personal
-preferences (verbosity, editor, shortcuts) go in `.claude/CLAUDE.md.local`.
+preferences (verbosity, editor, shortcuts) go in `CLAUDE.local.md`.
 
 > **Exercise:**
 > 1. Create `.claude/rules/src.md` with a rule about error handling for `src/`
@@ -401,7 +412,7 @@ preferences (verbosity, editor, shortcuts) go in `.claude/CLAUDE.md.local`.
 >    established in existing modules.")
 > 2. Add an `@docs/adr/adw.md` import to the project CLAUDE.md so Claude always has the
 >    ADW architecture reference
-> 3. Create a `.claude/CLAUDE.md.local` with a personal preference (e.g., preferred
+> 3. Create a `CLAUDE.local.md` with a personal preference (e.g., preferred
 >    verbosity level or a debugging note)
 
 > **Callout:** CLAUDE.md, skills, hooks, and `rules/` form a four-layer context system.

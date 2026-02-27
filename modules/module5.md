@@ -93,7 +93,7 @@ As you build, these operational skills will be useful:
 | Cost tracking | `/cost`, `/stats` | Monitor spend per session |
 | Effort levels | `/model` → low/medium/high | Balance cost vs quality |
 | Extended thinking | `Alt+T` | Complex reasoning tasks |
-| Checkpointing | `Esc+Esc`, `/rewind` | Recover from wrong directions |
+| Checkpointing | `Esc+Esc`, `/rewind` | Recover from wrong directions (file edits only, not bash) |
 | Headless testing | `claude -p "prompt"` | Test todd features non-interactively |
 | CI/CD patterns | `gh pr diff \| claude -p "review"` | Automate reviews in pipelines |
 
