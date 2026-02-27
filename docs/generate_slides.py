@@ -72,7 +72,7 @@ class TwoColumnSlide(SlideData):
     right: list[Bullet] = field(default_factory=list)
 
 
-# All 30 slides in exact order
+# All 29 slides in exact order
 SLIDES: list[SlideData] = [
     # Slide 1: Title slide
     TitleSlide(
@@ -331,7 +331,7 @@ SLIDES: list[SlideData] = [
     # Slide 21: Back Pressure (with image)
     ImageSlide(
         title="Back Pressure",
-        image="images/back_pressure.png",
+        image="images/back_pressure_layers.png",
         notes="Back pressure is the system's resistance to bad output. Pre-commit hooks (M1) are the first layer — reject malformed commits. PostToolUse hooks (M3) are the second layer — inspect write operations before they land. Plan mode (M2) is architectural back pressure — think before writing. Tests (M1-M2) are verification back pressure — prove it works before you commit it. The goal: detect failure as early as possible. The later a failure is caught, the more expensive it is to fix. Hooks are cheap back pressure. They run synchronously, provide immediate feedback, and cost nothing if output is correct. Transition: Module 4 builds on this foundation by adding team-based orchestration.",
     ),
     # Slide 22: M3 Summary
@@ -371,29 +371,23 @@ SLIDES: list[SlideData] = [
         title="Module 4: Team Orchestration",
         notes="Module 4 scales from single-agent workflows to multi-agent teams. You'll create worker agents that operate in parallel, coordinate via leader agents, and execute in isolated worktrees. The key insight: team orchestration is just phase-driven workflows with parallel execution. Each worker gets its own fresh worktree and context window. Leaders delegate, workers execute, results merge. This is how you scale Claude to multiple simultaneous work streams. Transition: What we do.",
     ),
-    # Slide 24: M4 What We Do (1/2)
+    # Slide 24: M4 Let's get to work
     ContentSlide(
-        title="M4: What We Do (1/2)",
+        title="Let's get to work",
         bullets=[
-            "Plan team worker agents from PRD (docs/prds/team-workers.md)",
-            "Create 3 worker agents: backend-dev, frontend-dev, test-engineer",
-            "Build orchestrator commands for team workflows: /team:feature, /team:bug",
-            "Wire worktree isolation into team commands (each worker in its own worktree)",
+            "Open `modules/module4.md` for our list of tasks",
         ],
-        notes="Walk through the PRD for team workers. Point out the three worker agents: backend-dev (API implementation), frontend-dev (UI implementation), test-engineer (integration tests). Each worker operates in a separate worktree — this is the isolation mechanism. The leader agent (delegator) coordinates work via the /team:feature and /team:bug commands. Workers run in parallel when phases allow, sequentially when dependencies exist. Transition: Part 2.",
+        notes="Participants follow the steps in module4.md at their own pace. "
+              "Flag down an assistant if you get stuck.\n\n"
+              "Presenter talking points:\n"
+              "- Plan team worker agents from PRD (docs/prds/team-workers.md)\n"
+              "- Create 3 worker agents: backend-dev, frontend-dev, test-engineer\n"
+              "- Build orchestrator commands: /team:feature, /team:bug\n"
+              "- Wire worktree isolation into team commands\n"
+              "- Test parallel execution, observe worktree isolation\n"
+              "- Inspect agent coordination: leader delegates, workers execute",
     ),
-    # Slide 25: M4 What We Do (2/2)
-    ContentSlide(
-        title="M4: What We Do (2/2)",
-        bullets=[
-            "Test parallel execution with /team:feature 'add health endpoint'",
-            "Observe worktree isolation: each worker in separate git worktree",
-            "Inspect agent coordination: leader delegates, workers execute",
-            "Merge results: leader collects worker outputs, integrates changes",
-        ],
-        notes="The test scenario is a health endpoint — simple enough to see the pattern clearly. Backend-dev implements the endpoint. Frontend-dev updates the client. Test-engineer adds integration tests. All three run in parallel. Each worker operates in its own worktree, so there are no conflicts. The leader agent merges results back into the main branch. Transition: Let's look at how worktrees provide isolation.",
-    ),
-    # Slide 26: Worktree Isolation (with image)
+    # Slide 25: Worktree Isolation (with image)
     ImageSlide(
         title="Worktree Isolation",
         image="images/worktree_isolation.png",
@@ -464,198 +458,272 @@ SLIDES: list[SlideData] = [
 ]
 
 
-def add_text_to_shape(
-    shape, text: str, font_size: int = 18, bold: bool = False
-) -> None:
-    """Add text to a shape."""
-    if not hasattr(shape, "text_frame"):
-        return
+def style_slide(slide, prs):
+    """Set background image and dark text on all slide elements."""
+    # Add background image covering full slide, sent to back
+    pic = slide.shapes.add_picture(BG_IMAGE, 0, 0, prs.slide_width, prs.slide_height)
+    # Move picture to back of z-order
+    sp_tree = slide.shapes._spTree
+    sp_tree.remove(pic._element)
+    sp_tree.insert(2, pic._element)
 
-    text_frame = shape.text_frame
-    text_frame.clear()
-    p = text_frame.paragraphs[0]
-    run = p.add_run()
-    run.text = text
-    run.font.size = Pt(font_size)
-    run.font.color.rgb = DARK_TEXT
-    run.font.bold = bold
+    # Set all text to dark color
+    for shape in slide.shapes:
+        if shape.has_text_frame:
+            for paragraph in shape.text_frame.paragraphs:
+                paragraph.font.color.rgb = DARK_TEXT
+                for run in paragraph.runs:
+                    run.font.color.rgb = DARK_TEXT
 
 
-def add_bullet_points(
-    text_frame, bullets: list[Bullet], base_level: int = 0
-) -> None:
-    """Add bullet points to a text frame."""
-    text_frame.clear()
+def fill_bullets(placeholder, bullets):
+    """Fill a placeholder with bullet items."""
+    tf = placeholder.text_frame
+    tf.clear()
+    for i, bullet in enumerate(bullets):
+        if i == 0:
+            p = tf.paragraphs[0]
+        else:
+            p = tf.add_paragraph()
 
-    for bullet in bullets:
-        # Handle different bullet formats
-        if isinstance(bullet, str):
-            # Simple string bullet
-            p = text_frame.add_paragraph()
-            p.text = bullet
-            p.level = base_level
-            p.font.size = Pt(18)
-            p.font.color.rgb = DARK_TEXT
-
-        elif isinstance(bullet, tuple):
-            # Tuple format: (bold_text, regular_text, level)
-            bold_text, regular_text, level = bullet
-            p = text_frame.add_paragraph()
-
-            # Add bold part
-            run1 = p.add_run()
-            run1.text = bold_text
-            run1.font.size = Pt(18)
-            run1.font.bold = True
-            run1.font.color.rgb = DARK_TEXT
-
-            # Add regular part
-            run2 = p.add_run()
-            run2.text = regular_text
-            run2.font.size = Pt(18)
-            run2.font.color.rgb = DARK_TEXT
-
-            p.level = base_level + level
-
+        if isinstance(bullet, tuple):
+            bold_text, normal_text, level = bullet
+            p.level = level
+            run = p.add_run()
+            run.text = bold_text
+            run.font.bold = True
+            if normal_text:
+                run2 = p.add_run()
+                run2.text = normal_text
         elif isinstance(bullet, dict):
-            # Dict format: {"text": "...", "level": N}
-            p = text_frame.add_paragraph()
             p.text = bullet["text"]
             p.level = bullet.get("level", 0)
-            p.font.size = Pt(18)
-            p.font.color.rgb = DARK_TEXT
+        else:
+            p.text = bullet
+            p.level = 0
 
 
-def create_title_slide(prs, slide_data: TitleSlide) -> None:
-    """Create the title slide."""
-    slide_layout = prs.slide_layouts[LAYOUT_TITLE]
-    slide = prs.slides.add_slide(slide_layout)
-
-    # Set title
-    title_shape = slide.shapes.title
-    add_text_to_shape(title_shape, slide_data.title, font_size=44, bold=True)
-
-    # Set subtitle
-    if slide_data.subtitle:
-        for shape in slide.shapes:
-            if shape.has_text_frame and shape != title_shape:
-                add_text_to_shape(shape, slide_data.subtitle, font_size=28)
-                break
-
-    # Add notes
-    if slide_data.notes:
-        notes_slide = slide.notes_slide
-        notes_slide.notes_text_frame.text = slide_data.notes
+def delete_original_slides(prs, count):
+    """Delete the first N slides (original template slides)."""
+    # We must delete from the beginning, always removing index 0
+    # because indices shift after each removal
+    for _ in range(count):
+        sldIdLst = prs.slides._sldIdLst
+        rNs = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}"
+        sldId_elem = sldIdLst[0]  # Always remove first slide
+        rId = sldId_elem.get(rNs + "id")
+        sldIdLst.remove(sldId_elem)
+        prs.part.drop_rel(rId)
 
 
-def create_section_slide(prs, slide_data: SectionSlide) -> None:
-    """Create a section header slide."""
-    slide_layout = prs.slide_layouts[slide_data.layout]
-    slide = prs.slides.add_slide(slide_layout)
-
-    # Set title
-    title_shape = slide.shapes.title
-    add_text_to_shape(title_shape, slide_data.title, font_size=44, bold=True)
-
-    # Add notes
-    if slide_data.notes:
-        notes_slide = slide.notes_slide
-        notes_slide.notes_text_frame.text = slide_data.notes
+def set_notes_font_size(prs):
+    """Set speaker notes font size to 18pt for readability."""
+    for slide in prs.slides:
+        if slide.has_notes_slide:
+            for paragraph in slide.notes_slide.notes_text_frame.paragraphs:
+                paragraph.font.size = Pt(18)
+                for run in paragraph.runs:
+                    run.font.size = Pt(18)
 
 
-def create_content_slide(prs, slide_data: ContentSlide) -> None:
-    """Create a content slide with bullet points."""
-    slide_layout = prs.slide_layouts[LAYOUT_CONTENT]
-    slide = prs.slides.add_slide(slide_layout)
+def add_title_slide(prs, layout_idx, title_text, subtitle_text=None, notes_text=""):
+    """Add a slide with centered title and optional subtitle."""
+    layout = prs.slide_layouts[layout_idx]
+    slide = prs.slides.add_slide(layout)
 
-    # Set title
-    title_shape = slide.shapes.title
-    add_text_to_shape(title_shape, slide_data.title, font_size=32, bold=True)
+    for ph in slide.placeholders:
+        if ph.placeholder_format.idx == 0:  # Title
+            ph.text = title_text
+        elif ph.placeholder_format.idx == 1 and subtitle_text:  # Subtitle
+            ph.text = subtitle_text
 
-    # Add bullet points
-    for shape in slide.shapes:
-        if shape.has_text_frame and shape != title_shape:
-            add_bullet_points(shape.text_frame, slide_data.bullets)
-            break
+    if notes_text:
+        notes = slide.notes_slide
+        notes.notes_text_frame.text = notes_text
 
-    # Add notes
-    if slide_data.notes:
-        notes_slide = slide.notes_slide
-        notes_slide.notes_text_frame.text = slide_data.notes
+    style_slide(slide, prs)
+    return slide
 
 
-def create_image_slide(prs, slide_data: ImageSlide) -> None:
-    """Create an image slide."""
-    slide_layout = prs.slide_layouts[LAYOUT_CONTENT]
-    slide = prs.slides.add_slide(slide_layout)
+def add_section_header(prs, layout_idx, title_text, notes_text=""):
+    """Add a section header slide with centered title only."""
+    layout = prs.slide_layouts[layout_idx]
+    slide = prs.slides.add_slide(layout)
 
-    # Set title
-    title_shape = slide.shapes.title
-    add_text_to_shape(title_shape, slide_data.title, font_size=32, bold=True)
+    for ph in slide.placeholders:
+        if ph.placeholder_format.idx == 0:  # Title
+            ph.text = title_text
 
-    # Add image
-    if slide_data.image:
-        image_path = os.path.join(REPO_ROOT, slide_data.image)
-        if os.path.exists(image_path):
-            # Calculate position (centered below title)
-            left = prs.slide_width * 0.1
-            top = prs.slide_height * 0.25
-            width = prs.slide_width * 0.8
+    if notes_text:
+        notes = slide.notes_slide
+        notes.notes_text_frame.text = notes_text
 
-            slide.shapes.add_picture(image_path, left, top, width=width)
-
-    # Add notes
-    if slide_data.notes:
-        notes_slide = slide.notes_slide
-        notes_slide.notes_text_frame.text = slide_data.notes
+    style_slide(slide, prs)
+    return slide
 
 
-def create_two_column_slide(prs, slide_data: TwoColumnSlide) -> None:
-    """Create a two-column slide."""
-    slide_layout = prs.slide_layouts[LAYOUT_TWO_COLUMN]
-    slide = prs.slides.add_slide(slide_layout)
+def add_content_slide(prs, layout_idx, title_text, bullets, notes_text=""):
+    """Add a slide with title and bullet list content."""
+    layout = prs.slide_layouts[layout_idx]
+    slide = prs.slides.add_slide(layout)
 
-    # Set title
-    title_shape = slide.shapes.title
-    add_text_to_shape(title_shape, slide_data.title, font_size=32, bold=True)
+    title_ph = None
+    content_ph = None
 
-    # Add content to columns
-    text_frames = [
-        shape.text_frame
-        for shape in slide.shapes
-        if shape.has_text_frame and shape != title_shape
-    ]
+    for ph in slide.placeholders:
+        if ph.placeholder_format.idx == 0:  # Title
+            title_ph = ph
+        elif ph.placeholder_format.idx in (1, 10, 11):  # Content area
+            content_ph = ph
 
-    if len(text_frames) >= 2:
-        add_bullet_points(text_frames[0], slide_data.left)
-        add_bullet_points(text_frames[1], slide_data.right)
+    if title_ph:
+        title_ph.text = title_text
 
-    # Add notes
-    if slide_data.notes:
-        notes_slide = slide.notes_slide
-        notes_slide.notes_text_frame.text = slide_data.notes
+    if content_ph:
+        fill_bullets(content_ph, bullets)
+
+    if notes_text:
+        notes = slide.notes_slide
+        notes.notes_text_frame.text = notes_text
+
+    style_slide(slide, prs)
+    return slide
 
 
-def generate_presentation() -> None:
-    """Generate the PowerPoint presentation."""
+def add_image_slide(prs, layout_idx, title_text, image_path, notes_text=""):
+    """Add a slide with title and a full-width image in the content area."""
+    layout = prs.slide_layouts[layout_idx]
+    slide = prs.slides.add_slide(layout)
+
+    title_ph = None
+    content_ph = None
+
+    for ph in slide.placeholders:
+        if ph.placeholder_format.idx == 0:
+            title_ph = ph
+        elif ph.placeholder_format.idx in (1, 10, 11):
+            content_ph = ph
+
+    if title_ph:
+        title_ph.text = title_text
+
+    # Remove the content placeholder and add the image in its place
+    if content_ph:
+        left = content_ph.left
+        top = content_ph.top
+        width = content_ph.width
+        height = content_ph.height
+        # Remove placeholder
+        sp = content_ph._element
+        sp.getparent().remove(sp)
+        # Add image
+        slide.shapes.add_picture(image_path, left, top, width, height)
+
+    if notes_text:
+        notes = slide.notes_slide
+        notes.notes_text_frame.text = notes_text
+
+    style_slide(slide, prs)
+    return slide
+
+
+def add_two_column_slide(
+    prs, layout_idx, title_text, left_bullets, right_bullets, notes_text=""
+):
+    """Add a two-column slide."""
+    layout = prs.slide_layouts[layout_idx]
+    slide = prs.slides.add_slide(layout)
+
+    placeholders = {ph.placeholder_format.idx: ph for ph in slide.placeholders}
+
+    # Title
+    if 0 in placeholders:
+        placeholders[0].text = title_text
+
+    # Left content (idx=1)
+    if 1 in placeholders:
+        fill_bullets(placeholders[1], left_bullets)
+
+    # Right content (idx=2)
+    if 2 in placeholders:
+        fill_bullets(placeholders[2], right_bullets)
+
+    if notes_text:
+        notes = slide.notes_slide
+        notes.notes_text_frame.text = notes_text
+
+    style_slide(slide, prs)
+    return slide
+
+
+def render_title(prs, slide_data):
+    add_title_slide(
+        prs, LAYOUT_TITLE, slide_data.title, slide_data.subtitle, slide_data.notes
+    )
+
+
+def render_section(prs, slide_data):
+    add_section_header(prs, slide_data.layout, slide_data.title, slide_data.notes)
+
+
+def render_content(prs, slide_data):
+    add_content_slide(
+        prs, LAYOUT_CONTENT, slide_data.title, slide_data.bullets, slide_data.notes
+    )
+
+
+def render_image(prs, slide_data):
+    image_path = os.path.join(REPO_ROOT, slide_data.image)
+    add_image_slide(prs, LAYOUT_CONTENT, slide_data.title, image_path, slide_data.notes)
+
+
+def render_two_column(prs, slide_data):
+    add_two_column_slide(
+        prs,
+        LAYOUT_TWO_COLUMN,
+        slide_data.title,
+        slide_data.left,
+        slide_data.right,
+        slide_data.notes,
+    )
+
+
+RENDERERS = {
+    TitleSlide: render_title,
+    SectionSlide: render_section,
+    ContentSlide: render_content,
+    ImageSlide: render_image,
+    TwoColumnSlide: render_two_column,
+}
+
+
+def main():
     prs = Presentation(TEMPLATE)
 
-    for slide_data in SLIDES:
-        if isinstance(slide_data, TitleSlide):
-            create_title_slide(prs, slide_data)
-        elif isinstance(slide_data, SectionSlide):
-            create_section_slide(prs, slide_data)
-        elif isinstance(slide_data, ContentSlide):
-            create_content_slide(prs, slide_data)
-        elif isinstance(slide_data, ImageSlide):
-            create_image_slide(prs, slide_data)
-        elif isinstance(slide_data, TwoColumnSlide):
-            create_two_column_slide(prs, slide_data)
+    # Print available layouts for debugging
+    print("Available layouts:")
+    for i, layout in enumerate(prs.slide_layouts):
+        placeholders_info = [
+            (ph.placeholder_format.idx, ph.name) for ph in layout.placeholders
+        ]
+        print(f"  Layout {i}: {layout.name} — placeholders: {placeholders_info}")
+    print()
 
+    original_slide_count = len(prs.slides)
+    print(f"Original template has {original_slide_count} slides\n")
+
+    for slide_data in SLIDES:
+        renderer = RENDERERS[type(slide_data)]
+        renderer(prs, slide_data)
+
+    print(f"Deleting {original_slide_count} original template slides...")
+    delete_original_slides(prs, original_slide_count)
+    set_notes_font_size(prs)
+
+    os.makedirs(os.path.dirname(OUTPUT), exist_ok=True)
     prs.save(OUTPUT)
-    print(f"✓ Presentation generated: {OUTPUT}")
-    print(f"  Total slides: {len(SLIDES)}")
+    print(f"\nSaved presentation with {len(prs.slides)} slides to {OUTPUT}")
 
 
 if __name__ == "__main__":
-    generate_presentation()
+    main()
