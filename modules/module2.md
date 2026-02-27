@@ -77,6 +77,17 @@ Browse to the **Discover** tab, find **context7**, and install it at **user** sc
 >
 > Think of it like npm or pip, but for Claude Code capabilities.
 
+> **Security: the lethal trifecta.** Simon Willison
+> [identifies three capabilities](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/)
+> that, combined in an AI agent, create serious security risk:
+> **(1)** access to private data, **(2)** exposure to untrusted content, and
+> **(3)** the ability to communicate externally. An MCP server can grant all
+> three — file-system tools read private data, web-fetching tools ingest
+> untrusted content, and API tools can send data out. Claude Code's permission
+> prompts are your first line of defense, but they're not a substitute for
+> reviewing what tools a plugin actually installs. Before you approve, check
+> the tool list and understand what each one does.
+
 ---
 
 ## 2. Examine Context Utilization
