@@ -184,6 +184,10 @@ each subagent starts with a fresh context, a noisy or incorrect result from one 
 can't accumulate and corrupt the reasoning in the main conversation. If a subagent
 goes wrong, you restart that subagent — not your entire session.
 
+> **Pro tip — session resume.** If you need to exit and come back,
+> `claude --continue` resumes the most recent session, and `claude --resume`
+> lets you pick by name. Use `/rename <name>` to label sessions for easy recall.
+
 ---
 
 ## 7. Review and Approve the Plan
@@ -232,6 +236,11 @@ The `opusplan` alias you used earlier is a hybrid mode:
 
 Compare to `/model opus` which uses Opus for everything (higher cost). `opusplan`
 gives you Opus reasoning where it matters most and Sonnet speed for the rest.
+
+> **Pro tip — effort levels.** Each model also has effort levels (low / medium /
+> high) accessible via `/model`. Low for quick edits, high for complex reasoning.
+> Extended thinking (`Alt+T`) gives Claude a scratchpad for longer chains. Both
+> affect cost and quality.
 
 ---
 
