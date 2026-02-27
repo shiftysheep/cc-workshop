@@ -68,11 +68,15 @@ uv run python adw_feature.py --resume cc73faf1
 
 ### Phase Invocation
 
-- Each phase invoked via subprocess: `claude -p /<phase_name>`
+- Each phase invoked via subprocess: `claude -p /<phase_name> <issue>`
+  — headless, no `-w` flag, runs in the current (worktree) directory
 - Phases execute sequentially — one must complete before the next starts
 - Non-zero exit from a phase halts the workflow and updates `status` to `failed`
-- Each ADW runs via `claude -w {adw_id}`, creating an isolated worktree at
-  `.claude/worktrees/{adw_id}/` on branch `worktree-{adw_id}`
+- Capture stdout/stderr and append to `agents/{adw_id}/{phase}/raw_output.jsonl`
+
+> **How the orchestrator is launched (not the phases).** Module 4 runs the
+> orchestrator inside a worktree: `claude -w {adw_id}`. Individual phase
+> invocations do NOT use `-w` — they run headlessly in the current directory.
 
 ### Non-Functional
 

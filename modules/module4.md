@@ -187,22 +187,21 @@ Group 2 starts.
 — research completes → design starts → plan starts. One phase at a time,
 each building on the previous.
 
-Check state files as phases complete:
-
-```
-Read .claude/worktrees/adw-feat/agents/*/state.json
-Read .claude/worktrees/adw-bug/agents/*/state.json
-```
-
 > **Observable differences.** The team run shows bursts of parallel activity
 > followed by synthesis pauses. The single-agent run shows steady sequential
 > progress. Both produce status logs to stderr with timestamps — compare the
 > wall-clock time for the analysis phases (Group 1 parallel vs sequential
 > research → design → plan → validation).
 
-Note: if either run hasn't finished, you can `Ctrl+C` and still inspect
-the state files and partial output. The orchestrators being built support
-`--resume` precisely for this case.
+> **Note on state files.** The `agents/{adw_id}/state.json` files referenced
+> in the PRD are written by the Python orchestrators when they *run phases* —
+> not during this build step. The commands are building the orchestrators; state
+> tracking starts when you subsequently run `adw_feature.py` or `adw_bug.py`.
+> To monitor progress during the build, watch the terminal output directly or
+> ask Claude: "What phases have you completed and what are you working on now?"
+
+Note: if either run hasn't finished, you can `Ctrl+C` and resume after. The
+orchestrators being built support `--resume` precisely for this case.
 
 ---
 
@@ -228,6 +227,15 @@ Compare the code produced by the two worktrees. Focus on:
 ---
 
 ## 7. Analyze Session Logs
+
+Claude Code writes a session log (JSONL) for every run, including worktree
+sessions. Each worktree gets its own project entry in `~/.claude/projects/`,
+keyed by the worktree's filesystem path with slashes replaced by hyphens:
+
+```
+~/.claude/projects/...-cc-workshop-test--claude-worktrees-adw-feat/
+~/.claude/projects/...-cc-workshop-test--claude-worktrees-adw-bug/
+```
 
 ```
 Find the session logs from both worktree runs and compare them. Show me:
