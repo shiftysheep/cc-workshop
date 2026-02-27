@@ -19,8 +19,5 @@ We'll be focusing on utilizing the terminal version but you should be able to fo
 Throughout this workshop we will be building out an application repository to explore the capabilities of Claude Code.
 The tools we build can be the building blocks to take into your own projects or help you build your own.
 
-## Getting Started
-
-Once you have completed the prerequisites, open Claude Code in this repository and follow the instructions.
-
-When you're ready proceed to [Module 1](modules/module1.md).
+To be ready for the workshop, you should be able to open Claude Code in the terminal, make a prompt and get a reply.
+Once you are at this point you are ready to start the workshop.
