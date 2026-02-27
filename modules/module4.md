@@ -260,6 +260,25 @@ orchestration. Here's what each component does.
 - Atomic writes: temp file + rename to guarantee valid JSON at all times
 - Logging: phase transitions to stderr with timestamps
 
+> **This is headless mode.** The `claude -p "prompt"` flag runs Claude
+> non-interactively — no chat box, no confirmation prompts. The command runs,
+> produces output, and exits. This is how orchestrators chain phases: each
+> `claude -p /<phase>` is a self-contained headless invocation that reads
+> state from JSON and writes results back.
+>
+> Key flags for headless execution:
+>
+> | Flag | Purpose |
+> |------|---------|
+> | `--output-format text\|json\|stream-json` | Control output format |
+> | `--max-turns N` | Limit agentic turns |
+> | `--max-budget-usd X.XX` | Hard cost cap |
+> | `--allowedTools "Read,Grep"` | Restrict available tools |
+>
+> You can also pipe content: `cat file.py | claude -p "review this code"`.
+> This pattern is the foundation for CI/CD integration — if it runs in your
+> terminal, it can run in a pipeline.
+
 **`adw_feature.py`** — 7-phase feature workflow:
 - Phases: research → design → plan → validation → implement → review → document
 - `--from-design` flag: skip research and design when a spec already exists
