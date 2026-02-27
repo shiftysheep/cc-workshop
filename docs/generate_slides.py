@@ -72,7 +72,7 @@ class TwoColumnSlide(SlideData):
     right: list[Bullet] = field(default_factory=list)
 
 
-# All 29 slides in exact order
+# All 30 slides in exact order
 SLIDES: list[SlideData] = [
     # Slide 1: Title slide
     TitleSlide(
@@ -393,7 +393,7 @@ SLIDES: list[SlideData] = [
         image="images/worktree_isolation.png",
         notes="This diagram shows how worktrees isolate parallel work. Each worker agent gets its own worktree — a separate working directory linked to the same git repository. Workers can write, commit, and test without interfering with each other. The leader agent operates in the main worktree and coordinates merges. This is the primary isolation mechanism for team orchestration. It prevents file conflicts, context contamination, and race conditions. Point out the three worktrees (backend, frontend, test) and the main worktree (leader). Transition: Let's discuss managing Claude Code projects long-term.",
     ),
-    # Slide 27: Managing Projects with Claude Code
+    # Slide 26: Managing Projects with Claude Code
     ContentSlide(
         title="Managing Projects with Claude Code",
         bullets=[
@@ -411,43 +411,49 @@ SLIDES: list[SlideData] = [
               "checkpointing are operational hygiene for sustained usage. Participants will use "
               "all of these skills in the M5 capstone project.",
     ),
-    # Slide 28: The Progression (with image)
+    # Slide 27: The Progression (with image)
     ImageSlide(
         title="The Progression",
         image="images/progression.png",
         notes="This slide shows the full five-module progression. M1: CLAUDE.md + pre-commit (foundational quality). M2: Context management + subagents (efficiency). M3: Four-layer context + orchestration (scale). M4: Team workers + worktrees (parallelization). M5 (take-home): Build todd into a Claude Code clone. Each module builds on the last. The principles — progressive disclosure, back pressure, isolation, delegation — compound. By M4, you have a fully operational agentic delivery system. Transition: Let's review how the eight tenets mapped to this progression.",
     ),
-    # Slide 29: Tenets — Full Coverage Recap
+    # Slide 28: Tenets — Recap
     ContentSlide(
         title="Tenets of Quality Output — Recap",
         bullets=[
-            ("1. Verify: ", "M1 manual check → M2 automated test → M3 lint hooks → M4 CI gates", 0),
-            ("2. Be specific: ", "M2 PRD workflow → M3 orchestration PRDs → M4 orchestrator PRDs", 0),
-            ("3. CLAUDE.md + hooks: ", "M1 CLAUDE.md + pre-commit → M3 PostToolUse → M3 anti-patterns + audit checklist", 0),
-            ("4. Context is finite: ", "M2 /context viz + subagent isolation → M3 progressive disclosure", 0),
-            ("5. Explore → Plan → Code: ", "M2 plan mode → M3 plan-before-build → M4 phase sequences", 0),
-            ("6. Progressive disclosure: ", "M3 four-layer system → M3 skills auto-load → M4 state files", 0),
-            ("7. Agent design: ", "M3 custom agents → M4 team workers → M4 orchestrators", 0),
-            ("8. Scale with isolation: ", "M4 worktrees + teams → M4 headless mode + CI patterns", 0),
+            ("1. Verify your work: ", "tests and expected outputs", 0),
+            ("2. Be specific: ", "reference files, constraints, patterns", 0),
+            ("3. CLAUDE.md + hooks: ", "persistent memory + automated gates", 0),
+            ("4. Context is finite: ", "performance degrades as it fills", 0),
+            ("5. Explore → Plan → Code: ", "read before writing", 0),
+            ("6. Progressive disclosure: ", "right context, right scope, right time", 0),
+            ("7. Agent design: ", "composable workers with clear scope", 0),
+            ("8. Scale with isolation: ", "worktrees, teams, sandboxing", 0),
         ],
         notes=(
             "This is the payoff slide. Walk through each tenet and ask participants to recall "
             "the specific exercises. Every tenet from slides 6-7 now has hands-on coverage.\n\n"
-            "FOUNDATIONAL (1-3): Verification progressed from manual spot-check (M1) through "
-            "automated test (M2) to automated hooks (M3) to CI gates (M4). "
-            "Specificity was demonstrated every time a PRD drove the work. "
-            "CLAUDE.md + hooks threaded from M1 through M4 — the longest-running tenet. "
-            "M3 anti-patterns and audit checklist are where maintenance is covered.\n\n"
-            "INTERMEDIATE (4-6): Context management was the M2 headline. "
-            "Plan mode enforced the explore-plan-code discipline. "
-            "Progressive disclosure was built as a four-layer system in M3.\n\n"
-            "ADVANCED (7-8): Agent design started with custom agents in M3, "
-            "scaled to team workers in M4, and built orchestrators in M4. "
-            "Isolation layered up: worktrees (M4) + subagents (M2) + hooks (M3) + headless mode (M4).\n\n"
+            "Tenets 1-4 (Foundations): verification, specificity, CLAUDE.md + hooks, context management.\n\n"
+            "Tenets 5-8 (At Scale): plan mode discipline, progressive disclosure, agent design, isolation.\n\n"
             "Sources: code.claude.com/docs/en/best-practices, "
             "simonwillison.net (agentic engineering), "
             "github.com/anthropics/prompt-eng-interactive-tutorial"
         ),
+    ),
+    # Slide 29: Module 5 Homework
+    ContentSlide(
+        title="Homework: Build a Claude Code Clone",
+        bullets=[
+            "Module 5 is a self-paced capstone project",
+            "Open `modules/module5.md` for 5 milestone PRDs",
+            "Use your ADW tools — `/feature` and `/team:feature` work here",
+        ],
+        notes="Module 5 is take-home. Participants extend todd from a single-shot "
+              "prompt forwarder into an interactive agentic tool — a miniature Claude "
+              "Code clone. Five milestones: REPL, Tool Use, Streaming, CLAUDE.md "
+              "Loading, Session Persistence. Each has a PRD in docs/prds/. Estimated "
+              "2-4 hours across multiple sessions. Use `claude --resume` to pick up "
+              "where you left off.",
     ),
     # Slide 30: Closing
     SectionSlide(
