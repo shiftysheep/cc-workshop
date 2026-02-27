@@ -21,6 +21,15 @@ The tools we build can be the building blocks to take into your own projects or 
 As we progress through the course we will use the `/module` command in Claude to migrate our application into a more heavily structured agentic codebase.
 This will allow us to slowly introduce topics and focus on key aspects of the tool and agentic coding as we progress.
 
+## Workshop Structure
+
+| Module | Focus | Format | Est. Time |
+|--------|-------|--------|-----------|
+| 1 | Project Scaffolding | In-person | ~20 min |
+| 2 | MCP, Plan Mode, Agent SDK | In-person | ~35 min |
+| 3 | Commands, Skills, Hooks | In-person | ~40 min |
+| 4 | Team Orchestration | In-person | ~55 min |
+| 5 | Build a Claude Code Clone | Take-home project | 2-4 hours |
 
 ## How Modules Work
 
