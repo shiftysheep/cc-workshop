@@ -134,6 +134,9 @@ In the chat box, run:
 > There are many other built-in slash commands you can see if you just type `/` in the chat window.
 > For a full list, see the [Anthropic docs on slash commands](https://code.claude.com/docs/en/interactive-mode#built-in-commands).
 
+> **Pro tip:** Type `/cost` to see token usage and spend for this session, or
+> `/stats` for daily patterns. Cost awareness grows more important in later modules.
+
 ---
 
 ## 6. CLI Navigation Essentials
@@ -150,6 +153,9 @@ this in step 3). It's shorthand for asking Claude to run a Bash tool call.
 a new line in the prompt.
 
 **`Ctrl+G`** — open the current prompt in your default text editor for longer edits.
+
+**`Esc+Esc`** — open the rewind menu to undo Claude's changes (code, conversation,
+or both). Useful when Claude goes in a wrong direction.
 
 > **Exercise:** Type `@src/todd/__init__.py` to reference the init file, then run
 > `!uv run todd hello` to verify the CLI still works.
