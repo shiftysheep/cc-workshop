@@ -72,7 +72,7 @@ class TwoColumnSlide(SlideData):
     right: list[Bullet] = field(default_factory=list)
 
 
-# All 33 slides in exact order
+# All 30 slides in exact order
 SLIDES: list[SlideData] = [
     # Slide 1: Title slide
     TitleSlide(
@@ -397,83 +397,69 @@ SLIDES: list[SlideData] = [
     ImageSlide(
         title="Worktree Isolation",
         image="images/worktree_isolation.png",
-        notes="This diagram shows how worktrees isolate parallel work. Each worker agent gets its own worktree — a separate working directory linked to the same git repository. Workers can write, commit, and test without interfering with each other. The leader agent operates in the main worktree and coordinates merges. This is the primary isolation mechanism for team orchestration. It prevents file conflicts, context contamination, and race conditions. Point out the three worktrees (backend, frontend, test) and the main worktree (leader). Transition: Module 5 extends this to CI/CD and headless execution.",
+        notes="This diagram shows how worktrees isolate parallel work. Each worker agent gets its own worktree — a separate working directory linked to the same git repository. Workers can write, commit, and test without interfering with each other. The leader agent operates in the main worktree and coordinates merges. This is the primary isolation mechanism for team orchestration. It prevents file conflicts, context contamination, and race conditions. Point out the three worktrees (backend, frontend, test) and the main worktree (leader). Transition: Let's discuss managing Claude Code projects long-term.",
     ),
-    # Slide 27: Module 5 Section Header
-    SectionSlide(
-        title="Module 5: CI/CD and Headless Execution",
-        notes="Module 5 takes everything we've built and wires it into CI/CD. You'll configure GitHub Actions to trigger Claude agents on PR events, run headless reviews, and enforce quality gates. The key insight: agents are just executables. If they run in your terminal, they can run in CI. Sandboxing and permissions prevent overreach. This is where Claude becomes part of your delivery pipeline. Transition: What we do.",
-    ),
-    # Slide 28: M5 What We Do (1/2)
+    # Slide 27: Managing Projects with Claude Code
     ContentSlide(
-        title="M5: What We Do (1/2)",
+        title="Managing Projects with Claude Code",
         bullets=[
-            "Configure GitHub Actions workflow (.github/workflows/claude-review.yml)",
-            "Wire PR events to trigger code-review agent",
-            "Test headless execution: open PR, see agent comment with review",
-            "Inspect sandboxing: agent has read-only access, can't push commits",
+            ("CLAUDE.md audits: ", "Stale instructions actively mislead — review after major changes", 0),
+            ("CI/CD with headless mode: ", "`claude -p /<command>` in pipelines for automated reviews and ADWs", 0),
+            ("Automated delivery: ", "Orchestrators chain phase commands — same pattern as M4, in CI", 0),
+            ("Cost & session hygiene: ", "`/cost`, `/stats`, `--max-budget-usd` to prevent surprise bills", 0),
+            ("Checkpointing: ", "`Esc+Esc` / `/rewind` to recover from wrong directions", 0),
         ],
-        notes="The workflow listens for pull_request events. When a PR opens or updates, it triggers the code-review agent. The agent runs headless (no interactive session), reads the PR diff, analyzes the changes, and posts a review comment. Sandboxing is enforced via environment variables and permissions — the agent can read but not write. This prevents accidental damage. Transition: Part 2.",
+        notes="This is the high-level 'what comes next' discussion slide. CLAUDE.md audits "
+              "tie back to the anti-patterns taught in M3 — now applied at maintenance scale. "
+              "CI/CD utilization uses the same headless mode pattern participants saw in M4's "
+              "orchestrators — `claude -p` with predefined commands automates ADWs or individual "
+              "lifecycle phases (review, test, document) in GitHub Actions. Cost tracking and "
+              "checkpointing are operational hygiene for sustained usage. Participants will use "
+              "all of these skills in the M5 capstone project.",
     ),
-    # Slide 29: M5 What We Do (2/2)
-    ContentSlide(
-        title="M5: What We Do (2/2)",
-        bullets=[
-            "Extend to other CI gates: /team:test (parallel test execution)",
-            "Add security scanning: bandit + Claude analysis",
-            "Configure failure notifications: Slack or email on agent failure",
-            "Review audit logs: agent decisions, tool usage, token costs",
-        ],
-        notes="The /team:test command runs test-engineer agents in parallel — one per test suite. Security scanning combines bandit (static analysis) with Claude's reasoning (context-aware checks). Failure notifications use existing CI mechanisms (Slack, email, PagerDuty). Audit logs capture agent decisions, tool usage, and token costs — this is how you measure ROI. Transition: Let's look at the CI integration architecture.",
-    ),
-    # Slide 30: CI Integration Architecture (with image)
-    ImageSlide(
-        title="CI Integration Architecture",
-        image="images/ci_integration.png",
-        notes="This diagram shows the full CI integration. GitHub Actions triggers on PR events. The runner environment has Claude CLI installed and configured. Agents run headless via /agent:run command. Results post back to GitHub as PR comments. Sandboxing is enforced via read-only filesystem mounts and restricted API tokens. The key insight: this is just automation — agents are executables, CI is a scheduler. The architecture is simple by design. Transition: Let's recap the full progression.",
-    ),
-    # Slide 31: The Progression (with image)
+    # Slide 28: The Progression (with image)
     ImageSlide(
         title="The Progression",
         image="images/progression.png",
-        notes="This slide shows the full five-module progression. M1: CLAUDE.md + pre-commit (foundational quality). M2: Context management + subagents (efficiency). M3: Four-layer context + orchestration (scale). M4: Team workers + worktrees (parallelization). M5: CI/CD + headless (automation). Each module builds on the last. The principles — progressive disclosure, back pressure, isolation, delegation — compound. By M5, you have a fully operational agentic delivery system. Transition: Let's review how the eight tenets mapped to this progression.",
+        notes="This slide shows the full five-module progression. M1: CLAUDE.md + pre-commit (foundational quality). M2: Context management + subagents (efficiency). M3: Four-layer context + orchestration (scale). M4: Team workers + worktrees (parallelization). M5 (take-home): Build todd into a Claude Code clone. Each module builds on the last. The principles — progressive disclosure, back pressure, isolation, delegation — compound. By M4, you have a fully operational agentic delivery system. Transition: Let's review how the eight tenets mapped to this progression.",
     ),
-    # Slide 32: Tenets — Full Coverage Recap
+    # Slide 29: Tenets — Full Coverage Recap
     ContentSlide(
         title="Tenets of Quality Output — Recap",
         bullets=[
             ("1. Verify: ", "M1 manual check → M2 automated test → M3 lint hooks → M4 CI gates", 0),
             ("2. Be specific: ", "M2 PRD workflow → M3 orchestration PRDs → M4 orchestrator PRDs", 0),
-            ("3. CLAUDE.md + hooks: ", "M1 CLAUDE.md + pre-commit → M3 PostToolUse → M5 maintenance", 0),
+            ("3. CLAUDE.md + hooks: ", "M1 CLAUDE.md + pre-commit → M3 PostToolUse → M3 anti-patterns + audit checklist", 0),
             ("4. Context is finite: ", "M2 /context viz + subagent isolation → M3 progressive disclosure", 0),
             ("5. Explore → Plan → Code: ", "M2 plan mode → M3 plan-before-build → M4 phase sequences", 0),
             ("6. Progressive disclosure: ", "M3 four-layer system → M3 skills auto-load → M4 state files", 0),
-            ("7. Agent design: ", "M3 custom agents → M4 team workers → M5 custom subagents", 0),
-            ("8. Scale with isolation: ", "M4 worktrees + teams → M5 headless/CI + sandboxing", 0),
+            ("7. Agent design: ", "M3 custom agents → M4 team workers → M4 orchestrators", 0),
+            ("8. Scale with isolation: ", "M4 worktrees + teams → M4 headless mode + CI patterns", 0),
         ],
         notes=(
             "This is the payoff slide. Walk through each tenet and ask participants to recall "
             "the specific exercises. Every tenet from slides 6-7 now has hands-on coverage.\n\n"
             "FOUNDATIONAL (1-3): Verification progressed from manual spot-check (M1) through "
-            "automated test (M2) to automated hooks (M3) to CI gates (M4-5). "
+            "automated test (M2) to automated hooks (M3) to CI gates (M4). "
             "Specificity was demonstrated every time a PRD drove the work. "
-            "CLAUDE.md + hooks threaded from M1 through M5 — the longest-running tenet.\n\n"
+            "CLAUDE.md + hooks threaded from M1 through M4 — the longest-running tenet. "
+            "M3 anti-patterns and audit checklist are where maintenance is covered.\n\n"
             "INTERMEDIATE (4-6): Context management was the M2 headline. "
             "Plan mode enforced the explore-plan-code discipline. "
             "Progressive disclosure was built as a four-layer system in M3.\n\n"
-            "ADVANCED (7-8): Agent design started with custom agents and custom subagents in M3, "
-            "scaled to team workers in M4, and was operationalized in M5 (headless/CI). "
-            "Isolation layered up: worktrees (M4) + subagents (M2) + hooks (M3) + permissions (M4-5).\n\n"
+            "ADVANCED (7-8): Agent design started with custom agents in M3, "
+            "scaled to team workers in M4, and built orchestrators in M4. "
+            "Isolation layered up: worktrees (M4) + subagents (M2) + hooks (M3) + headless mode (M4).\n\n"
             "Sources: code.claude.com/docs/en/best-practices, "
             "simonwillison.net (agentic engineering), "
             "github.com/anthropics/prompt-eng-interactive-tutorial"
         ),
     ),
-    # Slide 33: Closing
+    # Slide 30: Closing
     SectionSlide(
         title="Questions?",
         layout=LAYOUT_CLOSING,
-        notes="Open the floor for questions. If time permits, offer to demo any specific concept live. Repo is available for participants to continue working through modules independently. Point them to code.claude.com for official documentation.",
+        notes="Open the floor for questions. If time permits, offer to demo any specific concept live. Repo is available for participants to continue working through modules independently. Point participants to Module 5 — the capstone project where they build todd into a Claude Code clone using everything they've learned. Point them to code.claude.com for official documentation.",
     ),
 ]
 
