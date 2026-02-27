@@ -359,6 +359,24 @@ Merge the worktree changes and commit the orchestrator scripts
 > sandboxes, teams as parallelism — apply to any project where you want
 > Claude to do sustained, multi-step work reliably.
 
+> **Workshop Recap — Eight Tenets of Quality Output:**
+>
+> 1. **Verify your work** — manual check → automated test → lint hooks → CI gates
+> 2. **Be specific** — PRD-driven workflows reduce guessing
+> 3. **CLAUDE.md + hooks** — persistent memory + automated quality gates
+> 4. **Context is finite** — delegate noise to subagents, /compact long sessions
+> 5. **Explore → Plan → Code** — think before doing
+> 6. **Progressive disclosure** — right context, right scope, right time
+> 7. **Agent design** — composable workers with clear interfaces
+> 8. **Scale with isolation** — worktrees, subagents, hooks, permissions
+
 ---
 
-[← Module 3](module3.md) | [Module 5 →](module5.md)
+**Take it home.** Module 5 is a capstone project: extend todd from a single-shot
+CLI into a Claude Code clone with interactive chat, tool use, and session management.
+Use the ADW commands you built in Module 3 to drive the development. Open
+[modules/module5.md](module5.md) when you're ready.
+
+---
+
+[← Module 3](module3.md) | [Module 5 (Take-home) →](module5.md)
