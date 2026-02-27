@@ -72,7 +72,7 @@ class TwoColumnSlide(SlideData):
     right: list[Bullet] = field(default_factory=list)
 
 
-# All 33 slides in exact order
+# All 30 slides in exact order
 SLIDES: list[SlideData] = [
     # Slide 1: Title slide
     TitleSlide(
@@ -331,7 +331,7 @@ SLIDES: list[SlideData] = [
     # Slide 21: Back Pressure (with image)
     ImageSlide(
         title="Back Pressure",
-        image="images/back_pressure.png",
+        image="images/back_pressure_layers.png",
         notes="Back pressure is the system's resistance to bad output. Pre-commit hooks (M1) are the first layer — reject malformed commits. PostToolUse hooks (M3) are the second layer — inspect write operations before they land. Plan mode (M2) is architectural back pressure — think before writing. Tests (M1-M2) are verification back pressure — prove it works before you commit it. The goal: detect failure as early as possible. The later a failure is caught, the more expensive it is to fix. Hooks are cheap back pressure. They run synchronously, provide immediate feedback, and cost nothing if output is correct. Transition: Module 4 builds on this foundation by adding team-based orchestration.",
     ),
     # Slide 22: M3 Summary
@@ -371,305 +371,365 @@ SLIDES: list[SlideData] = [
         title="Module 4: Team Orchestration",
         notes="Module 4 scales from single-agent workflows to multi-agent teams. You'll create worker agents that operate in parallel, coordinate via leader agents, and execute in isolated worktrees. The key insight: team orchestration is just phase-driven workflows with parallel execution. Each worker gets its own fresh worktree and context window. Leaders delegate, workers execute, results merge. This is how you scale Claude to multiple simultaneous work streams. Transition: What we do.",
     ),
-    # Slide 24: M4 What We Do (1/2)
+    # Slide 24: M4 Let's get to work
     ContentSlide(
-        title="M4: What We Do (1/2)",
+        title="Let's get to work",
         bullets=[
-            "Plan team worker agents from PRD (docs/prds/team-workers.md)",
-            "Create 3 worker agents: backend-dev, frontend-dev, test-engineer",
-            "Build orchestrator commands for team workflows: /team:feature, /team:bug",
-            "Wire worktree isolation into team commands (each worker in its own worktree)",
+            "Open `modules/module4.md` for our list of tasks",
         ],
-        notes="Walk through the PRD for team workers. Point out the three worker agents: backend-dev (API implementation), frontend-dev (UI implementation), test-engineer (integration tests). Each worker operates in a separate worktree — this is the isolation mechanism. The leader agent (delegator) coordinates work via the /team:feature and /team:bug commands. Workers run in parallel when phases allow, sequentially when dependencies exist. Transition: Part 2.",
+        notes="Participants follow the steps in module4.md at their own pace. "
+              "Flag down an assistant if you get stuck.\n\n"
+              "Presenter talking points:\n"
+              "- Plan team worker agents from PRD (docs/prds/team-workers.md)\n"
+              "- Create 3 worker agents: backend-dev, frontend-dev, test-engineer\n"
+              "- Build orchestrator commands: /team:feature, /team:bug\n"
+              "- Wire worktree isolation into team commands\n"
+              "- Test parallel execution, observe worktree isolation\n"
+              "- Inspect agent coordination: leader delegates, workers execute",
     ),
-    # Slide 25: M4 What We Do (2/2)
-    ContentSlide(
-        title="M4: What We Do (2/2)",
-        bullets=[
-            "Test parallel execution with /team:feature 'add health endpoint'",
-            "Observe worktree isolation: each worker in separate git worktree",
-            "Inspect agent coordination: leader delegates, workers execute",
-            "Merge results: leader collects worker outputs, integrates changes",
-        ],
-        notes="The test scenario is a health endpoint — simple enough to see the pattern clearly. Backend-dev implements the endpoint. Frontend-dev updates the client. Test-engineer adds integration tests. All three run in parallel. Each worker operates in its own worktree, so there are no conflicts. The leader agent merges results back into the main branch. Transition: Let's look at how worktrees provide isolation.",
-    ),
-    # Slide 26: Worktree Isolation (with image)
+    # Slide 25: Worktree Isolation (with image)
     ImageSlide(
         title="Worktree Isolation",
         image="images/worktree_isolation.png",
-        notes="This diagram shows how worktrees isolate parallel work. Each worker agent gets its own worktree — a separate working directory linked to the same git repository. Workers can write, commit, and test without interfering with each other. The leader agent operates in the main worktree and coordinates merges. This is the primary isolation mechanism for team orchestration. It prevents file conflicts, context contamination, and race conditions. Point out the three worktrees (backend, frontend, test) and the main worktree (leader). Transition: Module 5 extends this to CI/CD and headless execution.",
+        notes="This diagram shows how worktrees isolate parallel work. Each worker agent gets its own worktree — a separate working directory linked to the same git repository. Workers can write, commit, and test without interfering with each other. The leader agent operates in the main worktree and coordinates merges. This is the primary isolation mechanism for team orchestration. It prevents file conflicts, context contamination, and race conditions. Point out the three worktrees (backend, frontend, test) and the main worktree (leader). Transition: Let's discuss managing Claude Code projects long-term.",
     ),
-    # Slide 27: Module 5 Section Header
-    SectionSlide(
-        title="Module 5: CI/CD and Headless Execution",
-        notes="Module 5 takes everything we've built and wires it into CI/CD. You'll configure GitHub Actions to trigger Claude agents on PR events, run headless reviews, and enforce quality gates. The key insight: agents are just executables. If they run in your terminal, they can run in CI. Sandboxing and permissions prevent overreach. This is where Claude becomes part of your delivery pipeline. Transition: What we do.",
-    ),
-    # Slide 28: M5 What We Do (1/2)
+    # Slide 26: Managing Projects with Claude Code
     ContentSlide(
-        title="M5: What We Do (1/2)",
+        title="Managing Projects with Claude Code",
         bullets=[
-            "Configure GitHub Actions workflow (.github/workflows/claude-review.yml)",
-            "Wire PR events to trigger code-review agent",
-            "Test headless execution: open PR, see agent comment with review",
-            "Inspect sandboxing: agent has read-only access, can't push commits",
+            ("CLAUDE.md audits: ", "Stale instructions actively mislead — review after major changes", 0),
+            ("CI/CD with headless mode: ", "`claude -p /<command>` in pipelines for automated reviews and ADWs", 0),
+            ("Automated delivery: ", "Orchestrators chain phase commands — same pattern as M4, in CI", 0),
+            ("Cost & session hygiene: ", "`/cost`, `/stats`, `--max-budget-usd` to prevent surprise bills", 0),
+            ("Checkpointing: ", "`Esc+Esc` / `/rewind` to recover from wrong directions", 0),
         ],
-        notes="The workflow listens for pull_request events. When a PR opens or updates, it triggers the code-review agent. The agent runs headless (no interactive session), reads the PR diff, analyzes the changes, and posts a review comment. Sandboxing is enforced via environment variables and permissions — the agent can read but not write. This prevents accidental damage. Transition: Part 2.",
+        notes="This is the high-level 'what comes next' discussion slide. CLAUDE.md audits "
+              "tie back to the anti-patterns taught in M3 — now applied at maintenance scale. "
+              "CI/CD utilization uses the same headless mode pattern participants saw in M4's "
+              "orchestrators — `claude -p` with predefined commands automates ADWs or individual "
+              "lifecycle phases (review, test, document) in GitHub Actions. Cost tracking and "
+              "checkpointing are operational hygiene for sustained usage. Participants will use "
+              "all of these skills in the M5 capstone project.",
     ),
-    # Slide 29: M5 What We Do (2/2)
-    ContentSlide(
-        title="M5: What We Do (2/2)",
-        bullets=[
-            "Extend to other CI gates: /team:test (parallel test execution)",
-            "Add security scanning: bandit + Claude analysis",
-            "Configure failure notifications: Slack or email on agent failure",
-            "Review audit logs: agent decisions, tool usage, token costs",
-        ],
-        notes="The /team:test command runs test-engineer agents in parallel — one per test suite. Security scanning combines bandit (static analysis) with Claude's reasoning (context-aware checks). Failure notifications use existing CI mechanisms (Slack, email, PagerDuty). Audit logs capture agent decisions, tool usage, and token costs — this is how you measure ROI. Transition: Let's look at the CI integration architecture.",
-    ),
-    # Slide 30: CI Integration Architecture (with image)
-    ImageSlide(
-        title="CI Integration Architecture",
-        image="images/ci_integration.png",
-        notes="This diagram shows the full CI integration. GitHub Actions triggers on PR events. The runner environment has Claude CLI installed and configured. Agents run headless via /agent:run command. Results post back to GitHub as PR comments. Sandboxing is enforced via read-only filesystem mounts and restricted API tokens. The key insight: this is just automation — agents are executables, CI is a scheduler. The architecture is simple by design. Transition: Let's recap the full progression.",
-    ),
-    # Slide 31: The Progression (with image)
+    # Slide 27: The Progression (with image)
     ImageSlide(
         title="The Progression",
         image="images/progression.png",
-        notes="This slide shows the full five-module progression. M1: CLAUDE.md + pre-commit (foundational quality). M2: Context management + subagents (efficiency). M3: Four-layer context + orchestration (scale). M4: Team workers + worktrees (parallelization). M5: CI/CD + headless (automation). Each module builds on the last. The principles — progressive disclosure, back pressure, isolation, delegation — compound. By M5, you have a fully operational agentic delivery system. Transition: Let's review how the eight tenets mapped to this progression.",
+        notes="This slide shows the full five-module progression. M1: CLAUDE.md + pre-commit (foundational quality). M2: Context management + subagents (efficiency). M3: Four-layer context + orchestration (scale). M4: Team workers + worktrees (parallelization). M5 (take-home): Build todd into a Claude Code clone. Each module builds on the last. The principles — progressive disclosure, back pressure, isolation, delegation — compound. By M4, you have a fully operational agentic delivery system. Transition: Let's review how the eight tenets mapped to this progression.",
     ),
-    # Slide 32: Tenets — Full Coverage Recap
+    # Slide 28: Tenets — Recap
     ContentSlide(
         title="Tenets of Quality Output — Recap",
         bullets=[
-            ("1. Verify: ", "M1 manual check → M2 automated test → M3 lint hooks → M4 CI gates", 0),
-            ("2. Be specific: ", "M2 PRD workflow → M3 orchestration PRDs → M4 orchestrator PRDs", 0),
-            ("3. CLAUDE.md + hooks: ", "M1 CLAUDE.md + pre-commit → M3 PostToolUse → M5 maintenance", 0),
-            ("4. Context is finite: ", "M2 /context viz + subagent isolation → M3 progressive disclosure", 0),
-            ("5. Explore → Plan → Code: ", "M2 plan mode → M3 plan-before-build → M4 phase sequences", 0),
-            ("6. Progressive disclosure: ", "M3 four-layer system → M3 skills auto-load → M4 state files", 0),
-            ("7. Agent design: ", "M3 custom agents → M4 team workers → M5 custom subagents", 0),
-            ("8. Scale with isolation: ", "M4 worktrees + teams → M5 headless/CI + sandboxing", 0),
+            ("1. Verify your work: ", "tests and expected outputs", 0),
+            ("2. Be specific: ", "reference files, constraints, patterns", 0),
+            ("3. CLAUDE.md + hooks: ", "persistent memory + automated gates", 0),
+            ("4. Context is finite: ", "performance degrades as it fills", 0),
+            ("5. Explore → Plan → Code: ", "read before writing", 0),
+            ("6. Progressive disclosure: ", "right context, right scope, right time", 0),
+            ("7. Agent design: ", "composable workers with clear scope", 0),
+            ("8. Scale with isolation: ", "worktrees, teams, sandboxing", 0),
         ],
         notes=(
             "This is the payoff slide. Walk through each tenet and ask participants to recall "
             "the specific exercises. Every tenet from slides 6-7 now has hands-on coverage.\n\n"
-            "FOUNDATIONAL (1-3): Verification progressed from manual spot-check (M1) through "
-            "automated test (M2) to automated hooks (M3) to CI gates (M4-5). "
-            "Specificity was demonstrated every time a PRD drove the work. "
-            "CLAUDE.md + hooks threaded from M1 through M5 — the longest-running tenet.\n\n"
-            "INTERMEDIATE (4-6): Context management was the M2 headline. "
-            "Plan mode enforced the explore-plan-code discipline. "
-            "Progressive disclosure was built as a four-layer system in M3.\n\n"
-            "ADVANCED (7-8): Agent design started with custom agents and custom subagents in M3, "
-            "scaled to team workers in M4, and was operationalized in M5 (headless/CI). "
-            "Isolation layered up: worktrees (M4) + subagents (M2) + hooks (M3) + permissions (M4-5).\n\n"
+            "Tenets 1-4 (Foundations): verification, specificity, CLAUDE.md + hooks, context management.\n\n"
+            "Tenets 5-8 (At Scale): plan mode discipline, progressive disclosure, agent design, isolation.\n\n"
             "Sources: code.claude.com/docs/en/best-practices, "
             "simonwillison.net (agentic engineering), "
             "github.com/anthropics/prompt-eng-interactive-tutorial"
         ),
     ),
-    # Slide 33: Closing
+    # Slide 29: Module 5 Homework
+    ContentSlide(
+        title="Homework: Build a Claude Code Clone",
+        bullets=[
+            "Module 5 is a self-paced capstone project",
+            "Open `modules/module5.md` for 5 milestone PRDs",
+            "Use your ADW tools — `/feature` and `/team:feature` work here",
+        ],
+        notes="Module 5 is take-home. Participants extend todd from a single-shot "
+              "prompt forwarder into an interactive agentic tool — a miniature Claude "
+              "Code clone. Five milestones: REPL, Tool Use, Streaming, CLAUDE.md "
+              "Loading, Session Persistence. Each has a PRD in docs/prds/. Estimated "
+              "2-4 hours across multiple sessions. Use `claude --resume` to pick up "
+              "where you left off.",
+    ),
+    # Slide 30: Closing
     SectionSlide(
         title="Questions?",
         layout=LAYOUT_CLOSING,
-        notes="Open the floor for questions. If time permits, offer to demo any specific concept live. Repo is available for participants to continue working through modules independently. Point them to code.claude.com for official documentation.",
+        notes="Open the floor for questions. If time permits, offer to demo any specific concept live. Repo is available for participants to continue working through modules independently. Point participants to Module 5 — the capstone project where they build todd into a Claude Code clone using everything they've learned. Point them to code.claude.com for official documentation.",
     ),
 ]
 
 
-def add_text_to_shape(
-    shape, text: str, font_size: int = 18, bold: bool = False
-) -> None:
-    """Add text to a shape."""
-    if not hasattr(shape, "text_frame"):
-        return
+def style_slide(slide, prs):
+    """Set background image and dark text on all slide elements."""
+    # Add background image covering full slide, sent to back
+    pic = slide.shapes.add_picture(BG_IMAGE, 0, 0, prs.slide_width, prs.slide_height)
+    # Move picture to back of z-order
+    sp_tree = slide.shapes._spTree
+    sp_tree.remove(pic._element)
+    sp_tree.insert(2, pic._element)
 
-    text_frame = shape.text_frame
-    text_frame.clear()
-    p = text_frame.paragraphs[0]
-    run = p.add_run()
-    run.text = text
-    run.font.size = Pt(font_size)
-    run.font.color.rgb = DARK_TEXT
-    run.font.bold = bold
+    # Set all text to dark color
+    for shape in slide.shapes:
+        if shape.has_text_frame:
+            for paragraph in shape.text_frame.paragraphs:
+                paragraph.font.color.rgb = DARK_TEXT
+                for run in paragraph.runs:
+                    run.font.color.rgb = DARK_TEXT
 
 
-def add_bullet_points(
-    text_frame, bullets: list[Bullet], base_level: int = 0
-) -> None:
-    """Add bullet points to a text frame."""
-    text_frame.clear()
+def fill_bullets(placeholder, bullets):
+    """Fill a placeholder with bullet items."""
+    tf = placeholder.text_frame
+    tf.clear()
+    for i, bullet in enumerate(bullets):
+        if i == 0:
+            p = tf.paragraphs[0]
+        else:
+            p = tf.add_paragraph()
 
-    for bullet in bullets:
-        # Handle different bullet formats
-        if isinstance(bullet, str):
-            # Simple string bullet
-            p = text_frame.add_paragraph()
-            p.text = bullet
-            p.level = base_level
-            p.font.size = Pt(18)
-            p.font.color.rgb = DARK_TEXT
-
-        elif isinstance(bullet, tuple):
-            # Tuple format: (bold_text, regular_text, level)
-            bold_text, regular_text, level = bullet
-            p = text_frame.add_paragraph()
-
-            # Add bold part
-            run1 = p.add_run()
-            run1.text = bold_text
-            run1.font.size = Pt(18)
-            run1.font.bold = True
-            run1.font.color.rgb = DARK_TEXT
-
-            # Add regular part
-            run2 = p.add_run()
-            run2.text = regular_text
-            run2.font.size = Pt(18)
-            run2.font.color.rgb = DARK_TEXT
-
-            p.level = base_level + level
-
+        if isinstance(bullet, tuple):
+            bold_text, normal_text, level = bullet
+            p.level = level
+            run = p.add_run()
+            run.text = bold_text
+            run.font.bold = True
+            if normal_text:
+                run2 = p.add_run()
+                run2.text = normal_text
         elif isinstance(bullet, dict):
-            # Dict format: {"text": "...", "level": N}
-            p = text_frame.add_paragraph()
             p.text = bullet["text"]
             p.level = bullet.get("level", 0)
-            p.font.size = Pt(18)
-            p.font.color.rgb = DARK_TEXT
+        else:
+            p.text = bullet
+            p.level = 0
 
 
-def create_title_slide(prs, slide_data: TitleSlide) -> None:
-    """Create the title slide."""
-    slide_layout = prs.slide_layouts[LAYOUT_TITLE]
-    slide = prs.slides.add_slide(slide_layout)
-
-    # Set title
-    title_shape = slide.shapes.title
-    add_text_to_shape(title_shape, slide_data.title, font_size=44, bold=True)
-
-    # Set subtitle
-    if slide_data.subtitle:
-        for shape in slide.shapes:
-            if shape.has_text_frame and shape != title_shape:
-                add_text_to_shape(shape, slide_data.subtitle, font_size=28)
-                break
-
-    # Add notes
-    if slide_data.notes:
-        notes_slide = slide.notes_slide
-        notes_slide.notes_text_frame.text = slide_data.notes
+def delete_original_slides(prs, count):
+    """Delete the first N slides (original template slides)."""
+    # We must delete from the beginning, always removing index 0
+    # because indices shift after each removal
+    for _ in range(count):
+        sldIdLst = prs.slides._sldIdLst
+        rNs = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}"
+        sldId_elem = sldIdLst[0]  # Always remove first slide
+        rId = sldId_elem.get(rNs + "id")
+        sldIdLst.remove(sldId_elem)
+        prs.part.drop_rel(rId)
 
 
-def create_section_slide(prs, slide_data: SectionSlide) -> None:
-    """Create a section header slide."""
-    slide_layout = prs.slide_layouts[slide_data.layout]
-    slide = prs.slides.add_slide(slide_layout)
-
-    # Set title
-    title_shape = slide.shapes.title
-    add_text_to_shape(title_shape, slide_data.title, font_size=44, bold=True)
-
-    # Add notes
-    if slide_data.notes:
-        notes_slide = slide.notes_slide
-        notes_slide.notes_text_frame.text = slide_data.notes
+def set_notes_font_size(prs):
+    """Set speaker notes font size to 18pt for readability."""
+    for slide in prs.slides:
+        if slide.has_notes_slide:
+            for paragraph in slide.notes_slide.notes_text_frame.paragraphs:
+                paragraph.font.size = Pt(18)
+                for run in paragraph.runs:
+                    run.font.size = Pt(18)
 
 
-def create_content_slide(prs, slide_data: ContentSlide) -> None:
-    """Create a content slide with bullet points."""
-    slide_layout = prs.slide_layouts[LAYOUT_CONTENT]
-    slide = prs.slides.add_slide(slide_layout)
+def add_title_slide(prs, layout_idx, title_text, subtitle_text=None, notes_text=""):
+    """Add a slide with centered title and optional subtitle."""
+    layout = prs.slide_layouts[layout_idx]
+    slide = prs.slides.add_slide(layout)
 
-    # Set title
-    title_shape = slide.shapes.title
-    add_text_to_shape(title_shape, slide_data.title, font_size=32, bold=True)
+    for ph in slide.placeholders:
+        if ph.placeholder_format.idx == 0:  # Title
+            ph.text = title_text
+        elif ph.placeholder_format.idx == 1 and subtitle_text:  # Subtitle
+            ph.text = subtitle_text
 
-    # Add bullet points
-    for shape in slide.shapes:
-        if shape.has_text_frame and shape != title_shape:
-            add_bullet_points(shape.text_frame, slide_data.bullets)
-            break
+    if notes_text:
+        notes = slide.notes_slide
+        notes.notes_text_frame.text = notes_text
 
-    # Add notes
-    if slide_data.notes:
-        notes_slide = slide.notes_slide
-        notes_slide.notes_text_frame.text = slide_data.notes
+    style_slide(slide, prs)
+    return slide
 
 
-def create_image_slide(prs, slide_data: ImageSlide) -> None:
-    """Create an image slide."""
-    slide_layout = prs.slide_layouts[LAYOUT_CONTENT]
-    slide = prs.slides.add_slide(slide_layout)
+def add_section_header(prs, layout_idx, title_text, notes_text=""):
+    """Add a section header slide with centered title only."""
+    layout = prs.slide_layouts[layout_idx]
+    slide = prs.slides.add_slide(layout)
 
-    # Set title
-    title_shape = slide.shapes.title
-    add_text_to_shape(title_shape, slide_data.title, font_size=32, bold=True)
+    for ph in slide.placeholders:
+        if ph.placeholder_format.idx == 0:  # Title
+            ph.text = title_text
 
-    # Add image
-    if slide_data.image:
-        image_path = os.path.join(REPO_ROOT, slide_data.image)
-        if os.path.exists(image_path):
-            # Calculate position (centered below title)
-            left = prs.slide_width * 0.1
-            top = prs.slide_height * 0.25
-            width = prs.slide_width * 0.8
+    if notes_text:
+        notes = slide.notes_slide
+        notes.notes_text_frame.text = notes_text
 
-            slide.shapes.add_picture(image_path, left, top, width=width)
-
-    # Add notes
-    if slide_data.notes:
-        notes_slide = slide.notes_slide
-        notes_slide.notes_text_frame.text = slide_data.notes
+    style_slide(slide, prs)
+    return slide
 
 
-def create_two_column_slide(prs, slide_data: TwoColumnSlide) -> None:
-    """Create a two-column slide."""
-    slide_layout = prs.slide_layouts[LAYOUT_TWO_COLUMN]
-    slide = prs.slides.add_slide(slide_layout)
+def add_content_slide(prs, layout_idx, title_text, bullets, notes_text=""):
+    """Add a slide with title and bullet list content."""
+    layout = prs.slide_layouts[layout_idx]
+    slide = prs.slides.add_slide(layout)
 
-    # Set title
-    title_shape = slide.shapes.title
-    add_text_to_shape(title_shape, slide_data.title, font_size=32, bold=True)
+    title_ph = None
+    content_ph = None
 
-    # Add content to columns
-    text_frames = [
-        shape.text_frame
-        for shape in slide.shapes
-        if shape.has_text_frame and shape != title_shape
-    ]
+    for ph in slide.placeholders:
+        if ph.placeholder_format.idx == 0:  # Title
+            title_ph = ph
+        elif ph.placeholder_format.idx in (1, 10, 11):  # Content area
+            content_ph = ph
 
-    if len(text_frames) >= 2:
-        add_bullet_points(text_frames[0], slide_data.left)
-        add_bullet_points(text_frames[1], slide_data.right)
+    if title_ph:
+        title_ph.text = title_text
 
-    # Add notes
-    if slide_data.notes:
-        notes_slide = slide.notes_slide
-        notes_slide.notes_text_frame.text = slide_data.notes
+    if content_ph:
+        fill_bullets(content_ph, bullets)
+
+    if notes_text:
+        notes = slide.notes_slide
+        notes.notes_text_frame.text = notes_text
+
+    style_slide(slide, prs)
+    return slide
 
 
-def generate_presentation() -> None:
-    """Generate the PowerPoint presentation."""
+def add_image_slide(prs, layout_idx, title_text, image_path, notes_text=""):
+    """Add a slide with title and a full-width image in the content area."""
+    layout = prs.slide_layouts[layout_idx]
+    slide = prs.slides.add_slide(layout)
+
+    title_ph = None
+    content_ph = None
+
+    for ph in slide.placeholders:
+        if ph.placeholder_format.idx == 0:
+            title_ph = ph
+        elif ph.placeholder_format.idx in (1, 10, 11):
+            content_ph = ph
+
+    if title_ph:
+        title_ph.text = title_text
+
+    # Remove the content placeholder and add the image in its place
+    if content_ph:
+        left = content_ph.left
+        top = content_ph.top
+        width = content_ph.width
+        height = content_ph.height
+        # Remove placeholder
+        sp = content_ph._element
+        sp.getparent().remove(sp)
+        # Add image
+        slide.shapes.add_picture(image_path, left, top, width, height)
+
+    if notes_text:
+        notes = slide.notes_slide
+        notes.notes_text_frame.text = notes_text
+
+    style_slide(slide, prs)
+    return slide
+
+
+def add_two_column_slide(
+    prs, layout_idx, title_text, left_bullets, right_bullets, notes_text=""
+):
+    """Add a two-column slide."""
+    layout = prs.slide_layouts[layout_idx]
+    slide = prs.slides.add_slide(layout)
+
+    placeholders = {ph.placeholder_format.idx: ph for ph in slide.placeholders}
+
+    # Title
+    if 0 in placeholders:
+        placeholders[0].text = title_text
+
+    # Left content (idx=1)
+    if 1 in placeholders:
+        fill_bullets(placeholders[1], left_bullets)
+
+    # Right content (idx=2)
+    if 2 in placeholders:
+        fill_bullets(placeholders[2], right_bullets)
+
+    if notes_text:
+        notes = slide.notes_slide
+        notes.notes_text_frame.text = notes_text
+
+    style_slide(slide, prs)
+    return slide
+
+
+def render_title(prs, slide_data):
+    add_title_slide(
+        prs, LAYOUT_TITLE, slide_data.title, slide_data.subtitle, slide_data.notes
+    )
+
+
+def render_section(prs, slide_data):
+    add_section_header(prs, slide_data.layout, slide_data.title, slide_data.notes)
+
+
+def render_content(prs, slide_data):
+    add_content_slide(
+        prs, LAYOUT_CONTENT, slide_data.title, slide_data.bullets, slide_data.notes
+    )
+
+
+def render_image(prs, slide_data):
+    image_path = os.path.join(REPO_ROOT, slide_data.image)
+    add_image_slide(prs, LAYOUT_CONTENT, slide_data.title, image_path, slide_data.notes)
+
+
+def render_two_column(prs, slide_data):
+    add_two_column_slide(
+        prs,
+        LAYOUT_TWO_COLUMN,
+        slide_data.title,
+        slide_data.left,
+        slide_data.right,
+        slide_data.notes,
+    )
+
+
+RENDERERS = {
+    TitleSlide: render_title,
+    SectionSlide: render_section,
+    ContentSlide: render_content,
+    ImageSlide: render_image,
+    TwoColumnSlide: render_two_column,
+}
+
+
+def main():
     prs = Presentation(TEMPLATE)
 
-    for slide_data in SLIDES:
-        if isinstance(slide_data, TitleSlide):
-            create_title_slide(prs, slide_data)
-        elif isinstance(slide_data, SectionSlide):
-            create_section_slide(prs, slide_data)
-        elif isinstance(slide_data, ContentSlide):
-            create_content_slide(prs, slide_data)
-        elif isinstance(slide_data, ImageSlide):
-            create_image_slide(prs, slide_data)
-        elif isinstance(slide_data, TwoColumnSlide):
-            create_two_column_slide(prs, slide_data)
+    # Print available layouts for debugging
+    print("Available layouts:")
+    for i, layout in enumerate(prs.slide_layouts):
+        placeholders_info = [
+            (ph.placeholder_format.idx, ph.name) for ph in layout.placeholders
+        ]
+        print(f"  Layout {i}: {layout.name} — placeholders: {placeholders_info}")
+    print()
 
+    original_slide_count = len(prs.slides)
+    print(f"Original template has {original_slide_count} slides\n")
+
+    for slide_data in SLIDES:
+        renderer = RENDERERS[type(slide_data)]
+        renderer(prs, slide_data)
+
+    print(f"Deleting {original_slide_count} original template slides...")
+    delete_original_slides(prs, original_slide_count)
+    set_notes_font_size(prs)
+
+    os.makedirs(os.path.dirname(OUTPUT), exist_ok=True)
     prs.save(OUTPUT)
-    print(f"✓ Presentation generated: {OUTPUT}")
-    print(f"  Total slides: {len(SLIDES)}")
+    print(f"\nSaved presentation with {len(prs.slides)} slides to {OUTPUT}")
 
 
 if __name__ == "__main__":
-    generate_presentation()
+    main()
