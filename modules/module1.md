@@ -99,7 +99,10 @@ project instructions that load automatically every session.
 |-------|------|----------------|
 | Global (all projects) | `~/.claude/CLAUDE.md` | No |
 | Project (team-wide) | `./CLAUDE.md` | Yes |
-| Personal (local only) | `./CLAUDE.md.local` | No (gitignored) |
+| Personal (local only) | `./CLAUDE.local.md` | No (gitignored) |
+
+> Project memory can also live at `./.claude/CLAUDE.md`. When scopes overlap,
+> project-level instructions take precedence over global.
 
 **Exercise:** Update the project `CLAUDE.md` with proper structure:
 
@@ -155,7 +158,8 @@ a new line in the prompt.
 **`Ctrl+G`** — open the current prompt in your default text editor for longer edits.
 
 **`Esc+Esc`** — open the rewind menu to undo Claude's changes (code, conversation,
-or both). Useful when Claude goes in a wrong direction.
+or both). Useful when Claude goes in a wrong direction. Note: only tracks file edits
+via Write/Edit tools, not changes made by bash commands.
 
 > **Exercise:** Type `@src/todd/__init__.py` to reference the init file, then run
 > `!uv run todd hello` to verify the CLI still works.
