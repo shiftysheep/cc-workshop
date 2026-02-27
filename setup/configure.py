@@ -18,7 +18,7 @@ from typing import cast
 
 import typer  # type: ignore[import-not-found]
 from textual.app import App  # type: ignore[import-not-found]
-from textual.widgets import OptionList  # type: ignore[import-not-found]
+from textual.widgets import Input, OptionList  # type: ignore[import-not-found]
 from textual.widgets.option_list import Option  # type: ignore[import-not-found]
 
 # Constants
@@ -83,9 +83,17 @@ class ProfileSelector(App[str]):  # type: ignore[misc]
         self.profiles = profiles
 
     def compose(self):
-        """Create the option list with profiles."""
-        options = [Option(profile) for profile in self.profiles]
-        yield OptionList(*options)
+        """Create the filter input and option list with profiles."""
+        yield Input(placeholder="Type to filter profiles...")
+        yield OptionList(*[Option(profile) for profile in self.profiles])
+
+    def on_input_changed(self, event: Input.Changed) -> None:
+        """Filter the option list as the user types."""
+        option_list = self.query_one(OptionList)
+        option_list.clear_options()
+        query = event.value.lower()
+        filtered = [p for p in self.profiles if query in p.lower()]
+        option_list.add_options([Option(p) for p in filtered])
 
     def on_option_list_option_selected(self, event) -> None:
         """Handle profile selection."""
