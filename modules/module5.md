@@ -1,4 +1,4 @@
-# Module 5: Agentic Delivery Workflows
+# Module 5: Team Orchestration
 
 In this module you use the orchestration commands from Module 4 to build
 Python orchestrators in parallel worktrees. Two Claude instances run
