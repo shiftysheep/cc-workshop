@@ -256,7 +256,7 @@ SLIDES: list[SlideData] = [
     ),
     # Slide 10: Module 1 Section Header
     SectionSlide(
-        title="Module 1: Pre-commit + CLAUDE.md",
+        title="Module 1: Project Scaffolding",
         notes="Module 1 establishes the baseline: set up the tools, configure quality gates, and let Claude build a simple Typer CLI app from a natural language prompt. The workshop starts slow on purpose — scaffolding a CLI is boring but demonstrates Claude operating on your behalf. Claude is doing, not planning. Pre-commit hooks are back pressure (automated quality gates). CLAUDE.md shapes Claude's behavior across sessions. These patterns scale. Transition: What we do in this module.",
     ),
     # Slide 11: M1 Let's get to work
@@ -281,7 +281,7 @@ SLIDES: list[SlideData] = [
     ),
     # Slide 13: Module 2 Section Header
     SectionSlide(
-        title="Module 2: MCP, Plan Mode, and Agent SDK",
+        title="Module 2: MCP, Plan Mode, and the Agent SDK",
         notes="Module 2 introduces the critical concept of context as a finite resource. You'll install your first MCP server, see how MCP tools load on demand via ToolSearch, switch models for planning, and build a real feature through plan mode. The key progression: Module 1 was about Claude doing things for you. Module 2 is about Claude thinking before doing. Transition: What we do in this module.",
     ),
     # Slide 14: M2 What We Do
@@ -335,7 +335,7 @@ SLIDES: list[SlideData] = [
     ),
     # Slide 18: Module 3 Section Header
     SectionSlide(
-        title="Module 3: ADW Foundations",
+        title="Module 3: Extending Claude Code",
         notes="Module 3 builds the full extensibility layer. We create commands, skills, hooks, rules, and custom agents — all in .claude/. The key insight: all of this is markdown and configuration — no code. Claude's behavior is shaped by prose instructions, not programming. This is prompt-driven orchestration. Transition: What we do.",
     ),
     # Slide 19: M3 Let's get to work
