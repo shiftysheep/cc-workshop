@@ -51,7 +51,7 @@ claude
 In the chat box, enter:
 
 ```markdown
-Let's setup our project scaffolding utilizing UV. We will be creating a Typer cli application with the name of todd. Include a hello command.
+Let's setup our project scaffolding utilizing UV with a src layout. We will be creating a Typer cli application with the name of todd. Include a hello command.
 ```
 
 Claude will create the project structure: `pyproject.toml`, the `src/todd/` package,
@@ -81,6 +81,14 @@ Test the new command directly from the chat box using the `!` prefix to run shel
 ```
 
 You should see `Hello. How can I assist?` (or similar) printed to the terminal.
+
+> **Install pre-commit hooks.** After verifying the CLI works, install the hooks
+> Claude created:
+> ```
+> !uv run pre-commit install
+> !uv run pre-commit run --all-files
+> ```
+> This validates that all hooks pass on the current codebase before you start modifying anything.
 
 > **Tenet 1: Verify your work.** This manual test is a spot-check — it proves
 > the CLI works *right now*. In Module 2, we'll upgrade from manual verification
@@ -114,6 +122,7 @@ Update the project CLAUDE.md to include:
 - How to run the CLI: uv run todd
 - Coding standards: ruff (rules E, W, F, I, N, UP, B, C4, PLC, PLE, PLW, RUF), mypy strict
 - Commit conventions: conventional commits
+- Also have Claude update the project configuration (pyproject.toml) to match the CLAUDE.md standards (ruff rules, mypy strict mode, etc.)
 ```
 
 > **Callout:** This CLAUDE.md will shape Claude's behavior for the rest of the workshop.
@@ -136,6 +145,12 @@ In the chat box, run:
 > This HUD becomes more useful in later modules as context management and model switching become part of your workflow.
 > There are many other built-in slash commands you can see if you just type `/` in the chat window.
 > For a full list, see the [Anthropic docs on slash commands](https://code.claude.com/docs/en/interactive-mode#built-in-commands).
+
+> **Windows/PowerShell users:** ANSI escape codes may not render correctly.
+> Use this color-free variant instead:
+> ```
+> /statusline Show {model short name} | {context}% context | {cwd abbreviated} | {git_status} | {branch} where git status is plain text "clean" or "modified" without ANSI colors, abbreviate long paths, and omit git fields if not in a repo.
+> ```
 
 > **Pro tip:** Type `/cost` to see token usage and spend for this session, or
 > `/stats` for daily patterns. Cost awareness grows more important in later modules.
@@ -166,7 +181,68 @@ via Write/Edit tools, not changes made by bash commands.
 
 ---
 
-## 7. Commit and Proceed
+## 7. Hands-On: Claude Code for Non-Coding Tasks
+
+Claude Code isn't just for developers. These exercises demonstrate the same agentic
+capabilities applied to everyday knowledge work tasks.
+
+> **Prerequisite: Install document skills**
+> Before starting, install the skills Claude needs for file generation:
+> ```
+> /install-skill document-skills:pptx
+> /install-skill document-skills:xlsx
+> ```
+> These give Claude the ability to create PowerPoint and Excel files directly.
+
+---
+
+### Exercise 1: Data Transformation
+
+A sample sales report lives at `data/sales_report.csv`. Ask Claude:
+
+```
+Read @data/sales_report.csv and create a formatted Excel spreadsheet with
+a summary sheet showing totals by region and a chart of monthly trends.
+Save it to data/sales_summary.xlsx
+```
+
+> *What to notice:* Claude reads the CSV, creates a multi-sheet .xlsx with
+> formulas and charts — no Python script required.
+
+---
+
+### Exercise 2: Research → Presentation
+
+Ask Claude to research a topic and produce a slide deck:
+
+```
+Research the repository https://github.com/anthropics/claude-code — what
+it does, key features, and how to get started. Create a 5-slide PowerPoint
+overview deck and save it to data/claude_code_overview.pptx
+```
+
+> *What to notice:* Claude uses web search and the gh CLI to gather info,
+> then synthesizes it into a formatted presentation with slides, titles,
+> and bullet points.
+
+---
+
+### Exercise 3: Document Generation
+
+A meeting transcript lives at `data/meeting_notes.txt`. Ask Claude:
+
+```
+Read @data/meeting_notes.txt and create a structured action-item tracker.
+Extract every action item, assign owners where mentioned, set due dates
+from context, and save it as data/action_items.md
+```
+
+> *What to notice:* Claude parses unstructured text, extracts structured
+> data, and produces a formatted deliverable.
+
+---
+
+## 8. Commit and Proceed
 
 Ask Claude to commit the changes (including the CLAUDE.md update), then advance to
 the next module:

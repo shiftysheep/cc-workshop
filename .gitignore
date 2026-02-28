@@ -215,3 +215,6 @@ docs/~$*.pptx
 workshop-slides.pdf
 *.potx
 .DS_Store
+data/*.xlsx
+data/*.pptx
+data/action_items.md

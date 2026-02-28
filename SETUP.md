@@ -1,5 +1,16 @@
 # AWS Bedrock configuration
 
+## Before You Begin
+
+- **IDE** — You'll need a code editor. **VS Code** is recommended (free, cross-platform, excellent terminal integration). Any editor with an integrated terminal works.
+- **Run `claude update`** — ensure Claude Code is on the latest version before starting.
+- **Clone outside OneDrive/iCloud** — synced folders cause file-locking issues with git and uv; clone to a local-only directory (e.g. `~/repos/`).
+- **Quick clone instructions**:
+  ```
+  git clone https://github.com/shiftysheep/cc-workshop.git
+  cd cc-workshop
+  ```
+
 ## Automated Setup (Recommended)
 
 Run the automated configuration script:
