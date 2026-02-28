@@ -60,6 +60,20 @@ a `hello` command wired up with Typer, and code quality tooling.
 > tooling to respond to our natural language request. CLAUDE.md provided the project
 > instructions that shaped everything Claude just built.
 
+Now install the pre-commit hooks Claude created and validate they pass:
+
+```shell
+!uv run pre-commit install
+!uv run pre-commit run --all-files
+```
+
+> **Tenet 3: CLAUDE.md + hooks.** Pre-commit hooks enforce quality from the
+> first commit — this is *deterministic* quality. Unlike asking Claude to "be
+> careful," a hook guarantees the check runs every time. CLAUDE.md provided the
+> project instructions that shaped everything Claude just built. Together, they
+> form persistent memory (CLAUDE.md) plus automated gates (hooks).
+> This is one form of back pressure we can utilize to drive quality output.
+
 ---
 
 ## 3. Verify the Setup
@@ -75,20 +89,6 @@ You should see `Hello. How can I assist?` (or similar) printed to the terminal.
 > **Tenet 1: Verify your work.** This manual test is a spot-check — it proves
 > the CLI works *right now*. In Module 2, we'll upgrade from manual verification
 > to automated tests that catch regressions permanently.
-
-Now install the pre-commit hooks Claude created and validate they pass:
-
-```shell
-!uv run pre-commit install
-!uv run pre-commit run --all-files
-```
-
-> **Tenet 3: CLAUDE.md + hooks.** Pre-commit hooks enforce quality from the
-> first commit — this is *deterministic* quality. Unlike asking Claude to "be
-> careful," a hook guarantees the check runs every time. CLAUDE.md provided the
-> project instructions that shaped everything Claude just built. Together, they
-> form persistent memory (CLAUDE.md) plus automated gates (hooks).
-> This is one form of back pressure we can utilize to drive quality output.
 
 ---
 
