@@ -1,4 +1,4 @@
-# Module 3: ADW Foundations — Commands, Skills, and Hooks
+# Module 3: Extending Claude Code — Commands, Skills, Hooks, and Agents
 
 In this module we use Claude to generate a visual reference document for the ADW
 system already present in this branch, then explore the `.claude/` scaffolding that
