@@ -17,7 +17,7 @@ CURRENT_BRANCH = !`git branch --show-current`
 ## Instructions
 
 Propagate changes forward from a source module branch through all downstream module
-branches (up to module-5).
+branches (up to module-6).
 
 - If $ARGUMENTS contains a module branch name (e.g. "module-2"), use that as the
   source instead of CURRENT_BRANCH.
@@ -30,14 +30,14 @@ branches (up to module-5).
 ### 1. Determine the source branch
 
 - Use $ARGUMENTS module name if provided, otherwise CURRENT_BRANCH.
-- Validate it matches `module-N` where N is 1–4. If module-5, report "nothing
+- Validate it matches `module-N` where N is 1–5. If module-6, report "nothing
   downstream" and stop. If not a module branch, ask the user.
 - Extract the module number N.
 
 ### 2. Dry-run check
 
 If $ARGUMENTS contains "dry-run": list each downstream step
-(module-(N+1) through module-5) and the operations that would run, then stop.
+(module-(N+1) through module-6) and the operations that would run, then stop.
 
 ### 3. Ensure source is current
 
@@ -46,7 +46,7 @@ git checkout module-N
 git pull origin module-N
 ```
 
-### 4. For each downstream branch M from (N+1) through 5
+### 4. For each downstream branch M from (N+1) through 6
 
 **4a. Skip check (idempotency)**
 
@@ -117,5 +117,6 @@ Propagation complete from module-N:
   module-N → module-(N+1): ✓ clean merge
   module-(N+1) → module-(N+2): ✓ resolved 1 conflict
   ...
+  module-5 → module-6: ✓ clean merge
 Returned to module-N.
 ```
