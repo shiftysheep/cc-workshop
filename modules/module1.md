@@ -31,13 +31,11 @@ foundation every subsequent module builds on.
 
 ---
 
-## 1. Clone and Launch
+## 1. Launch Claude
 
-Clone the repository and launch Claude from the project directory:
+Open a terminal and launch Claude from the project directory:
 
 ```shell
-git clone https://github.com/shiftysheep/cc-workshop.git
-cd cc-workshop
 claude
 ```
 
