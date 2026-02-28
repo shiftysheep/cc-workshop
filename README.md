@@ -31,6 +31,17 @@ This will allow us to slowly introduce topics and focus on key aspects of the to
 | 4 | Team Orchestration | In-person | ~55 min |
 | 5 | Build a Claude Code Clone | Take-home project | 2-4 hours |
 
+## Workshop Structure
+
+| Module | Focus | Format | Est. Time |
+|--------|-------|--------|-----------|
+| 1 | Project Scaffolding | In-person | ~30 min |
+| 2 | MCP, Plan Mode, Agent SDK | In-person | ~40 min |
+| 3 | Commands, Skills, Hooks | In-person | ~40 min |
+| 4 | Building Orchestration Commands | In-person | ~25 min |
+| 5 | Team Orchestration | In-person | ~55 min |
+| 6 | Build a Claude Code Clone | Take-home project | 2-4 hours |
+
 ## How Modules Work
 
 Each module lives in `modules/moduleN.md` and walks you through the exercises for that milestone.
