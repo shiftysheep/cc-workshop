@@ -49,24 +49,16 @@ claude
 In the chat box, enter:
 
 ```markdown
-Let's setup our project scaffolding utilizing UV with a src layout. We will be creating a Typer cli application with the name of todd. Include a hello command.
+Let's setup our project scaffolding utilizing UV with a src layout. We will be creating a Typer cli application with the name of todd. Include a hello command. Also setup pre-commit with ruff, mypy, bandit, vulture, and xenon hooks.
 ```
 
 Claude will create the project structure: `pyproject.toml`, the `src/todd/` package,
-a `hello` command wired up with Typer, and code quality tooling (ruff, mypy,
-pre-commit).
+a `hello` command wired up with Typer, and code quality tooling.
 
-> **What just happened?** Claude used `Write` and `Bash` to build the entire project structure — no manual file creation needed.
-> Claude harnessed our existing tooling to respond to our natural language request.
-> Notice the pre-commit hooks in the output — these instructions came from our CLAUDE.md that was predefined.
-> Now every commit from here will run linting and type checking automatically, enforcing quality from the start.
-> This is one form of back pressure we can utilize to drive quality output.
-
-> **Tenet 3: CLAUDE.md + hooks.** Pre-commit hooks enforce quality from the
-> first commit — this is *deterministic* quality. Unlike asking Claude to "be
-> careful," a hook guarantees the check runs every time. CLAUDE.md provided the
-> project instructions that shaped everything Claude just built. Together, they
-> form persistent memory (CLAUDE.md) plus automated gates (hooks).
+> **What just happened?** Claude used `Write` and `Bash` to build the entire
+> project structure — no manual file creation needed. Claude harnessed our existing
+> tooling to respond to our natural language request. CLAUDE.md provided the project
+> instructions that shaped everything Claude just built.
 
 ---
 
@@ -80,17 +72,23 @@ Test the new command directly from the chat box using the `!` prefix to run shel
 
 You should see `Hello. How can I assist?` (or similar) printed to the terminal.
 
-> **Install pre-commit hooks.** After verifying the CLI works, install the hooks
-> Claude created:
-> ```
-> !uv run pre-commit install
-> !uv run pre-commit run --all-files
-> ```
-> This validates that all hooks pass on the current codebase before you start modifying anything.
-
 > **Tenet 1: Verify your work.** This manual test is a spot-check — it proves
 > the CLI works *right now*. In Module 2, we'll upgrade from manual verification
 > to automated tests that catch regressions permanently.
+
+Now install the pre-commit hooks Claude created and validate they pass:
+
+```shell
+!uv run pre-commit install
+!uv run pre-commit run --all-files
+```
+
+> **Tenet 3: CLAUDE.md + hooks.** Pre-commit hooks enforce quality from the
+> first commit — this is *deterministic* quality. Unlike asking Claude to "be
+> careful," a hook guarantees the check runs every time. CLAUDE.md provided the
+> project instructions that shaped everything Claude just built. Together, they
+> form persistent memory (CLAUDE.md) plus automated gates (hooks).
+> This is one form of back pressure we can utilize to drive quality output.
 
 ---
 
