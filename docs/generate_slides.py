@@ -31,7 +31,7 @@ LAYOUT_CONTENT = 6
 LAYOUT_CLOSING = 7
 
 # Bullet type alias
-Bullet = str | tuple[str, str, int] | dict[str, str | int]
+Bullet = str | tuple[str, str, int] | dict[str, str | int]  # pyright: ignore[reportGeneralTypeIssues]
 
 
 @dataclass
@@ -72,7 +72,7 @@ class TwoColumnSlide(SlideData):
     right: list[Bullet] = field(default_factory=list)
 
 
-# All 30 slides in exact order
+# All 34 slides in exact order
 SLIDES: list[SlideData] = [
     # Slide 1: Title slide
     TitleSlide(
@@ -117,9 +117,10 @@ SLIDES: list[SlideData] = [
         bullets=[
             "M1: Scaffold a Typer CLI app from a natural language prompt",
             "M2: Build a simple CLI LLM tool called todd",
-            "M3: Build orchestration commands, agents, hooks, and skills",
-            "M4: Run parallel agent teams in isolated worktrees",
-            "M5 (Take-home): Build todd into a Claude Code clone",
+            "M3: Build phase commands, agents, hooks, and skills",
+            "M4: Build orchestration commands from PRD",
+            "M5: Run parallel agent teams in isolated worktrees",
+            "M6 (Take-home): Build todd into a Claude Code clone",
         ],
         notes="Frame this as a hands-on journey. Where we'll progressively build up capabilities and complexity. Transition: Let's start with what Claude Code actually is.",
     ),
@@ -150,7 +151,34 @@ SLIDES: list[SlideData] = [
         ],
         notes="Orient participants before they start. The module files are the source of truth for exercises — they follow those, not the slides. The /module command is the transition mechanism: it merges the current branch into the next, so nothing is lost. Participants work at their own pace; the command handles the git logistics.",
     ),
-    # Slide 6: What Is Claude Code?
+    # Slide 6: Getting Started
+    ContentSlide(
+        title="Getting Started",
+        bullets=[
+            (
+                "Open VS Code: ",
+                "use the integrated terminal (`` Ctrl+` `` / `Cmd+J`) side by side with the code editor",
+                0,
+            ),
+            (
+                "Launch Claude: ",
+                "run `claude` from the project root in the integrated terminal",
+                0,
+            ),
+            (
+                "Side-by-side workflow: ",
+                "terminal split lets you see Claude output and code changes simultaneously",
+                0,
+            ),
+            (
+                "VS Code extension: ",
+                "alternatively, install the Claude Code extension from the VS Code marketplace",
+                0,
+            ),
+        ],
+        notes="This is the 'how to begin' reference slide. Participants should already have VS Code installed (covered in SETUP.md). Walk them through opening the integrated terminal and launching Claude from the project root. The side-by-side workflow is critical — they need to see both Claude's output and the files it's editing. The extension is an alternative for participants who prefer a GUI integration over the terminal.",
+    ),
+    # Slide 7: What Is Claude Code?
     ContentSlide(
         title="What Is Claude Code?",
         bullets=[
@@ -182,7 +210,7 @@ SLIDES: list[SlideData] = [
         ],
         notes="Claude Code is not a chatbot — it's an agentic tool that operates on your codebase. It reads files, writes code, runs commands, and manages its own workflow through subagents. The extensibility layers — MCP, commands, skills, hooks, agents — are what make it a platform, not just a tool. Plugins package these extensions for distribution: a single plugin can bundle commands, skills, agents, and hooks into one installable unit. Plugin marketplaces — both the public Anthropic marketplace and private enterprise ones — let teams share and discover these packages. Each extension point gets dedicated coverage in later modules. Transition: Before diving into the modules, let's establish the vocabulary.",
     ),
-    # Slide 7: Quality Tenets — Foundations
+    # Slide 8: Quality Tenets — Foundations
     ContentSlide(
         title="Quality Tenets: Foundations",
         bullets=[
@@ -204,7 +232,7 @@ SLIDES: list[SlideData] = [
             "Transition: The next four tenets build on these foundations."
         ),
     ),
-    # Slide 8: Quality Tenets — At Scale
+    # Slide 9: Quality Tenets — At Scale
     ContentSlide(
         title="Quality Tenets: At Scale",
         bullets=[
@@ -226,20 +254,21 @@ SLIDES: list[SlideData] = [
             "Transition: Let's start building. Module 1."
         ),
     ),
-    # Slide 9: Module 1 Section Header
+    # Slide 10: Module 1 Section Header
     SectionSlide(
         title="Module 1: Pre-commit + CLAUDE.md",
         notes="Module 1 establishes the baseline: set up the tools, configure quality gates, and let Claude build a simple Typer CLI app from a natural language prompt. The workshop starts slow on purpose — scaffolding a CLI is boring but demonstrates Claude operating on your behalf. Claude is doing, not planning. Pre-commit hooks are back pressure (automated quality gates). CLAUDE.md shapes Claude's behavior across sessions. These patterns scale. Transition: What we do in this module.",
     ),
-    # Slide 10: M1 Let's get to work
+    # Slide 11: M1 Let's get to work
     ContentSlide(
         title="Let's get to work",
         bullets=[
+            "Open your terminal, run `claude` from the project root, then open `modules/module1.md`",
             "Open `modules/module1.md` for our list of tasks",
         ],
         notes="Participants follow the steps in module1.md at their own pace. Flag down an assistant if you get stuck.\n\nPresenter talking points:\n- Install uv (Python package manager)\n- Configure Claude CLI (Bedrock profile)\n- Scaffold a Typer CLI app from a natural language prompt — Claude reads uv docs, decides structure, writes code, tests pass\n- Pre-commit hooks enforce quality gates automatically — ruff, mypy, bandit, etc.\n- Verify Claude followed your CLAUDE.md instructions by inspecting the generated code\n\nThe key insight: Claude is not a chatbot. It's an autonomous tool that can read, write, run commands, make decisions. Pre-commit hooks provide back pressure. CLAUDE.md provides persistent memory.\n\nTransition: Describe what you want, Claude handles the rest. Pre-commit hooks are back pressure before we even name it. CLAUDE.md shaped everything Claude just did.",
     ),
-    # Slide 11: M1 Summary
+    # Slide 12: M1 Summary
     ContentSlide(
         title="Summarizing what we have seen",
         bullets=[
@@ -250,32 +279,33 @@ SLIDES: list[SlideData] = [
         ],
         notes="Describe what you want, Claude handles the rest. Pre-commit hooks are back pressure before we even name it. CLAUDE.md shaped everything Claude just did. Transition: Module 2 introduces context management and planning.",
     ),
-    # Slide 12: Module 2 Section Header
+    # Slide 13: Module 2 Section Header
     SectionSlide(
         title="Module 2: MCP, Plan Mode, and Agent SDK",
         notes="Module 2 introduces the critical concept of context as a finite resource. You'll install your first MCP server, see how MCP tools load on demand via ToolSearch, switch models for planning, and build a real feature through plan mode. The key progression: Module 1 was about Claude doing things for you. Module 2 is about Claude thinking before doing. Transition: What we do in this module.",
     ),
-    # Slide 13: M2 What We Do
+    # Slide 14: M2 What We Do
     ContentSlide(
         title="Let's get to work",
         bullets=[
+            "Open your terminal, run `claude` from the project root, then open `modules/module2.md`",
             "Open `modules/module2.md` for our list of tasks",
         ],
         notes="Participants follow the steps in module2.md at their own pace. Flag down an assistant if you get stuck.",
     ),
-    # Slide 14: The Context Window (with image)
+    # Slide 15: The Context Window (with image)
     ImageSlide(
         title="The Context Window",
         image="images/context_window_utilization.png",
         notes="This is the most important conceptual slide. Walk through each layer. System prompt and CLAUDE.md are always present — they're the 'tax' on every interaction. MCP tool definitions are deferred via ToolSearch — they load into context only when Claude discovers them. This is progressive disclosure at the tool level. Conversation history is the biggest consumer — this is why /compact and /clear matter. File contents are loaded on demand but can be huge. The 'available space' is what Claude has for actual reasoning. When it shrinks too much, that's context rot in action. Transition: Now let's see how subagents protect this window.",
     ),
-    # Slide 15: Subagent Context Isolation (with image)
+    # Slide 16: Subagent Context Isolation (with image)
     ImageSlide(
         title="Subagent Context Isolation",
         image="images/subagent_context_savings.png",
         notes="This diagram shows how subagents protect the main context window. When Claude needs to search 40+ files or do deep research, it spawns a subagent — typically Haiku for cheap exploration, Opus for architecture decisions. Each subagent gets its own fresh context window. The search noise (file contents, failed matches, irrelevant results) stays in the subagent's window. Only a compact summary flows back to the main conversation. This is the primary defense against context rot: delegate the noisy work, keep the main window clean. Point out the three subagent types: two Explore agents running Haiku for fast, cheap searches, and one Plan agent running Opus for deeper reasoning. Transition: Module 3 builds the orchestration layer.",
     ),
-    # Slide 16: M2 Summary
+    # Slide 17: M2 Summary
     ContentSlide(
         title="Summarizing what we have seen",
         bullets=[
@@ -303,38 +333,39 @@ SLIDES: list[SlideData] = [
         ],
         notes="Context is finite and precious. Rot happens gradually (long sessions). Poisoning happens suddenly (one bad assumption). Subagents are the primary defense against both — each gets a fresh context window. MCP tools are deferred via ToolSearch — no idle context cost. Once loaded, definitions do consume context, so selective loading matters. This is progressive disclosure at the tool level. Model selection is about cost-quality tradeoffs, not just 'use the best model.' Transition: Module 3 builds the orchestration layer.\n\nTenet tracker: #4 (context is finite) and #5 (explore-plan-code) are the headlines. #1 (verify) gets its first test exercise. #2 (be specific) is demonstrated through the PRD workflow.",
     ),
-    # Slide 17: Module 3 Section Header
+    # Slide 18: Module 3 Section Header
     SectionSlide(
         title="Module 3: ADW Foundations",
         notes="Module 3 builds the full extensibility layer. We create commands, skills, hooks, rules, and custom agents — all in .claude/. The key insight: all of this is markdown and configuration — no code. Claude's behavior is shaped by prose instructions, not programming. This is prompt-driven orchestration. Transition: What we do.",
     ),
-    # Slide 18: M3 Let's get to work
+    # Slide 19: M3 Let's get to work
     ContentSlide(
         title="Let's get to work",
         bullets=[
+            "Open your terminal, run `claude` from the project root, then open `modules/module3.md`",
             "Open `modules/module3.md` for our list of tasks",
         ],
         notes="Participants follow the steps in module3.md at their own pace. Flag down an assistant if you get stuck.\n\nPresenter talking points:\n- Generate Architecture Reference Document with Mermaid diagrams — Claude as documentation tool, no code written, just analysis\n- Install document-skills plugin from the marketplace\n- Plan orchestration commands from PRD (docs/prds/adw-commands.md) — Claude reads .claude/ scaffolding to understand patterns, explores phase commands, skills, agents before planning\n- Build 4 orchestration commands from PRD: /feature (single-agent, 7 sequential phases), /bug (single-agent, 6 phases), /team:feature (multi-agent, parallel analysis + coordinated implementation), /team:bug (multi-agent, parallel analysis, 6 phases)\n- Create custom agents (.claude/agents/ + YAML frontmatter) — code-reviewer exercise teaches agent anatomy, then three ADW specialist agents\n- Explore PostToolUse lint hook — back pressure after every write",
     ),
-    # Slide 19: The Four-Layer Context System (with image)
+    # Slide 20: The Four-Layer Context System (with image)
     ImageSlide(
         title="The Four-Layer Context System",
         image="images/fourlayer_context_system.png",
         notes="This is the architectural insight of Module 3. The four layers form a progressive disclosure system. CLAUDE.md is always present (broad but essential). Rules narrow to specific directories. Skills narrow to specific task types. Hooks narrow to specific actions. The key insight: context is delivered at the moment it's needed, at the right scope. This prevents context bloat while ensuring Claude always has what it needs. Transition: Let's dig deeper into when progressive disclosure works and when it doesn't.",
     ),
-    # Slide 20: Progressive Disclosure (with image)
+    # Slide 21: Progressive Disclosure (with image)
     ImageSlide(
         title="Progressive Disclosure",
         image="images/progressive_disclosure.png",
         notes="Progressive disclosure is the difference between a productive session and context rot. The four-layer funnel: CLAUDE.md (always-on) → rules/ (directory-scoped) → skills (task-scoped) → hooks (event-scoped). Each layer narrows scope and timing. Anti-patterns include: dumping 100KB+ in system prompt, loading all reference docs 'just in case', same context for every workflow phase, hiding context the agent needs now. Nielsen Norman research shows 3+ disclosure levels cause confusion even for humans. Progressive disclosure doesn't mean hiding information — it means delivering it at the right time. If an agent needs reference docs NOW, load them NOW. Transition: The other side of quality — back pressure.",
     ),
-    # Slide 21: Back Pressure (with image)
+    # Slide 22: Back Pressure (with image)
     ImageSlide(
         title="Back Pressure",
         image="images/back_pressure_layers.png",
         notes="Back pressure is the system's resistance to bad output. Pre-commit hooks (M1) are the first layer — reject malformed commits. PostToolUse hooks (M3) are the second layer — inspect write operations before they land. Plan mode (M2) is architectural back pressure — think before writing. Tests (M1-M2) are verification back pressure — prove it works before you commit it. The goal: detect failure as early as possible. The later a failure is caught, the more expensive it is to fix. Hooks are cheap back pressure. They run synchronously, provide immediate feedback, and cost nothing if output is correct. Transition: Module 4 builds on this foundation by adding team-based orchestration.",
     ),
-    # Slide 22: M3 Summary
+    # Slide 23: M3 Summary
     ContentSlide(
         title="Summarizing what we have seen",
         bullets=[
@@ -366,18 +397,44 @@ SLIDES: list[SlideData] = [
         ],
         notes="Module 3 is the turning point. We went from 'Claude does things' (M1) and 'Claude plans things' (M2) to 'Claude orchestrates workflows' (M3). The four-layer context system is the architectural win. Back pressure is the quality win. Custom agents are the extensibility win. Orchestration commands are the productivity win. Everything from here scales on this foundation.\n\nTenet tracker: #6 (progressive disclosure) is the M3 headline. #3 (CLAUDE.md + hooks) deepened with PostToolUse. #7 (agent design) introduced through custom agent YAML.",
     ),
-    # Slide 23: Module 4 Section Header
+    # Slide 24: Module 4 Section Header
     SectionSlide(
-        title="Module 4: Team Orchestration",
-        notes="Module 4 scales from single-agent workflows to multi-agent teams. You'll create worker agents that operate in parallel, coordinate via leader agents, and execute in isolated worktrees. The key insight: team orchestration is just phase-driven workflows with parallel execution. Each worker gets its own fresh worktree and context window. Leaders delegate, workers execute, results merge. This is how you scale Claude to multiple simultaneous work streams. Transition: What we do.",
+        title="Module 4: Building Orchestration Commands",
+        notes="Module 4 builds the orchestration commands from a PRD. You'll use plan mode to architect four delivery workflows — /feature, /bug, /team:feature, /team:bug — and let Claude read the existing phase commands to understand the patterns before building. The key insight: Claude researches the scaffolding before planning, producing commands that correctly compose the primitives. This is prompt-driven orchestration. Transition: What we do.",
     ),
-    # Slide 24: M4 Let's get to work
+    # Slide 25: M4 Let's get to work
     ContentSlide(
         title="Let's get to work",
         bullets=[
+            "Open your terminal, run `claude` from the project root, then open `modules/module4.md`",
             "Open `modules/module4.md` for our list of tasks",
         ],
-        notes="Participants follow the steps in module4.md at their own pace. "
+        notes="Participants follow the steps in module4.md at their own pace. Flag down an assistant if you get stuck.\n\nPresenter talking points:\n- Activate plan mode, give Claude the ADW PRD\n- Claude reads existing phase commands to understand invocation patterns\n- Review the plan for all four orchestration commands\n- Approve and let Claude build: /feature, /bug, /team:feature, /team:bug\n- Each command composes the phase primitives in different ways",
+    ),
+    # Slide 26: M4 Summary
+    ContentSlide(
+        title="Summarizing what we have seen",
+        bullets=[
+            ("Orchestration commands: ", "Compose phase primitives into end-to-end workflows", 0),
+            ("Plan mode as research: ", "Claude explores scaffolding before proposing a plan", 0),
+            ("Four delivery variants: ", "/feature, /bug, /team:feature, /team:bug", 0),
+            ("Prompt-driven composition: ", "Commands defined in markdown, no code required", 0),
+        ],
+        notes="Module 4 produced four orchestration commands by composing the seven phase primitives. Plan mode was used not for code but for configuration — Claude explored the codebase, understood the patterns, and produced a plan for markdown files. This is prompt-driven orchestration: no code written, just configuration. Transition: Module 5 runs these commands against real PRDs.",
+    ),
+    # Slide 27: Module 5 Section Header
+    SectionSlide(
+        title="Module 5: Team Orchestration",
+        notes="Module 5 scales from single-agent workflows to multi-agent teams. You'll create worker agents that operate in parallel, coordinate via leader agents, and execute in isolated worktrees. The key insight: team orchestration is just phase-driven workflows with parallel execution. Each worker gets its own fresh worktree and context window. Leaders delegate, workers execute, results merge. This is how you scale Claude to multiple simultaneous work streams. Transition: What we do.",
+    ),
+    # Slide 28: M5 Let's get to work
+    ContentSlide(
+        title="Let's get to work",
+        bullets=[
+            "Open your terminal, run `claude` from the project root, then open `modules/module5.md`",
+            "Open `modules/module5.md` for our list of tasks",
+        ],
+        notes="Participants follow the steps in module5.md at their own pace. "
               "Flag down an assistant if you get stuck.\n\n"
               "Presenter talking points:\n"
               "- Plan team worker agents from PRD (docs/prds/team-workers.md)\n"
@@ -387,13 +444,13 @@ SLIDES: list[SlideData] = [
               "- Test parallel execution, observe worktree isolation\n"
               "- Inspect agent coordination: leader delegates, workers execute",
     ),
-    # Slide 25: Worktree Isolation (with image)
+    # Slide 29: Worktree Isolation (with image)
     ImageSlide(
         title="Worktree Isolation",
         image="images/worktree_isolation.png",
-        notes="This diagram shows how worktrees isolate parallel work. Each worker agent gets its own worktree — a separate working directory linked to the same git repository. Workers can write, commit, and test without interfering with each other. The leader agent operates in the main worktree and coordinates merges. This is the primary isolation mechanism for team orchestration. It prevents file conflicts, context contamination, and race conditions. Point out the three worktrees (backend, frontend, test) and the main worktree (leader). Transition: Let's discuss managing Claude Code projects long-term.",
+        notes="This diagram shows how worktrees isolate parallel work. Each worker agent gets its own worktree — a separate working directory linked to the same git repository. Workers can write, commit, and test without interfering with each other. The leader agent operates in the main worktree and coordinates merges. This is the primary isolation mechanism for team orchestration. It prevents file conflicts, context contamination, and race conditions. Point out the three worktrees (backend, frontend, test) and the main worktree (leader). This is Module 5. Transition: Let's discuss managing Claude Code projects long-term.",
     ),
-    # Slide 26: Managing Projects with Claude Code
+    # Slide 30: Managing Projects with Claude Code
     ContentSlide(
         title="Managing Projects with Claude Code",
         bullets=[
@@ -405,19 +462,19 @@ SLIDES: list[SlideData] = [
         ],
         notes="This is the high-level 'what comes next' discussion slide. CLAUDE.md audits "
               "tie back to the anti-patterns taught in M3 — now applied at maintenance scale. "
-              "CI/CD utilization uses the same headless mode pattern participants saw in M4's "
+              "CI/CD utilization uses the same headless mode pattern participants saw in M5's "
               "orchestrators — `claude -p` with predefined commands automates ADWs or individual "
               "lifecycle phases (review, test, document) in GitHub Actions. Cost tracking and "
               "checkpointing are operational hygiene for sustained usage. Participants will use "
-              "all of these skills in the M5 capstone project.",
+              "all of these skills in the M6 capstone project.",
     ),
-    # Slide 27: The Progression (with image)
+    # Slide 31: The Progression (with image)
     ImageSlide(
         title="The Progression",
         image="images/progression.png",
-        notes="This slide shows the full five-module progression. M1: CLAUDE.md + pre-commit (foundational quality). M2: Context management + subagents (efficiency). M3: Four-layer context + orchestration (scale). M4: Team workers + worktrees (parallelization). M5 (take-home): Build todd into a Claude Code clone. Each module builds on the last. The principles — progressive disclosure, back pressure, isolation, delegation — compound. By M4, you have a fully operational agentic delivery system. Transition: Let's review how the eight tenets mapped to this progression.",
+        notes="This slide shows the full six-module progression. M1: CLAUDE.md + pre-commit (foundational quality). M2: Context management + subagents (efficiency). M3: Four-layer context + phase commands (scale). M4: Orchestration commands from PRD (composition). M5: Team workers + worktrees (parallelization). M6 (take-home): Build todd into a Claude Code clone. Each module builds on the last. The principles — progressive disclosure, back pressure, isolation, delegation — compound. By M5, you have a fully operational agentic delivery system. Transition: Let's review how the eight tenets mapped to this progression.",
     ),
-    # Slide 28: Tenets — Recap
+    # Slide 32: Tenets — Recap
     ContentSlide(
         title="Tenets of Quality Output — Recap",
         bullets=[
@@ -440,26 +497,26 @@ SLIDES: list[SlideData] = [
             "github.com/anthropics/prompt-eng-interactive-tutorial"
         ),
     ),
-    # Slide 29: Module 5 Homework
+    # Slide 33: Module 6 Homework
     ContentSlide(
         title="Homework: Build a Claude Code Clone",
         bullets=[
-            "Module 5 is a self-paced capstone project",
-            "Open `modules/module5.md` for 5 milestone PRDs",
+            "Module 6 is a self-paced capstone project",
+            "Open `modules/module6.md` for 5 milestone PRDs",
             "Use your ADW tools — `/feature` and `/team:feature` work here",
         ],
-        notes="Module 5 is take-home. Participants extend todd from a single-shot "
+        notes="Module 6 is take-home. Participants extend todd from a single-shot "
               "prompt forwarder into an interactive agentic tool — a miniature Claude "
               "Code clone. Five milestones: REPL, Tool Use, Streaming, CLAUDE.md "
               "Loading, Session Persistence. Each has a PRD in docs/prds/. Estimated "
               "2-4 hours across multiple sessions. Use `claude --resume` to pick up "
               "where you left off.",
     ),
-    # Slide 30: Closing
+    # Slide 34: Closing
     SectionSlide(
         title="Questions?",
         layout=LAYOUT_CLOSING,
-        notes="Open the floor for questions. If time permits, offer to demo any specific concept live. Repo is available for participants to continue working through modules independently. Point participants to Module 5 — the capstone project where they build todd into a Claude Code clone using everything they've learned. Point them to code.claude.com for official documentation.",
+        notes="Open the floor for questions. If time permits, offer to demo any specific concept live. Repo is available for participants to continue working through modules independently. Point participants to Module 6 — the capstone project where they build todd into a Claude Code clone using everything they've learned. Point them to code.claude.com for official documentation.",
     ),
 ]
 

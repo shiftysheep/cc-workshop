@@ -37,7 +37,7 @@ one does:
 | `Glob` | Finds files by pattern (e.g. `**/*.py`) |
 | `Grep` | Searches file contents with regex |
 | `Bash` | Runs a shell command |
-| `Task` | Spawns a subagent to handle a focused subtask |
+| `Agent` | Spawns a subagent to handle a focused subtask |
 
 **Context7 MCP tools** (installed in step 1)
 
@@ -87,6 +87,14 @@ Browse to the **Discover** tab, find **context7**, and install it at **user** sc
 > prompts are your first line of defense, but they're not a substitute for
 > reviewing what tools a plugin actually installs. Before you approve, check
 > the tool list and understand what each one does.
+
+> **More MCP examples.** Teams build plugins for nearly any workflow:
+> - **Jira/Confluence** — Read Jira tickets and Confluence pages directly from Claude.
+>   Pull requirements and meeting notes without switching tools.
+> - **Lucidchart** — Diagramming MCP servers let Claude generate or update visual
+>   diagrams as part of documentation workflows.
+> - Discover more through the `/plugin` marketplace — browse the **Discover** tab
+>   to see community and enterprise plugins.
 
 ---
 
@@ -138,7 +146,37 @@ to show `⏸ plan mode on`.
 
 ---
 
-## 5. Build the todd Query Command
+## 5. Configure the Language Server
+
+A language server gives you real-time type feedback as Claude generates code — instead
+of waiting for `mypy` to run at commit time, you see red squiggles the moment a type
+error is introduced.
+
+**VS Code users:** Install the **Pylance** extension (which bundles Pyright):
+
+1. Open the Extensions panel (`Cmd+Shift+X` / `Ctrl+Shift+X`)
+2. Search for **Pylance** and install it
+3. Open the Command Palette (`Cmd+Shift+P`) and run
+   **Python: Select Interpreter** — choose the `.venv` created by uv
+
+**Other editors:** Install Pyright standalone:
+
+```shell
+npm install -g pyright
+```
+
+Then configure your editor to use it as the Python language server.
+
+> **Why LSP matters for agentic workflows.** A language server like Pyright gives
+> you instant type-error feedback as Claude generates code. Instead of waiting for
+> `mypy` to run at commit time, you'll see red squiggles in real-time — catch type
+> mismatches, missing imports, and signature errors the moment Claude writes them.
+> This tightens the human-in-the-loop feedback cycle: you spot issues while Claude
+> is still in context, rather than after the fact.
+
+---
+
+## 6. Build the todd Query Command
 
 Now let's put it to work. We have a requirements document ready at
 `docs/prds/todd-query.md`. Enter this prompt in the chat box:
@@ -158,7 +196,7 @@ touching any code.
 
 ---
 
-## 6. Understanding Subagents and Context
+## 7. Understanding Subagents and Context
 
 While Claude is working on the plan, here's what's happening under the hood.
 
@@ -195,13 +233,20 @@ each subagent starts with a fresh context, a noisy or incorrect result from one 
 can't accumulate and corrupt the reasoning in the main conversation. If a subagent
 goes wrong, you restart that subagent — not your entire session.
 
-> **Pro tip — session resume.** If you need to exit and come back,
-> `claude --continue` resumes the most recent session, and `claude --resume`
-> lets you pick by name. Use `/rename <name>` to label sessions for easy recall.
+> **Session management — resuming, naming, and branching.**
+>
+> - **`claude --continue`** — resumes the most recent session automatically, no picker needed.
+> - **`claude --resume`** — interactive picker to choose a named session by title.
+> - **`/rename <name>`** — labels the current session for easy recall later.
+> - **Rewind (`Esc+Esc`)** — undo Claude's recent file edits and the conversation up to a
+>   chosen checkpoint. Only tracks changes made via Write/Edit tools — not bash commands.
+> - **Fork (`Shift+Tab` once)** — creates a new branch of the conversation from the current
+>   point, preserving the original session. Useful for trying an alternate approach without
+>   losing your current context.
 
 ---
 
-## 7. Review and Approve the Plan
+## 8. Review and Approve the Plan
 
 Claude will present a plan showing:
 
@@ -220,7 +265,7 @@ Read it carefully. You can:
 
 ---
 
-## 8. Implement the Plan
+## 9. Implement the Plan
 
 Once you're satisfied with the plan, confirm it. Claude will switch from Opus to
 Sonnet and begin implementing — creating files, updating `pyproject.toml`, and
@@ -228,7 +273,7 @@ writing the code described in the plan.
 
 ---
 
-## 9. Understanding Model Selection
+## 10. Understanding Model Selection
 
 Claude Code supports multiple models, each suited to different tasks:
 
@@ -255,7 +300,7 @@ gives you Opus reasoning where it matters most and Sonnet speed for the rest.
 
 ---
 
-## 10. Test the New Command
+## 11. Test the New Command
 
 Once Claude is done, verify it works directly from the chat box:
 
@@ -267,7 +312,7 @@ You should see a response from Claude describing which model is active.
 
 ---
 
-## 11. Write a Verification Test
+## 12. Write a Verification Test
 
 Before committing, let's verify the feature with an automated test — not just a
 manual check.
@@ -295,7 +340,7 @@ After Claude creates the test, run it:
 
 ---
 
-## 12. Commit and Proceed
+## 13. Commit and Proceed
 
 Ask Claude to commit the changes, then advance to the next module:
 
