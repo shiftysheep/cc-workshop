@@ -14,14 +14,14 @@ Research codebase and documentation to answer questions, understand patterns, an
 ## Workflow
 
 1. **Decompose** the research question into sub-questions: what to find in codebase, what to find in docs
-2. **Spawn Explore subagents** (use Task tool with subagent_type=Explore) for parallel investigation:
+2. **Spawn Explore subagents** (use Agent tool with subagent_type=Explore) for parallel investigation:
    - One for codebase structure and implementation patterns
    - One for existing documentation and specs
 3. **Synthesize** findings from all subagents into a unified research report
 
 ## Delegate to Explore Subagents
 
-Use the Task tool with `subagent_type: "Explore"` for read-only codebase and documentation research.
+Use the Agent tool with `subagent_type: "Explore"` for read-only codebase and documentation research.
 Explore subagents are fast (haiku model) and ideal for parallel searches.
 
 ## Output

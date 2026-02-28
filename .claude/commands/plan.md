@@ -14,7 +14,7 @@ Create a phased implementation plan with atomic commits, saved to `docs/plans/`.
 ## Workflow
 
 1. **Read input** — consume any referenced spec document, research findings, or feature description from `$ARGUMENTS`
-2. **Delegate to Plan subagent** (use Task tool with `subagent_type: "Plan"`) for planning:
+2. **Delegate to Plan subagent** (use Agent tool with `subagent_type: "Plan"`) for planning:
    - Provide full spec/research context in the prompt
    - Ask it to produce phases with `[PHASE-XXX]` IDs, each representing one atomic commit
    - Each phase should include: files changed, tests strategy, acceptance criteria
@@ -22,7 +22,7 @@ Create a phased implementation plan with atomic commits, saved to `docs/plans/`.
 
 ## Delegate to Plan Subagents
 
-Use the Task tool with `subagent_type: "Plan"` for structured implementation planning.
+Use the Agent tool with `subagent_type: "Plan"` for structured implementation planning.
 
 ## Phase Structure Requirements
 
