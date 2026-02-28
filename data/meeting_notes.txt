@@ -1,0 +1,29 @@
+Product Release Planning - Q1 2024
+Meeting Date: February 15, 2024
+Attendees: Sarah Chen (PM), Mike Torres (Engineering), Jessica Park (QA), David Kim (Design)
+
+Sarah: Let's review our Q1 release timeline. We're targeting March 28th for the 2.1 release. Mike, where are we on the authentication refactor?
+
+Mike: Making good progress. The OAuth integration is complete, but we still need to implement the token refresh logic. I'd estimate another week for that. We also discovered some performance issues with the session management — average response time jumped from 200ms to 450ms under load.
+
+Sarah: That's concerning. Can we fix it before the release?
+
+Mike: Yes, but we'll need to push the API rate limiting feature to 2.2. I'll need Jessica's help testing the session changes once they're ready.
+
+Jessica: Works for me. I'm finishing up the mobile test suite this week. David, have you finalized the new onboarding flow designs?
+
+David: Almost done. I'll have the final mockups ready by end of day Friday. Once those are approved, I can hand them off to Mike for implementation.
+
+Sarah: Great. Let's make sure we document the breaking changes for the API. Mike, can you update the migration guide by next Wednesday?
+
+Mike: Sure thing. I'll also add examples for the new OAuth flow.
+
+Jessica: One more thing — we found a critical bug in the password reset flow. Users can't reset passwords if they have special characters in their email address. This needs to be fixed before launch.
+
+Sarah: Agreed, that's a blocker. Mike, can you prioritize that?
+
+Mike: I'll start on it tomorrow morning and aim to have a fix by end of week.
+
+David: Should we schedule a final review meeting before the release?
+
+Sarah: Yes, let's book something for March 25th — three days before launch. That gives us time to address any last-minute issues.
