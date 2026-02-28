@@ -106,6 +106,38 @@ implement a feature, research a topic, run a phase. In this repo:
 
 The distinction in practice:
 
+**Diagram 1: Extension point overview**
+
+```mermaid
+graph LR
+    User["User / Operator"] -->|invokes| Cmd["/command"]
+    User -->|invokes| Skill["/skill"]
+    Cmd -->|delegates| Agent["Agent"]
+    Skill -->|delegates| Agent
+    Hook["Hook<br>(lifecycle event)"] -->|fires at| ToolCall["Tool call"]
+    Agent -->|loads| Skill
+    Cmd -->|loads| Skill
+```
+
+**Diagram 2: Execution flow**
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant C as Command
+    participant A as Agent
+    participant S as Skill
+    participant H as Hook
+
+    U->>C: /feature @prd.md
+    C->>A: delegate research phase
+    A->>S: load code-review skill
+    A->>H: PostToolUse fires on write
+    H-->>A: lint result (exit 0/2)
+    A-->>C: phase complete
+    C-->>U: plan ready for review
+```
+
 | | Command | Skill |
 |-|---------|-------|
 | **Invocation** | Explicit (`/research`, `/implement`) | Automatic (description match) |
@@ -121,6 +153,20 @@ The distinction in practice:
 > (useful for workflows that shouldn't pollute the main context). This gives you
 > command-style explicit invocation with skill-level bundled references and scripts.
 
+**When to use what:**
+
+| If you want to... | Use |
+|-------------------|-----|
+| Execute a repeatable workflow | **Command** |
+| Teach Claude domain knowledge | **Skill** |
+| Coordinate specialist workers | **Agent** |
+| Validate output automatically | **Hook** |
+
+> **Practical decision tree.** If it's a workflow → command. If it's knowledge → skill.
+> If it's a specialist worker → agent. If it's a quality gate → hook.
+> Agents can invoke commands (e.g. an orchestrator agent running `/implement`).
+> Commands can delegate to agents (e.g. `/team:feature` spawning worker agents).
+
 > **Four ways to deliver work.** The phase commands are reusable primitives.
 > You can compose them in four ways — two single-agent, two multi-agent:
 >
@@ -133,6 +179,14 @@ The distinction in practice:
 >
 > A PRD at `docs/prds/adw-commands.md` defines all four commands we'll build
 > in this module using prompt-driven orchestration.
+
+---
+
+> **Internal Plugin Marketplace.** Your team maintains an internal marketplace
+> of Claude Code plugins. These plugins provide pre-built commands, skills,
+> and agents for common workflows — including code review, Jira integration,
+> security hooks, and orchestration patterns. Your instructor will walk you
+> through how to access and install them.
 
 ---
 
@@ -212,104 +266,28 @@ Do not suggest fixes — only identify issues.
 | `memory` | Memory scope | `user`, `project`, `local` |
 | `isolation` | Execution isolation | `worktree` |
 
+> See the full [agent settings reference](https://code.claude.com/docs/en/agents)
+> for all available frontmatter fields.
+
 > **Exercise:** Create `.claude/agents/code-reviewer.md` with the configuration above.
 > Then ask Claude to "review the todd query command" and observe it delegating to your
 > custom subagent.
+
+> **Exercise 2:** Ask Claude to create a design agent:
+> ```
+> Create .claude/agents/design.md — a design agent with model: opus, tools: Read,
+> Glob, Grep, Write, and the documentation-standards skill. The agent should produce
+> technical specifications for features based on PRDs and research findings.
+> ```
+> Notice that Claude creates the agent file itself — this is Claude building its own
+> tooling. Review the generated frontmatter and system prompt before continuing.
 
 You'll see three more agents (implementation.md, validation.md, documentation.md)
 when you explore the `.claude/` scaffolding in the next section.
 
 ---
 
-## 5. Plan the Orchestration Commands
-
-Now activate plan mode and give Claude the PRD. Claude will research the
-existing scaffolding to understand what it's composing before proposing a plan.
-
-Press `Shift+Tab` twice to enter plan mode, then enter:
-
-```markdown
-Read docs/prds/adw-commands.md and plan how to create the four orchestration
-commands described in the PRD: /feature, /bug, /team:feature, and /team:bug.
-Research the existing phase commands and agent definitions to understand
-the invocation and team coordination patterns.
-```
-
-Claude will begin exploring the codebase — reading phase commands, existing
-skills, and the hook configuration — to understand the patterns before
-planning.
-
-> **Plan mode as research.** In Module 2 you used plan mode to plan a code
-> change. Here you're using it to plan `.claude/` configuration. The mechanism
-> is the same: Claude explores the codebase in read-only mode, reasons about
-> the existing structure, and produces a plan before writing anything. Plan
-> mode isn't just for code — it works for any task where understanding the
-> current state matters before changing it.
-
----
-
-## 6. How Claude Researches the Scaffolding
-
-While Claude works on its plan, here's what it's exploring and why it matters.
-
-**Phase commands as primitives.** Claude reads the seven commands in
-`.claude/commands/` — research, design, plan, validation, implement, review,
-document. Each is a single-responsibility slash command: one clear job,
-defined inputs, defined output. This is what makes them composable — the
-orchestration commands can chain them both sequentially (single-agent) and
-in parallel (team-based) because each phase is self-contained.
-
-**Existing skills as patterns.** Claude reads existing commands AND skills to
-understand patterns. The new commands compose phase commands; the team variants
-also use TeamCreate/SendMessage for parallel worker coordination. Commands are
-stored in `.claude/commands/<name>.md`, while skills in `.claude/skills/<name>/SKILL.md`
-show structure with YAML frontmatter, instructions, and optional `references/`.
-
-**Dynamic context injection.** Skills, hooks, and CLAUDE.md form a layered
-context system:
-
-| Mechanism | When it fires | Use case |
-|-----------|--------------|----------|
-| `CLAUDE.md` | Every session, always | Project-wide constants |
-| **Skill** | When task matches description | Standards loaded on demand |
-| **Hook** | At lifecycle events | Validation, back pressure |
-
-The new `/feature` command adds a fourth pattern: **explicit invocation** of
-orchestration workflows. Unlike auto-loaded skills, commands fire only when
-the user types `/<name>` — giving the user direct control over when
-orchestration starts.
-
-> **Progressive disclosure applied here.** Claude doesn't load all skills
-> into every context. A code quality skill doesn't fire when writing
-> documentation. A hook that validates `.py` files only runs after Python
-> writes. The new `/feature` skill will only fire when explicitly invoked.
-> Context is revealed at the moment it's needed — no earlier, no later.
-
----
-
-## 7. Review and Build
-
-Claude will present a plan for the four command files. Review it, then confirm.
-
-Verify the plan includes:
-- `/feature` and `/bug`: correct phase sequences, `$ARGUMENTS`, context handoff between phases
-- `/team:feature` and `/team:bug`: Group 1 parallel workers (4 for feature, 3 for bug), leader synthesis step, Group 2 coordinated workers
-- File locations: `.claude/commands/feature.md`, `.claude/commands/bug.md`, `.claude/commands/team:feature.md`, `.claude/commands/team:bug.md`
-
-Once satisfied, approve the plan. Claude will create the command files in
-`.claude/commands/`.
-
-> **What just happened?** You gave Claude a PRD and it produced four
-> orchestration commands that compose the seven existing phase commands. The
-> team commands introduce `TeamCreate` and `SendMessage` — the first time
-> these tools appear in the workshop. No code was written — just markdown
-> configuration. This is the power of the `.claude/` scaffolding: commands
-> are primitives, they compose each other, and the entire system is defined
-> in markdown.
-
----
-
-## 8. Explore the Lint Check Hook
+## 5. Explore the Lint Check Hook
 
 Hooks run at Claude Code lifecycle events. A `PostToolUse` hook fires after every
 `Write` or `Edit` tool call — the right moment to validate what Claude just wrote
@@ -337,7 +315,7 @@ fails.
 
 ---
 
-## 9. Understanding Dynamic Context Injection
+## 6. Understanding Dynamic Context Injection
 
 You've now explored three mechanisms for injecting context into Claude:
 
@@ -359,7 +337,7 @@ moments to inject or capture context dynamically.
 
 ---
 
-## 10. CLAUDE.md as a Context Engineering Tool
+## 7. CLAUDE.md as a Context Engineering Tool
 
 You've now seen CLAUDE.md as project-level configuration. It's also a powerful context
 engineering tool with several advanced features.
@@ -443,12 +421,12 @@ across every session.
 
 ---
 
-## 11. Commit and Proceed
+## 8. Commit and Proceed
 
 Ask Claude to commit the changes, then advance to the next module:
 
 ```markdown
-Commit the new command files and then run /module to proceed to module 4.
+Commit the changes and then run /module to proceed to module 4.
 ```
 
 ---
