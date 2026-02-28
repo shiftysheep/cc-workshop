@@ -26,8 +26,8 @@ This will allow us to slowly introduce topics and focus on key aspects of the to
 | Module | Focus | Format | Est. Time |
 |--------|-------|--------|-----------|
 | 1 | Project Scaffolding | In-person | ~30 min |
-| 2 | MCP, Plan Mode, Agent SDK | In-person | ~40 min |
-| 3 | Commands, Skills, Hooks | In-person | ~40 min |
+| 2 | MCP, Plan Mode, and the Agent SDK | In-person | ~40 min |
+| 3 | Extending Claude Code | In-person | ~40 min |
 | 4 | Building Orchestration Commands | In-person | ~25 min |
 | 5 | Team Orchestration | In-person | ~55 min |
 | 6 | Build a Claude Code Clone | Take-home project | 2-4 hours |
