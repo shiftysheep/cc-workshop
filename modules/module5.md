@@ -93,17 +93,7 @@ Read docs/prds/adw-feature.md and docs/prds/adw-bug.md
 
 ## 3. Launch Two Worktrees
 
-> **Prerequisite: enable agent teams.** The `/team:feature` command uses
-> `TeamCreate` and `SendMessage`, which require an experimental feature flag.
-> The project's `.claude/settings.json` already sets it — verify it's present
-> before continuing:
->
-> ```json
-> "env": { "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1" }
-> ```
->
-> If it's missing, add it to `.claude/settings.json` or export it in your
-> shell: `export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
+> **Agent teams are already enabled.** You enabled the flag in Module 3, Step 8.
 
 Open two terminal windows. Each runs an independent Claude instance in its
 own worktree:

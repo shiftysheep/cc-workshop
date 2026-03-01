@@ -37,6 +37,15 @@ by using session logs to analyze agent behavior and improve ADW velocity.
 | `Glob` | Finds files by pattern (e.g. `**/*.md`) |
 | `Bash` | Runs a shell command |
 
+**Team tools**
+
+| Tool | What it does |
+|------|-------------|
+| `TeamCreate` | Creates a named team with a shared task list |
+| `TaskCreate` | Adds a task to the current team's task list |
+| `TaskUpdate` | Updates task owner and status |
+| `SendMessage` | Sends messages between team members |
+
 ---
 
 ## 1. Generate the ADW Architecture Reference Document
@@ -282,8 +291,130 @@ Do not suggest fixes — only identify issues.
 > Notice that Claude creates the agent file itself — this is Claude building its own
 > tooling. Review the generated frontmatter and system prompt before continuing.
 
+
+### Agent MCP Scoping
+
+When an agent needs an MCP server, there are two patterns depending on whether the
+server requires OAuth authentication.
+
+**Pattern 1 — Inline `mcpServers` (local/stdio servers, no OAuth)**
+
+Use this for servers that start as a local process (stdio transport). The agent
+defines the server in its own frontmatter and gets its own instance:
+
+```yaml
+---
+name: docs-researcher
+description: Researches documentation using Context7
+model: haiku
+tools:
+  - Read
+  - mcp__context7__resolve-library-id
+  - mcp__context7__query-docs
+mcpServers:
+  context7:
+    command: "npx"
+    args: ["-y", "@upstash/context7-mcp@latest"]
+---
+```
+
+The server starts fresh for this agent. No authentication flow needed — works in
+subagents, `claude -p`, and team workers.
+
+**Pattern 2 — Plugin inheritance (OAuth-based servers)**
+
+For servers like Atlassian or Slack that require browser-based OAuth consent, omit
+`mcpServers` entirely. The agent inherits the parent session's plugin connections
+automatically. Use `tools` to control which MCP tools the agent can call:
+
+```yaml
+---
+name: jira-analyst
+description: Searches and retrieves Jira issues
+model: sonnet
+tools:
+  - Read
+  - Grep
+  - mcp__plugin_jira_atlassian__searchJiraIssuesUsingJql
+  - mcp__plugin_jira_atlassian__getJiraIssue
+---
+```
+
+> **Why inline fails for OAuth.** Each inline `mcpServers` definition creates a new
+> OAuth client registration. Subagents run in-process and cannot open a browser tab
+> to complete the consent flow. The plugin system solves this by authenticating once
+> (in your main session) and sharing that authenticated connection with all in-process
+> agents. Use inline only for stdio servers; let plugins handle OAuth.
+
 You'll see three more agents (implementation.md, validation.md, documentation.md)
 when you explore the `.claude/` scaffolding in the next section.
+
+
+### Sandboxing and Controlled Autonomous Builds
+
+When giving agents `bypassPermissions` or running autonomous builds, you want a
+safety net. Claude Code provides two complementary sandboxing mechanisms:
+
+**1. `/sandbox` — OS-level sandboxing**
+
+Enable via the `/sandbox` slash command or in `settings.json`:
+
+```json
+{
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true,
+    "network": {
+      "allowedDomains": ["pypi.org", "*.pythonhosted.org", "github.com"]
+    }
+  }
+}
+```
+
+On macOS this uses Seatbelt; on Linux, bubblewrap. It restricts the Bash tool to
+write only within your working directory and to network only to approved domains.
+
+`autoAllowBashIfSandboxed: true` removes per-command permission prompts — because
+the OS already enforces the boundary, the human approval gate adds friction without
+adding safety. The result: Claude runs shell commands at full speed while the
+sandbox quietly enforces limits.
+
+**2. Worktree isolation — git-level sandboxing for agents**
+
+Add to any agent's frontmatter:
+
+```yaml
+isolation: worktree
+permissionMode: bypassPermissions
+```
+
+The agent works in a separate git worktree — its file changes are invisible to your
+main branch until you explicitly merge them. If the output is bad, discard the
+worktree. If it's good, merge.
+
+CLI equivalent: `claude -w my-worktree --dangerously-skip-permissions`
+
+**Isolation layers at a glance:**
+
+| Layer | Mechanism | What it protects | Speed trade-off |
+|-------|-----------|-----------------|----------------|
+| **OS sandbox** | `/sandbox` (Seatbelt/bwrap) | Filesystem + network | Auto-allow bash |
+| **Worktree** | `isolation: worktree` | Git-level file isolation | Discard bad output |
+| **Tools** | `tools` allowlist | Available actions | Read-only agents |
+| **Permissions** | `permissionMode` | User approval gates | Bypass when sandboxed |
+| **Context** | Subagent boundary | Fresh context window | Prevents rot/poisoning |
+
+> **The pattern:** Sandbox + bypass permissions = fast autonomous builds within a
+> controlled blast radius. The sandbox (OS or worktree) provides the safety net;
+> `bypassPermissions` or `autoAllowBashIfSandboxed` removes the speed bump. This is
+> exactly how the orchestrators in Module 5 achieve speed without risk.
+
+**When to use each:**
+- `/sandbox`: Interactive sessions, CI, any context where OS-level enforcement matters
+- Worktree: Parallel agent work, team orchestration, discardable experiments
+- Both together: Maximum safety for autonomous multi-agent builds
+
+You'll see isolation layers running at scale in Module 5.
 
 ---
 
@@ -421,7 +552,52 @@ across every session.
 
 ---
 
-## 8. Commit and Proceed
+## 8. Enable Agent Teams
+
+Agent teams let you coordinate multiple Claude instances working in parallel on a
+shared task list. A team leader assigns work; specialist workers execute concurrently
+and report back.
+
+**Enable the feature flag** in `.claude/settings.json`:
+
+```json
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  }
+}
+```
+
+Or export it in your shell: `export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
+
+**Team tools overview:**
+
+| Tool | What it does |
+|------|-------------|
+| `TeamCreate` | Creates a team with a shared task list |
+| `TaskCreate` | Adds a task to the team's task list |
+| `TaskUpdate` | Updates task status (pending → in_progress → completed) |
+| `SendMessage` | Sends a direct message to a teammate |
+
+**Hands-on exercise:** Use a team to build your agents in parallel.
+
+```
+Create a team and use it to simultaneously build the code-reviewer agent (from
+Exercise 1) and the design agent (from Exercise 2). Launch both agents in parallel.
+```
+
+Observe how the team leader spawns two workers, assigns them tasks concurrently, and
+collects their results — rather than building each agent sequentially.
+
+> **When teams help.** Teams shine for parallel independent tasks: two agents building
+> separate files, a research agent and a coding agent running simultaneously, or
+> parallel validation passes. They add overhead for sequential dependent work (where
+> step B requires step A's output). Ask yourself: "Could these tasks run at the same
+> time?" If yes, a team likely helps.
+
+---
+
+## 9. Commit and Proceed
 
 Ask Claude to commit the changes, then advance to the next module:
 
