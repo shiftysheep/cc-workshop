@@ -72,7 +72,7 @@ class TwoColumnSlide(SlideData):
     right: list[Bullet] = field(default_factory=list)
 
 
-# All 39 slides in exact order
+# All 41 slides in exact order
 SLIDES: list[SlideData] = [
     # Slide 1: Title slide
     TitleSlide(
@@ -445,13 +445,25 @@ SLIDES: list[SlideData] = [
         ],
         notes="Participants follow the steps in module4.md at their own pace. Flag down an assistant if you get stuck.\n\nPresenter talking points:\n- Activate plan mode, give Claude the ADW PRD\n- Claude reads existing phase commands to understand invocation patterns\n- Review the plan for all four orchestration commands\n- Approve and let Claude build: /feature, /bug, /team:feature, /team:bug\n- Each command composes the phase primitives in different ways",
     ),
-    # Slide 30: Single-Agent vs Team Execution (with image)
+    # Slide 30: Phase Primitive Composition (with image)
+    ImageSlide(
+        title="Phase Primitive Composition",
+        image="images/phase_primitive_composition.png",
+        notes="This is the core architectural insight of Module 4. The same seven phase primitives — each a single-responsibility markdown command — compose into four distinct delivery workflows. Single-agent variants chain phases sequentially with context accumulating. Team variants split into two groups: parallel analysis (Group 1) feeds into a leader synthesis step, then coordinated implementation (Group 2). The /bug variants simply drop the design phase. All four commands are markdown files — no code, just prose instructions that describe the composition pattern.",
+    ),
+    # Slide 31: Context Handoff Chain (with image)
+    ImageSlide(
+        title="Context Handoff Chain",
+        image="images/context_handoff_chain.png",
+        notes="Context handoff is the mechanism that makes single-agent orchestration work — and the constraint that makes it break down. In single-agent mode, each phase's output feeds into the next phase's input: key findings, architectural decisions, file paths modified, blockers identified. This gives full continuity but the context window fills over long runs. Team mode solves this: each worker gets a fresh context window. The tradeoff is coordination overhead — the leader must synthesize results between groups. Rule of thumb: single-agent for features under ~2 hours of Claude time; team mode for larger work where parallelism pays for the synthesis cost.",
+    ),
+    # Slide 32: Single-Agent vs Team Execution (with image)
     ImageSlide(
         title="Single-Agent vs Team Execution",
         image="images/single_agent_vs_team.png",
         notes="Single-agent execution is sequential: each phase runs after the previous completes. This is /feature and /bug — seven or six phases in order, one agent context throughout. The advantage: simple to reason about, no coordination overhead, full context continuity. The limitation: slow for large features, context fills over long runs. Team execution is parallel: a leader dispatches workers that execute simultaneously in isolated contexts. This is /team:feature and /team:bug — analysis phases run in parallel (research, architecture, test planning), then implementation phases coordinate through the task list. The advantage: 3-4x faster for large features, each worker has a fresh context window. The limitation: coordination overhead, results must be synthesized. Rule of thumb: single-agent for features under ~2 hours of Claude time; team for larger work where parallelism pays for coordination cost.",
     ),
-    # Slide 31: M4 Summary
+    # Slide 33: M4 Summary
     ContentSlide(
         title="Summarizing what we have seen",
         bullets=[
@@ -462,12 +474,12 @@ SLIDES: list[SlideData] = [
         ],
         notes="Module 4 produced four orchestration commands by composing the seven phase primitives. Plan mode was used not for code but for configuration — Claude explored the codebase, understood the patterns, and produced a plan for markdown files. This is prompt-driven orchestration: no code written, just configuration. Transition: Module 5 runs these commands against real PRDs.",
     ),
-    # Slide 32: Module 5 Section Header
+    # Slide 34: Module 5 Section Header
     SectionSlide(
         title="Module 5: Team Orchestration",
         notes="Module 5 scales from single-agent workflows to multi-agent teams. You'll create worker agents that operate in parallel, coordinate via leader agents, and execute in isolated worktrees. The key insight: team orchestration is just phase-driven workflows with parallel execution. Each worker gets its own fresh worktree and context window. Leaders delegate, workers execute, results merge. This is how you scale Claude to multiple simultaneous work streams. Transition: What we do.",
     ),
-    # Slide 33: M5 Let's get to work
+    # Slide 35: M5 Let's get to work
     ContentSlide(
         title="Let's get to work",
         bullets=[
@@ -484,13 +496,13 @@ SLIDES: list[SlideData] = [
               "- Test parallel execution, observe worktree isolation\n"
               "- Inspect agent coordination: leader delegates, workers execute",
     ),
-    # Slide 34: Worktree Isolation (with image)
+    # Slide 36: Worktree Isolation (with image)
     ImageSlide(
         title="Worktree Isolation",
         image="images/worktree_isolation.png",
         notes="This diagram shows how worktrees isolate parallel work. Each worker agent gets its own worktree — a separate working directory linked to the same git repository. Workers can write, commit, and test without interfering with each other. The leader agent operates in the main worktree and coordinates merges. This is the primary isolation mechanism for team orchestration. It prevents file conflicts, context contamination, and race conditions. Point out the three worktrees (backend, frontend, test) and the main worktree (leader). This is Module 5. Transition: Let's discuss managing Claude Code projects long-term.",
     ),
-    # Slide 35: Managing Projects with Claude Code
+    # Slide 37: Managing Projects with Claude Code
     ContentSlide(
         title="Managing Projects with Claude Code",
         bullets=[
@@ -508,13 +520,13 @@ SLIDES: list[SlideData] = [
               "checkpointing are operational hygiene for sustained usage. Participants will use "
               "all of these skills in the M6 capstone project.",
     ),
-    # Slide 36: The Progression (with image)
+    # Slide 38: The Progression (with image)
     ImageSlide(
         title="The Progression",
         image="images/progression.png",
         notes="This slide shows the full six-module progression. M1: CLAUDE.md + pre-commit (foundational quality). M2: Context management + subagents (efficiency). M3: Four-layer context + phase commands (scale). M4: Orchestration commands from PRD (composition). M5: Team workers + worktrees (parallelization). M6 (take-home): Build todd into a Claude Code clone. Each module builds on the last. The principles — progressive disclosure, back pressure, isolation, delegation — compound. By M5, you have a fully operational agentic delivery system. Transition: Let's review how the eight tenets mapped to this progression.",
     ),
-    # Slide 37: Tenets — Recap
+    # Slide 39: Tenets — Recap
     ContentSlide(
         title="Tenets of Quality Output — Recap",
         bullets=[
@@ -537,7 +549,7 @@ SLIDES: list[SlideData] = [
             "github.com/anthropics/prompt-eng-interactive-tutorial"
         ),
     ),
-    # Slide 38: Module 6 Homework
+    # Slide 40: Module 6 Homework
     ContentSlide(
         title="Homework: Build a Claude Code Clone",
         bullets=[
@@ -552,7 +564,7 @@ SLIDES: list[SlideData] = [
               "2-4 hours across multiple sessions. Use `claude --resume` to pick up "
               "where you left off.",
     ),
-    # Slide 39: Closing
+    # Slide 41: Closing
     SectionSlide(
         title="Questions?",
         layout=LAYOUT_CLOSING,
