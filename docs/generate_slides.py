@@ -365,25 +365,31 @@ SLIDES: list[SlideData] = [
         image="images/back_pressure_layers.png",
         notes="Back pressure is the system's resistance to bad output. Pre-commit hooks (M1) are the first layer — reject malformed commits. PostToolUse hooks (M3) are the second layer — inspect write operations before they land. Plan mode (M2) is architectural back pressure — think before writing. Tests (M1-M2) are verification back pressure — prove it works before you commit it. The goal: detect failure as early as possible. The later a failure is caught, the more expensive it is to fix. Hooks are cheap back pressure. They run synchronously, provide immediate feedback, and cost nothing if output is correct. Transition: Module 4 builds on this foundation by adding team-based orchestration.",
     ),
-    # Slide 23: Agent MCP Scoping (with image)
+    # Slide 23: Anatomy of a Custom Agent (with image)
+    ImageSlide(
+        title="Anatomy of a Custom Agent",
+        image="images/agent_anatomy.png",
+        notes="Every custom agent is a markdown file with YAML frontmatter. The frontmatter is the API contract: identity (name, description — what the agent is and when to use it), cost control (model selection — Haiku for cheap workers, Opus for architects), tool scope (tools: allowlist — least privilege for the agent's role), and safety (permissionMode, sandbox flags). The markdown body is the system prompt: what the agent knows, how it reasons, what it produces. Agent design is API design — a well-defined agent is composable, testable, and reusable across commands. A poorly defined agent is a liability. Key insight: the tools: allowlist is not just safety — it's communication. A code-reviewer with only Read, Glob, and Grep communicates its role clearly. An agent with all tools is a generalist with no clear contract.",
+    ),
+    # Slide 24: Agent MCP Scoping (with image)
     ImageSlide(
         title="Agent MCP Scoping",
         image="images/agent_mcp_scoping.png",
         notes="MCP server scoping depends on the authentication model. stdio servers (like context7 or sequential-thinking) can be defined inline in agent frontmatter — each invocation spawns a fresh server process, which works cleanly for subagents, headless runs, and teams. OAuth-authenticated plugins (like Jira, Slack, Confluence) use authenticated connections established at the parent session level — child agents inherit this auth rather than re-authenticating. Inline mcpServers definitions won't work for OAuth plugins because the child agent has no browser to complete the OAuth flow. The rule: stdio → define inline in the agent. OAuth → rely on plugin inheritance. This distinction matters for agent portability: an agent with only inline stdio servers can run anywhere; one that needs OAuth plugins must run as a child of an authenticated session.",
     ),
-    # Slide 24: Isolation & Sandboxing Layers (with image)
+    # Slide 25: Isolation & Sandboxing Layers (with image)
     ImageSlide(
         title="Isolation & Sandboxing Layers",
         image="images/isolation_sandboxing_layers.png",
         notes="Defense in depth for agentic systems means five distinct isolation layers. OS Sandbox (outermost): Claude Code's /sandbox mode uses Seatbelt on macOS and bubblewrap on Linux to restrict filesystem and network access at the OS level. Worktree Isolation: isolation: worktree in agent frontmatter gives each agent a separate git working directory — agents can write and commit without touching each other's files. Tool Allowlist: the tools: array in agent frontmatter enforces least privilege — a researcher that only needs Read, Glob, and Grep should never have Bash. Permission Mode: permissionMode controls whether Claude asks for approval before executing tools — dontAsk for trusted automation, default for interactive use. Context Boundary (innermost): each subagent gets a fresh context window — no bleed from parent conversation history. The bypass: combining sandbox with permissionMode: dontAsk enables fast autonomous execution within a controlled blast radius. Transition: How do these layers combine for team workflows?",
     ),
-    # Slide 25: Agent Team Workflow (with image)
+    # Slide 26: Agent Team Workflow (with image)
     ImageSlide(
         title="Agent Team Workflow",
         image="images/agent_team_workflow.png",
         notes="Team orchestration follows a consistent pattern: create, task, execute, synthesize, shutdown. TeamCreate establishes the shared task list and team configuration. TaskCreate populates the queue — the leader breaks work into parallelizable units. Workers claim tasks via TaskUpdate (setting owner to their name) and execute in isolation. SendMessage returns results to the leader. The leader synthesizes and creates the next wave of tasks. This two-phase pattern (analysis wave → implementation wave) is the core of /team:feature and /team:bug. Key design insights: workers should be stateless — all coordination happens through the shared task list and direct messages. The leader never executes implementation work directly — it delegates, synthesizes, and coordinates. Shutdown is explicit: the leader sends shutdown_request to each worker after all tasks complete. Transition: Module 4 applies this pattern with the orchestration commands you'll build.",
     ),
-    # Slide 26: M3 Summary
+    # Slide 27: M3 Summary
     ContentSlide(
         title="Summarizing what we have seen",
         bullets=[
@@ -403,6 +409,11 @@ SLIDES: list[SlideData] = [
                 0,
             ),
             (
+                "Agent design: ",
+                "YAML frontmatter + markdown — composable workers with clear scope",
+                0,
+            ),
+            (
                 "Agent MCP scoping: ",
                 "Inline for stdio servers, plugin inheritance for OAuth",
                 0,
@@ -418,14 +429,14 @@ SLIDES: list[SlideData] = [
                 0,
             ),
         ],
-        notes="Module 3 is the turning point. We went from 'Claude does things' (M1) and 'Claude plans things' (M2) to 'Claude orchestrates workflows' (M3). The four-layer context system is the architectural win. Back pressure is the quality win. MCP scoping rules determine agent portability. Sandboxing layers give you a controlled blast radius for autonomous execution. Agent teams scale single-agent patterns to parallel workstreams. Everything from here builds on this foundation.\n\nTenet tracker: #6 (progressive disclosure) is the M3 headline. #3 (CLAUDE.md + hooks) deepened with PostToolUse. #7 (agent design) introduced through custom agent YAML. #8 (scale with isolation) previewed through sandboxing and teams.",
+        notes="Module 3 is the turning point. We went from 'Claude does things' (M1) and 'Claude plans things' (M2) to 'Claude orchestrates workflows' (M3). The four-layer context system is the architectural win. Back pressure is the quality win. Agent design — YAML frontmatter + markdown body — is the extensibility win. MCP scoping rules determine agent portability. Sandboxing layers give you a controlled blast radius for autonomous execution. Agent teams scale single-agent patterns to parallel workstreams. Everything from here builds on this foundation.\n\nTenet tracker: #6 (progressive disclosure) is the M3 headline. #3 (CLAUDE.md + hooks) deepened with PostToolUse. #7 (agent design) introduced through custom agent YAML. #8 (scale with isolation) previewed through sandboxing and teams.",
     ),
-    # Slide 27: Module 4 Section Header
+    # Slide 28: Module 4 Section Header
     SectionSlide(
         title="Module 4: Building Orchestration Commands",
         notes="Module 4 builds the orchestration commands from a PRD. You'll use plan mode to architect four delivery workflows — /feature, /bug, /team:feature, /team:bug — and let Claude read the existing phase commands to understand the patterns before building. The key insight: Claude researches the scaffolding before planning, producing commands that correctly compose the primitives. This is prompt-driven orchestration. Transition: What we do.",
     ),
-    # Slide 28: M4 Let's get to work
+    # Slide 29: M4 Let's get to work
     ContentSlide(
         title="Let's get to work",
         bullets=[
@@ -433,12 +444,6 @@ SLIDES: list[SlideData] = [
             "Open `modules/module4.md` for our list of tasks",
         ],
         notes="Participants follow the steps in module4.md at their own pace. Flag down an assistant if you get stuck.\n\nPresenter talking points:\n- Activate plan mode, give Claude the ADW PRD\n- Claude reads existing phase commands to understand invocation patterns\n- Review the plan for all four orchestration commands\n- Approve and let Claude build: /feature, /bug, /team:feature, /team:bug\n- Each command composes the phase primitives in different ways",
-    ),
-    # Slide 29: Anatomy of a Custom Agent (with image)
-    ImageSlide(
-        title="Anatomy of a Custom Agent",
-        image="images/agent_anatomy.png",
-        notes="Every custom agent is a markdown file with YAML frontmatter. The frontmatter is the API contract: identity (name, description — what the agent is and when to use it), cost control (model selection — Haiku for cheap workers, Opus for architects), tool scope (tools: allowlist — least privilege for the agent's role), and safety (permissionMode, sandbox flags). The markdown body is the system prompt: what the agent knows, how it reasons, what it produces. Agent design is API design — a well-defined agent is composable, testable, and reusable across commands. A poorly defined agent is a liability. Key insight: the tools: allowlist is not just safety — it's communication. A code-reviewer with only Read, Glob, and Grep communicates its role clearly. An agent with all tools is a generalist with no clear contract.",
     ),
     # Slide 30: Single-Agent vs Team Execution (with image)
     ImageSlide(
