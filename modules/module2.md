@@ -148,31 +148,40 @@ to show `⏸ plan mode on`.
 
 ## 5. Configure the Language Server
 
-A language server gives you real-time type feedback as Claude generates code — instead
+A language server gives Claude real-time type feedback as it generates code — instead
 of waiting for `mypy` to run at commit time, you see red squiggles the moment a type
 error is introduced.
 
-**VS Code users:** Install the **Pylance** extension (which bundles Pyright):
-
-1. Open the Extensions panel (`Cmd+Shift+X` / `Ctrl+Shift+X`)
-2. Search for **Pylance** and install it
-3. Open the Command Palette (`Cmd+Shift+P`) and run
-   **Python: Select Interpreter** — choose the `.venv` created by uv
-
-**Other editors:** Install Pyright standalone:
+**Install the Pyright plugin:**
 
 ```shell
+claude plugin install pyright-lsp@claude-plugins-official
+```
+
+Or discover it interactively: type `/plugins` → **Discover** → search for `pyright-lsp`.
+
+**Ensure the binary is available:**
+
+```shell
+# Using uv (recommended for this project)
+uv tool install pyright
+
+# Or via npm
 npm install -g pyright
 ```
 
-Then configure your editor to use it as the Python language server.
+**VS Code users:** No extra steps needed. The Claude Code IDE extension automatically
+provides `getDiagnostics`, which bridges all of VS Code's diagnostics (Pylance, ESLint,
+and any other language extensions) directly into Claude Code. When Claude writes
+Python, it can call `getDiagnostics` to see the same errors and warnings you see in
+the Problems panel.
 
-> **Why LSP matters for agentic workflows.** A language server like Pyright gives
-> you instant type-error feedback as Claude generates code. Instead of waiting for
-> `mypy` to run at commit time, you'll see red squiggles in real-time — catch type
-> mismatches, missing imports, and signature errors the moment Claude writes them.
-> This tightens the human-in-the-loop feedback cycle: you spot issues while Claude
-> is still in context, rather than after the fact.
+> **Why LSP matters for agentic workflows.** The `pyright-lsp` plugin works in both
+> the CLI and VS Code. The `getDiagnostics` tool is VS Code-only. Together they give
+> Claude the same signals a human developer gets from their editor: real-time type
+> errors, missing imports, and signature mismatches — caught while Claude is still
+> in context, not after the fact at commit time. This tightens the feedback loop
+> and reduces the back-and-forth of "run mypy → see error → ask Claude to fix it."
 
 ---
 
