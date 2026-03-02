@@ -163,7 +163,25 @@ sequenceDiagram
 | **Use case** | Phase execution, defined workflows | Standards, guidelines, domain knowledge |
 | **Location** | `.claude/commands/<name>.md` | `.claude/skills/<name>/SKILL.md` |
 | **Good for** | "Do this specific thing" | "Know this when doing related things" |
-| **Frontmatter** | N/A (just markdown) | `disable-model-invocation`, `context: fork`, `allowed-tools` |
+| **Frontmatter** | `description`, `context`, `agent`, `allowed-tools` | `disable-model-invocation`, `context: fork`, `allowed-tools` |
+
+> **Command frontmatter fields:**
+>
+> | Field | Effect |
+> |-------|--------|
+> | `description` | Short text shown in the slash-command picker. Also helps Claude decide relevance. |
+> | `context: fork` | Runs the command in a forked conversation — output doesn't pollute your main context. All seven phase commands use this. |
+> | `agent` | Delegates execution to a custom agent in `.claude/agents/`. The command file becomes the agent's prompt. |
+> | `allowed-tools` | Restricts which tools are available during command execution. |
+>
+> Example from `/implement`:
+> ```yaml
+> ---
+> description: Implement a plan using TDD methodology with atomic commits per phase
+> context: fork
+> agent: implementation
+> ---
+> ```
 
 > **Skills can behave exactly like commands.** Set `disable-model-invocation: true`
 > in a skill's frontmatter to prevent auto-loading — it will only run when the user
