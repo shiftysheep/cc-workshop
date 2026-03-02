@@ -12,8 +12,10 @@ foundation every subsequent module builds on.
 |------|-----------|
 | **UV** | A fast Python package and project manager. Replaces pip, virtualenv, and pip-tools with a single tool. We use it to manage dependencies and run the CLI. |
 | **Typer** | A Python library for building CLI applications using type hints. Minimal boilerplate — define a function, add type annotations, get a fully functional CLI command. |
-| **Status line** | A persistent display at the bottom of the terminal showing session state — model, context usage, working directory, and git status. Configured once; visible in every session. |
 | **Pre-commit hook** | A script that runs automatically before each `git commit`. Used to enforce code quality gates — linting, type checking, security scanning — before changes enter version control. |
+| **CLAUDE.md** | A markdown file that provides persistent project instructions to Claude, loaded automatically every session. Exists at three scopes — global (`~/.claude/CLAUDE.md`), project (`./CLAUDE.md`), and personal (`./CLAUDE.local.md`) — so teams share conventions while individuals keep local overrides. |
+| **Back pressure** | A mechanism that actively resists bad output rather than silently accepting it. Pre-commit hooks are one form: they block a commit until quality gates pass, forcing Claude to fix issues immediately rather than drifting from standards. |
+| **Status line** | A persistent display at the bottom of the terminal showing session state — model, context usage, working directory, and git status. Configured once; visible in every session. |
 | **Project scaffolding** | The initial structure, tooling, and configuration that all subsequent development builds on. A well-scaffolded project enforces quality from the first commit. |
 
 ---
