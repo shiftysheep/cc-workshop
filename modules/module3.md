@@ -88,8 +88,10 @@ difference between the two primary extension mechanisms.
 
 **Skills are capability bundles.** A skill is a directory — `.claude/skills/<name>/` —
 containing a `SKILL.md` file with YAML frontmatter and instructions, plus optional
-`references/` subdirectory, scripts, and templates. Claude loads a skill automatically
-when the current task matches the skill's description. Think of them as "know this when
+`references/` subdirectory, scripts, and templates. Claude reads skill descriptions
+and decides whether to load one based on the current task — skills are not triggered
+automatically like hooks. The `description` field in a skill's YAML frontmatter is
+the primary signal Claude uses to make this decision. Think of them as "know this when
 relevant": coding standards, domain knowledge, architectural context, or how to operate
 a tool. In this repo:
 
@@ -99,8 +101,14 @@ a tool. In this repo:
 > **Skills are the right place to teach Claude how to use CLI tools.** When your project
 > uses a custom CLI (like `todd`, `bb.py`, or a deployment tool), a skill can bundle the
 > command reference, common flags, and usage patterns that Claude needs to operate it
-> correctly. Because skills load automatically when the task matches, Claude gets the
-> tool knowledge exactly when it's about to use it — not on every turn.
+> correctly. Because skills load when the task matches, Claude gets the tool knowledge
+> exactly when it's about to use it — not on every turn.
+
+> **Writing effective skill descriptions.** A skill is only as discoverable as its
+> description. Be specific about *when* the skill applies — "MUST BE USED when
+> reviewing code" is stronger than "helps with code review." Include trigger phrases
+> Claude will see in user prompts. If your skill isn't firing when expected, the
+> description is the first thing to check.
 
 **Commands are focused workflows.** A command is a single markdown file at
 `.claude/commands/<name>.md`. It acts as a prompt template for a reproducible action.
