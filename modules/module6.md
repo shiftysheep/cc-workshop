@@ -84,6 +84,27 @@ Save and resume conversations:
 
 ---
 
+## Milestone 6 (Optional): Claude Code Session Viewer
+
+**PRD:** `docs/prds/session-viewer.md`
+
+Build a local web app for browsing Claude Code session history:
+- FastAPI + Jinja2 server-rendered app
+- Scans `~/.claude/projects/` for JSONL session files
+- Session list page with search, filters, and pagination
+- Session detail page with messages styled by type (user, assistant, tool use)
+- REST API at `/api/sessions` for programmatic access
+- Subagent session discovery with parent-child navigation
+
+This ties together everything from the workshop: JSONL parsing (Module 5),
+Python tooling (Module 1), API design, and the session log format you analyzed
+in the headless mode exercises.
+
+> **Use your ADW tools.** Run `/feature @docs/prds/session-viewer.md` to let
+> the orchestrator drive the implementation, or work through it interactively.
+
+---
+
 ## Operational Reference
 
 As you build, these operational skills will be useful:
