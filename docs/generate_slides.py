@@ -161,7 +161,7 @@ SLIDES: list[SlideData] = [
             ),
             (
                 "Built-in tools: ",
-                "Read, Write, Edit, Bash, Glob, Grep, Task (subagents)",
+                "Read, Write, Edit, Bash, Glob, Grep, Agent (subagents)",
                 0,
             ),
             (

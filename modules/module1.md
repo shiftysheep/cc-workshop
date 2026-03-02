@@ -17,7 +17,7 @@ you need to know:
 - **Push** — sends your local commits to a remote server (GitHub) so others can see them.
 
 That's enough to follow along. For a fuller primer, see GitHub's
-[About Git](https://docs.github.com/en/get-started/using-git/about-git) guide.
+[git - the simple guide](https://rogerdudler.github.io/git-guide/).
 
 ---
 
@@ -88,6 +88,11 @@ claude
 ## 2. Build the Project Scaffold
 
 In the chat box, enter:
+
+> **Approving tool calls:** As Claude works, it will pause to show you each tool call
+> and ask for approval. Review what it plans to do and press **Enter** to accept, or
+> type `no` to reject. You can also type `!` before a message to run a shell command
+> directly.
 
 ```markdown
 Let's setup our project scaffolding utilizing UV with a src layout. We will be creating a Typer cli application with the name of todd. Include a hello command. Also setup pre-commit with ruff, mypy, bandit, vulture, and xenon hooks.
@@ -224,12 +229,13 @@ Claude Code isn't just for developers. These exercises demonstrate the same agen
 capabilities applied to everyday knowledge work tasks.
 
 > **Prerequisite: Install document skills**
-> Before starting, install the skills Claude needs for file generation:
+> Before starting, add the Anthropic skills marketplace and install the document-skills plugin:
+> ```shell
+> claude plugin marketplace add anthropics/skills
+> claude plugin install document-skills@anthropic-agent-skills --scope user
 > ```
-> /install-skill document-skills:pptx
-> /install-skill document-skills:xlsx
-> ```
-> These give Claude the ability to create PowerPoint and Excel files directly.
+> This gives Claude the ability to create PowerPoint and Excel files directly.
+> Restart Claude Code after installing.
 
 ---
 
