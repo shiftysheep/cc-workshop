@@ -550,6 +550,37 @@ preferences (verbosity, editor, shortcuts) go in `CLAUDE.local.md`.
 Treat CLAUDE.md like any other config file: small investments in accuracy pay off
 across every session.
 
+### Structuring Prompts with XML Tags
+
+Anthropic officially recommends using XML tags to structure prompts with unambiguous boundaries. We've covered *where* to put context (CLAUDE.md, command files, hooks) and *when* it loads — now let's cover *how* to format the content within those files.
+
+Claude parses XML tags natively and unambiguously. Unlike markdown headers, which can blur section boundaries in complex prompts, XML tags make structure explicit and machine-readable.
+
+#### Common tag patterns
+
+```xml
+<instructions>What to do</instructions>
+<context>Background information</context>
+<examples>Few-shot demonstrations</examples>
+<input>The variable content to process</input>
+<constraints>Boundaries and limitations</constraints>
+```
+
+#### When to use XML vs markdown
+
+| Format | Best for |
+|--------|----------|
+| Markdown | Human-readable docs: CLAUDE.md, module content, READMEs |
+| XML tags | Structured agent prompts, skill instructions, command templates where unambiguous section boundaries matter |
+
+Use markdown when humans are the primary reader. Use XML when the agent is the primary reader.
+
+#### Exercise
+
+Open an existing command or skill file (e.g., `.claude/commands/research.md`) and identify where XML tags could improve clarity. Look for sections that blend instructions, context, and variable input — these are the best candidates for XML structure.
+
+> **Reference**: Anthropic's prompt engineering guide — [Use XML tags to structure your prompts](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/use-xml-tags)
+
 ---
 
 ## 8. Enable Agent Teams
