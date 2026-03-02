@@ -1,4 +1,4 @@
-# Module 2: MCP, Plan Mode, and the Claude Agent SDK
+# Module 2: MCP, Plan Mode, and the Agent SDK
 
 In this module we'll install our first MCP server, explore how tools load on demand via ToolSearch,
 switch to a more capable model for planning, and build a real feature using the
