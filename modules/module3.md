@@ -195,13 +195,26 @@ sequenceDiagram
 |-------------------|-----|
 | Execute a repeatable workflow | **Command** |
 | Teach Claude domain knowledge | **Skill** |
-| Coordinate specialist workers | **Agent** |
+| Coordinate a calibrated specialist | **Agent** |
 | Validate output automatically | **Hook** |
 
 > **Practical decision tree.** If it's a workflow → command. If it's knowledge → skill.
-> If it's a specialist worker → agent. If it's a quality gate → hook.
+> If it's a calibrated specialist → agent. If it's a quality gate → hook.
 > Agents can invoke commands (e.g. an orchestrator agent running `/implement`).
 > Commands can delegate to agents (e.g. `/team:feature` spawning worker agents).
+
+> **Agents as calibrated skillsets.** An agent isn't just "a specialist worker" — it's
+> a worker whose capabilities are explicitly scoped. You control:
+> - **Tools** — which tools the agent can use (via `allowed-tools` frontmatter)
+> - **Model** — which model runs the agent (via `model` frontmatter)
+> - **Knowledge** — what domain context it receives (the agent file's markdown body)
+> - **MCP access** — which MCP servers are available (via `mcp-servers` frontmatter)
+>
+> A narrowly scoped agent (e.g. `validation` with read-only tools) is safer and
+> cheaper than a general-purpose one. Start narrow — you can always widen scope later.
+> When choosing between "just use Claude directly" and "create an agent," ask: does
+> this task benefit from restricted tools, a specific model, or domain-specific
+> instructions? If yes, it's an agent. If no, a command or direct prompt is simpler.
 
 > **Four ways to deliver work.** The phase commands are reusable primitives.
 > You can compose them in four ways — two single-agent, two multi-agent:
