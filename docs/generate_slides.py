@@ -204,7 +204,7 @@ SLIDES: list[SlideData] = [
             ),
             (
                 "Plugin marketplace: ",
-                "Discover, install, and share packaged extensions via /plugin",
+                "Discover, install, and share packaged extensions via `claude plugin install`",
                 0,
             ),
         ],
