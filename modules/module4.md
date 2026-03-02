@@ -12,7 +12,6 @@ scaffolding and composing it through plan mode.
 | Term | Definition |
 |------|-----------|
 | **Prompt-driven orchestration** | Composing a multi-step workflow through prose instructions in a command or skill. Single-agent commands execute phases sequentially; team commands coordinate parallel specialist workers — both defined in markdown, no code required. |
-| **Team orchestration** | Composing a multi-step workflow through an agent team where a leader coordinates specialist workers via `TeamCreate`, `TaskCreate`, and `SendMessage`. Parallel where possible, prompt-driven, and defined in a slash command. |
 | **Phase command** | A single-responsibility slash command that handles one step of the delivery workflow (e.g. `/research`, `/implement`). Composable building blocks for orchestration. |
 | **Orchestration command** | A higher-order slash command that composes phase commands into an end-to-end workflow. Can be single-agent (sequential phases) or multi-agent (parallel workers). |
 
