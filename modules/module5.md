@@ -316,7 +316,7 @@ validator can all work from the same PRD simultaneously.
 the previous output) don't benefit from parallelism. Simpler coordination,
 less overhead, easier to debug.
 
-**Agent design is API design.** Each worker had clear inputs (feature
+**Agent design is tool design.** Each worker had clear inputs (feature
 description + leader context), clear output (specialist analysis), single
 responsibility, and explicit scope. The better defined the interface, the
 more reliably it composes.
@@ -329,7 +329,7 @@ more reliably it composes.
 | **Resumability** | Built into output (`--resume`) | Re-run the command |
 | **Best for** | Simpler tasks, debugging | Complex tasks, time-sensitive delivery |
 
-> **Agent design is API design.** Defining an agent is like defining an API:
+> **Agent design is tool design.** Defining an agent is like designing a tool:
 > clear inputs, clear outputs, single responsibility, explicit error handling.
 > The better defined the interface, the more reliably it composes.
 
