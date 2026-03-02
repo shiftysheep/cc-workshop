@@ -42,7 +42,7 @@ one does:
 | `Bash` | Runs a shell command |
 | `Agent` | Spawns a subagent to handle a focused subtask |
 
-**Context7 MCP tools** (installed in step 1)
+**Context7 MCP tools** (installed in step 2)
 
 | Tool | What it does |
 |------|-------------|
@@ -51,7 +51,46 @@ one does:
 
 ---
 
-## 1. Install the Context7 MCP Server
+## 1. Configure the Language Server
+
+A language server gives Claude real-time type feedback as it generates code — instead
+of waiting for `mypy` to run at commit time, you see red squiggles the moment a type
+error is introduced.
+
+**Install the Pyright plugin:**
+
+```shell
+claude plugin install pyright-lsp@claude-plugins-official
+```
+
+Or discover it interactively: type `/plugins` → **Discover** → search for `pyright-lsp`.
+
+**Ensure the binary is available:**
+
+```shell
+# Using uv (recommended for this project)
+uv tool install pyright
+
+# Or via npm
+npm install -g pyright
+```
+
+**VS Code users:** No extra steps needed. The Claude Code IDE extension automatically
+provides `getDiagnostics`, which bridges all of VS Code's diagnostics (Pylance, ESLint,
+and any other language extensions) directly into Claude Code. When Claude writes
+Python, it can call `getDiagnostics` to see the same errors and warnings you see in
+the Problems panel.
+
+> **Why LSP matters for agentic workflows.** The `pyright-lsp` plugin works in both
+> the CLI and VS Code. The `getDiagnostics` tool is VS Code-only. Together they give
+> Claude the same signals a human developer gets from their editor: real-time type
+> errors, missing imports, and signature mismatches — caught while Claude is still
+> in context, not after the fact at commit time. This tightens the feedback loop
+> and reduces the back-and-forth of "run mypy → see error → ask Claude to fix it."
+
+---
+
+## 2. Install the Context7 MCP Server
 
 Context7 is an MCP server that injects live, version-specific library documentation
 into Claude's context on demand. Instead of relying on potentially outdated training
@@ -101,7 +140,7 @@ Browse to the **Discover** tab, find **context7**, and install it at **user** sc
 
 ---
 
-## 2. Examine Context Utilization
+## 3. Examine Context Utilization
 
 MCP servers register tools that Claude discovers on demand via ToolSearch. Let's see what your context looks like before we start building.
 
@@ -118,7 +157,7 @@ baseline now that Context7 is installed — MCP tool definitions are deferred vi
 
 ---
 
-## 3. Switch to Opus Plan Mode
+## 4. Switch to Opus Plan Mode
 
 For the next task we're going to ask Claude to architect and implement a new feature.
 This is exactly the kind of consequential, multi-step work that benefits from a more
@@ -135,7 +174,7 @@ In the chat box, run:
 
 ---
 
-## 4. Activate Plan Mode and Note the Status Line
+## 5. Activate Plan Mode and Note the Status Line
 
 Activate plan mode by pressing `Shift+Tab` twice. You'll see the status line update
 to show `⏸ plan mode on`.
@@ -146,45 +185,6 @@ to show `⏸ plan mode on`.
 >
 > Notice the model shown in your status line has changed to reflect Opus. This is the
 > heads-up display you configured in Module 1 paying off.
-
----
-
-## 5. Configure the Language Server
-
-A language server gives Claude real-time type feedback as it generates code — instead
-of waiting for `mypy` to run at commit time, you see red squiggles the moment a type
-error is introduced.
-
-**Install the Pyright plugin:**
-
-```shell
-claude plugin install pyright-lsp@claude-plugins-official
-```
-
-Or discover it interactively: type `/plugins` → **Discover** → search for `pyright-lsp`.
-
-**Ensure the binary is available:**
-
-```shell
-# Using uv (recommended for this project)
-uv tool install pyright
-
-# Or via npm
-npm install -g pyright
-```
-
-**VS Code users:** No extra steps needed. The Claude Code IDE extension automatically
-provides `getDiagnostics`, which bridges all of VS Code's diagnostics (Pylance, ESLint,
-and any other language extensions) directly into Claude Code. When Claude writes
-Python, it can call `getDiagnostics` to see the same errors and warnings you see in
-the Problems panel.
-
-> **Why LSP matters for agentic workflows.** The `pyright-lsp` plugin works in both
-> the CLI and VS Code. The `getDiagnostics` tool is VS Code-only. Together they give
-> Claude the same signals a human developer gets from their editor: real-time type
-> errors, missing imports, and signature mismatches — caught while Claude is still
-> in context, not after the fact at commit time. This tightens the feedback loop
-> and reduces the back-and-forth of "run mypy → see error → ask Claude to fix it."
 
 ---
 
@@ -252,9 +252,9 @@ goes wrong, you restart that subagent — not your entire session.
 > - **`/rename <name>`** — labels the current session for easy recall later.
 > - **Rewind (`Esc+Esc`)** — undo Claude's recent file edits and the conversation up to a
 >   chosen checkpoint. Only tracks changes made via Write/Edit tools — not bash commands.
-> - **Fork (`Shift+Tab` once)** — creates a new branch of the conversation from the current
->   point, preserving the original session. Useful for trying an alternate approach without
->   losing your current context.
+> - **Fork (`/fork`)** — creates a new branch of the conversation from the current point,
+>   preserving the original session. Useful for trying an alternate approach without losing
+>   your current context.
 
 ---
 
@@ -394,4 +394,4 @@ Commit the changes and then run /module to proceed to module 3.
 
 ---
 
-[← Module 1](module1.md)
+[← Module 1](module1.md)   [Module 3 →](module3.md)
