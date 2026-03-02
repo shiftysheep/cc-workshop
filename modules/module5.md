@@ -93,17 +93,7 @@ Read docs/prds/adw-feature.md and docs/prds/adw-bug.md
 
 ## 3. Launch Two Worktrees
 
-> **Prerequisite: enable agent teams.** The `/team:feature` command uses
-> `TeamCreate` and `SendMessage`, which require an experimental feature flag.
-> The project's `.claude/settings.json` already sets it — verify it's present
-> before continuing:
->
-> ```json
-> "env": { "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1" }
-> ```
->
-> If it's missing, add it to `.claude/settings.json` or export it in your
-> shell: `export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
+> **Agent teams are already enabled.** You enabled the flag in Module 3, Step 8.
 
 Open two terminal windows. Each runs an independent Claude instance in its
 own worktree:
@@ -326,7 +316,7 @@ validator can all work from the same PRD simultaneously.
 the previous output) don't benefit from parallelism. Simpler coordination,
 less overhead, easier to debug.
 
-**Agent design is API design.** Each worker had clear inputs (feature
+**Agent design is tool design.** Each worker had clear inputs (feature
 description + leader context), clear output (specialist analysis), single
 responsibility, and explicit scope. The better defined the interface, the
 more reliably it composes.
@@ -339,7 +329,7 @@ more reliably it composes.
 | **Resumability** | Built into output (`--resume`) | Re-run the command |
 | **Best for** | Simpler tasks, debugging | Complex tasks, time-sensitive delivery |
 
-> **Agent design is API design.** Defining an agent is like defining an API:
+> **Agent design is tool design.** Defining an agent is like designing a tool:
 > clear inputs, clear outputs, single responsibility, explicit error handling.
 > The better defined the interface, the more reliably it composes.
 
