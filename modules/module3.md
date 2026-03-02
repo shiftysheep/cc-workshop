@@ -88,8 +88,10 @@ difference between the two primary extension mechanisms.
 
 **Skills are capability bundles.** A skill is a directory — `.claude/skills/<name>/` —
 containing a `SKILL.md` file with YAML frontmatter and instructions, plus optional
-`references/` subdirectory, scripts, and templates. Claude loads a skill automatically
-when the current task matches the skill's description. Think of them as "know this when
+`references/` subdirectory, scripts, and templates. Claude reads skill descriptions
+and decides whether to load one based on the current task — skills are not triggered
+automatically like hooks. The `description` field in a skill's YAML frontmatter is
+the primary signal Claude uses to make this decision. Think of them as "know this when
 relevant": coding standards, domain knowledge, architectural context, or how to operate
 a tool. In this repo:
 
@@ -99,8 +101,14 @@ a tool. In this repo:
 > **Skills are the right place to teach Claude how to use CLI tools.** When your project
 > uses a custom CLI (like `todd`, `bb.py`, or a deployment tool), a skill can bundle the
 > command reference, common flags, and usage patterns that Claude needs to operate it
-> correctly. Because skills load automatically when the task matches, Claude gets the
-> tool knowledge exactly when it's about to use it — not on every turn.
+> correctly. Because skills load when the task matches, Claude gets the tool knowledge
+> exactly when it's about to use it — not on every turn.
+
+> **Writing effective skill descriptions.** A skill is only as discoverable as its
+> description. Be specific about *when* the skill applies — "MUST BE USED when
+> reviewing code" is stronger than "helps with code review." Include trigger phrases
+> Claude will see in user prompts. If your skill isn't firing when expected, the
+> description is the first thing to check.
 
 **Commands are focused workflows.** A command is a single markdown file at
 `.claude/commands/<name>.md`. It acts as a prompt template for a reproducible action.
@@ -155,7 +163,25 @@ sequenceDiagram
 | **Use case** | Phase execution, defined workflows | Standards, guidelines, domain knowledge |
 | **Location** | `.claude/commands/<name>.md` | `.claude/skills/<name>/SKILL.md` |
 | **Good for** | "Do this specific thing" | "Know this when doing related things" |
-| **Frontmatter** | N/A (just markdown) | `disable-model-invocation`, `context: fork`, `allowed-tools` |
+| **Frontmatter** | `description`, `context`, `agent`, `allowed-tools` | `disable-model-invocation`, `context: fork`, `allowed-tools` |
+
+> **Command frontmatter fields:**
+>
+> | Field | Effect |
+> |-------|--------|
+> | `description` | Short text shown in the slash-command picker. Also helps Claude decide relevance. |
+> | `context: fork` | Runs the command in a forked conversation — output doesn't pollute your main context. All seven phase commands use this. |
+> | `agent` | Delegates execution to a custom agent in `.claude/agents/`. The command file becomes the agent's prompt. |
+> | `allowed-tools` | Restricts which tools are available during command execution. |
+>
+> Example from `/implement`:
+> ```yaml
+> ---
+> description: Implement a plan using TDD methodology with atomic commits per phase
+> context: fork
+> agent: implementation
+> ---
+> ```
 
 > **Skills can behave exactly like commands.** Set `disable-model-invocation: true`
 > in a skill's frontmatter to prevent auto-loading — it will only run when the user
@@ -169,13 +195,26 @@ sequenceDiagram
 |-------------------|-----|
 | Execute a repeatable workflow | **Command** |
 | Teach Claude domain knowledge | **Skill** |
-| Coordinate specialist workers | **Agent** |
+| Coordinate a calibrated specialist | **Agent** |
 | Validate output automatically | **Hook** |
 
 > **Practical decision tree.** If it's a workflow → command. If it's knowledge → skill.
-> If it's a specialist worker → agent. If it's a quality gate → hook.
+> If it's a calibrated specialist → agent. If it's a quality gate → hook.
 > Agents can invoke commands (e.g. an orchestrator agent running `/implement`).
 > Commands can delegate to agents (e.g. `/team:feature` spawning worker agents).
+
+> **Agents as calibrated skillsets.** An agent isn't just "a specialist worker" — it's
+> a worker whose capabilities are explicitly scoped. You control:
+> - **Tools** — which tools the agent can use (via `allowed-tools` frontmatter)
+> - **Model** — which model runs the agent (via `model` frontmatter)
+> - **Knowledge** — what domain context it receives (the agent file's markdown body)
+> - **MCP access** — which MCP servers are available (via `mcp-servers` frontmatter)
+>
+> A narrowly scoped agent (e.g. `validation` with read-only tools) is safer and
+> cheaper than a general-purpose one. Start narrow — you can always widen scope later.
+> When choosing between "just use Claude directly" and "create an agent," ask: does
+> this task benefit from restricted tools, a specific model, or domain-specific
+> instructions? If yes, it's an agent. If no, a command or direct prompt is simpler.
 
 > **Four ways to deliver work.** The phase commands are reusable primitives.
 > You can compose them in four ways — two single-agent, two multi-agent:
@@ -189,6 +228,28 @@ sequenceDiagram
 >
 > A PRD at `docs/prds/adw-commands.md` defines all four commands we'll build
 > in this module using prompt-driven orchestration.
+
+### The Seven Phase Commands
+
+These are the building blocks you'll chain into delivery workflows in Module 4.
+Each command runs in a forked context (`context: fork`) so it doesn't pollute your
+main conversation.
+
+| Command | What it does | Delegates to |
+|---------|-------------|-------------|
+| `/research` | Decomposes a question into sub-questions, spawns parallel Explore subagents, and synthesises findings into a research report. | Explore subagents (Haiku) |
+| `/design` | Reads requirements and produces a technical spec covering architecture, components, interfaces, data models, and risks. | Plan subagent |
+| `/plan` | Turns a spec into a phased implementation plan where each phase is one atomic commit with files, test strategy, and acceptance criteria. | Plan subagent |
+| `/validation` | Validates a plan's structure (PHASE-NNN identifiers, atomicity, conventional commits) and traceability to specs. Returns READY / NOT READY / NEEDS REVISION. | `validation` agent |
+| `/implement` | Executes a plan using TDD (Red → Green → Refactor), runs quality checks (pytest, ruff, mypy) after each phase, and creates one atomic commit per phase. | `implementation` agent |
+| `/review` | Multi-dimensional code review — quality (ruff, mypy, xenon), security (bandit), tests, and documentation — with severity ratings and an APPROVE / REQUEST_CHANGES recommendation. | `validation` agent |
+| `/document` | Analyses implementation changes, identifies affected docs, and updates them following documentation-standards conventions. | `documentation` agent |
+
+> **Notice the delegation pattern.** The first three commands (`/research`,
+> `/design`, `/plan`) delegate to built-in subagent types (Explore, Plan) using
+> inline Agent tool calls. The last four delegate to custom agents defined in
+> `.claude/agents/` via the `agent:` frontmatter key. You'll see both patterns
+> as you build your own extensions.
 
 ---
 
@@ -551,11 +612,38 @@ preferences (verbosity, editor, shortcuts) go in `CLAUDE.local.md`.
 Treat CLAUDE.md like any other config file: small investments in accuracy pay off
 across every session.
 
-### Structuring Prompts with XML Tags
+### Prompt Engineering Fundamentals
 
-Anthropic officially recommends using XML tags to structure prompts with unambiguous boundaries. We've covered *where* to put context (CLAUDE.md, command files, hooks) and *when* it loads — now let's cover *how* to format the content within those files.
+We've covered *where* to put context (CLAUDE.md, command files, hooks) and *when* it
+loads — now let's cover *how* to write effective prompts and format the content within
+those files.
 
-Claude parses XML tags natively and unambiguously. Unlike markdown headers, which can blur section boundaries in complex prompts, XML tags make structure explicit and machine-readable.
+**Core principles:**
+
+1. **Be specific** — "Write a Python function that validates email addresses using
+   regex" beats "write a validator." Constraints reduce guessing.
+2. **Provide context** — tell Claude *why* you need something, not just *what*. "This
+   runs in a Lambda with a 512 MB memory limit" shapes better answers than silence.
+3. **Show examples** — a single input/output example is worth paragraphs of
+   description. Use few-shot patterns when output format matters.
+4. **Set constraints** — explicit boundaries ("do not modify files outside `src/`",
+   "keep the response under 50 lines") prevent scope creep.
+
+> **Prompt engineering evolves with the model.** Claude 4.6 requires less scaffolding
+> than earlier generations — it follows instructions more reliably, handles ambiguity
+> better, and needs fewer examples to understand a pattern. Techniques that were
+> essential for Claude 3.5 (heavy XML wrapping, exhaustive few-shot examples) may now
+> be optional. Start simple; add structure only when Claude's output drifts from what
+> you need.
+>
+> See Anthropic's latest guidance:
+> [docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview)
+
+#### Structuring with XML Tags
+
+Anthropic recommends XML tags for structuring prompts with unambiguous boundaries.
+Claude parses XML tags natively. Unlike markdown headers, which can blur section
+boundaries in complex prompts, XML tags make structure explicit and machine-readable.
 
 #### Common tag patterns
 

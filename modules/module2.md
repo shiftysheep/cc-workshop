@@ -8,20 +8,25 @@ Claude Agent SDK.
 
 ## Key Concepts
 
+| Concept | Why it matters |
+|---------|---------------|
+| **Context window** | The total amount of text Claude can see at once. Your conversation history, file contents, tool results, and system instructions all share this space. When it fills up, older content is summarised or dropped. |
+| **Plan mode** | A read-only mode (`Shift+Tab` twice) where Claude explores the codebase, asks clarifying questions, and produces a plan — but cannot write or edit files until you approve. Used before consequential, multi-step work. |
+| **Context rot** | The gradual degradation of response quality as the context window fills up. Claude 4.6 models handle long contexts better than earlier generations, but they are not immune — older content still gets compressed or dropped in very long sessions, causing Claude to lose track of earlier instructions, decisions, or important details. |
+| **Context poisoning** | When incorrect, misleading, or contradictory information enters the context and skews all subsequent responses. Common sources: a failed tool call Claude misinterprets, a wrong assumption made early in a session that gets reinforced, or a bad test result Claude reasons from incorrectly. Unlike context rot, poisoning can happen even in a mostly empty context. |
+
+## Glossary
+
 | Term | Definition |
 |------|-----------|
 | **MCP (Model Context Protocol)** | An open standard that lets AI assistants connect to external tools and data sources. An MCP server is a program that exposes capabilities — like fetching documentation — as tools Claude can call. |
-| **Context window** | The total amount of text Claude can see at once. Your conversation history, file contents, tool results, and system instructions all share this space. When it fills up, older content is summarised or dropped. |
 | **Token** | The basic unit Claude uses to process text. Roughly 1 token ≈ 4 characters. Your context window holds a fixed number of tokens, which is why managing what's in it matters. |
 | **Tool call** | When Claude invokes one of its available tools (e.g. `Read`, `Bash`) to perform an action. You'll see these logged in the terminal as Claude works. |
-| **Plan mode** | A read-only mode (`Shift+Tab` twice) where Claude explores the codebase, asks clarifying questions, and produces a plan — but cannot write or edit files until you approve. Used before consequential, multi-step work. |
 | **PRD (Product Requirements Document)** | A document describing what a feature should do, without specifying how to implement it. We use one to give Claude clear, stable requirements before it starts planning. |
 | **Claude Agent SDK** | A Python/TypeScript library that exposes the same agent loop powering Claude Code — built-in tools, subagent spawning, session management — so you can embed Claude's capabilities directly in your own programs. |
 | **Subagent** | An isolated Claude instance spawned for a focused subtask. Each subagent gets a fresh context window, restricted tools, and its own model. Built-in types — Explore, Plan, General-purpose — keep expensive work from polluting the main conversation. |
 | **Learning test** | A test that verifies assumptions about an external library you don't control. Exercises the real library directly — not mocks — so behavioural changes surface immediately on upgrades. |
 | **Amazon Bedrock** | AWS's managed AI service. We use it as the authentication and inference layer for Claude so we don't need a direct Anthropic API key. |
-| **Context rot** | The gradual degradation of response quality as the context window fills up. Older content gets compressed or dropped, causing Claude to lose track of earlier instructions, decisions, or important details. Long-running sessions are most vulnerable. |
-| **Context poisoning** | When incorrect, misleading, or contradictory information enters the context and skews all subsequent responses. Common sources: a failed tool call Claude misinterprets, a wrong assumption made early in a session that gets reinforced, or a bad test result Claude reasons from incorrectly. Unlike context rot, poisoning can happen even in a mostly empty context. |
 
 ---
 
@@ -42,7 +47,7 @@ one does:
 | `Bash` | Runs a shell command |
 | `Agent` | Spawns a subagent to handle a focused subtask |
 
-**Context7 MCP tools** (installed in step 1)
+**Context7 MCP tools** (installed in step 2)
 
 | Tool | What it does |
 |------|-------------|
@@ -51,7 +56,46 @@ one does:
 
 ---
 
-## 1. Install the Context7 MCP Server
+## 1. Configure the Language Server
+
+A language server gives Claude real-time type feedback as it generates code — instead
+of waiting for `mypy` to run at commit time, you see red squiggles the moment a type
+error is introduced.
+
+**Install the Pyright plugin:**
+
+```shell
+claude plugin install pyright-lsp@claude-plugins-official
+```
+
+Or discover it interactively: type `/plugins` → **Discover** → search for `pyright-lsp`.
+
+**Ensure the binary is available:**
+
+```shell
+# Using uv (recommended for this project)
+uv tool install pyright
+
+# Or via npm
+npm install -g pyright
+```
+
+**VS Code users:** No extra steps needed. The Claude Code IDE extension automatically
+provides `getDiagnostics`, which bridges all of VS Code's diagnostics (Pylance, ESLint,
+and any other language extensions) directly into Claude Code. When Claude writes
+Python, it can call `getDiagnostics` to see the same errors and warnings you see in
+the Problems panel.
+
+> **Why LSP matters for agentic workflows.** The `pyright-lsp` plugin works in both
+> the CLI and VS Code. The `getDiagnostics` tool is VS Code-only. Together they give
+> Claude the same signals a human developer gets from their editor: real-time type
+> errors, missing imports, and signature mismatches — caught while Claude is still
+> in context, not after the fact at commit time. This tightens the feedback loop
+> and reduces the back-and-forth of "run mypy → see error → ask Claude to fix it."
+
+---
+
+## 2. Install the Context7 MCP Server
 
 Context7 is an MCP server that injects live, version-specific library documentation
 into Claude's context on demand. Instead of relying on potentially outdated training
@@ -101,9 +145,10 @@ Browse to the **Discover** tab, find **context7**, and install it at **user** sc
 
 ---
 
-## 2. Examine Context Utilization
+## 3. Examine Context Utilization
 
-MCP servers register tools that Claude discovers on demand via ToolSearch. Let's see what your context looks like before we start building.
+MCP servers register tools that Claude discovers on demand via ToolSearch. Let's see
+what your context looks like before we start building.
 
 In the chat box, run:
 
@@ -112,13 +157,35 @@ In the chat box, run:
 ```
 
 The colored grid shows how much of your context window is currently in use. Note the
-baseline now that Context7 is installed — MCP tool definitions are deferred via ToolSearch and only load into context when Claude needs them. This keeps your idle context lean.
+baseline now that Context7 is installed — MCP tool definitions are deferred via
+ToolSearch and only load into context when Claude needs them. This keeps your idle
+context lean.
 
-> **Why this matters:** Context is finite. With ToolSearch, MCP tools no longer add idle overhead — but once loaded, they stay in context for the session. Subagents remain valuable because each gets a fresh context window with only the tools it needs.
+Now try:
+
+```
+/clear
+```
+
+This resets your conversation entirely — a fresh context with zero history. You're
+back to a clean slate with only your CLAUDE.md and system instructions loaded.
+
+> **When to use each:**
+>
+> - **`/context`** — check how full your context is. Use it periodically during long
+>   sessions to decide whether to continue or start fresh.
+> - **`/clear`** — reset when your context is polluted, you're switching tasks, or
+>   Claude starts producing degraded responses (a sign of context rot). Cheaper than
+>   closing and reopening Claude.
+
+> **Why this matters:** Context is finite. With ToolSearch, MCP tools no longer add
+> idle overhead — but once loaded, they stay in context for the session. Subagents
+> remain valuable because each gets a fresh context window with only the tools it
+> needs.
 
 ---
 
-## 3. Switch to Opus Plan Mode
+## 4. Switch to Opus Plan Mode
 
 For the next task we're going to ask Claude to architect and implement a new feature.
 This is exactly the kind of consequential, multi-step work that benefits from a more
@@ -135,7 +202,7 @@ In the chat box, run:
 
 ---
 
-## 4. Activate Plan Mode and Note the Status Line
+## 5. Activate Plan Mode and Note the Status Line
 
 Activate plan mode by pressing `Shift+Tab` twice. You'll see the status line update
 to show `⏸ plan mode on`.
@@ -146,45 +213,6 @@ to show `⏸ plan mode on`.
 >
 > Notice the model shown in your status line has changed to reflect Opus. This is the
 > heads-up display you configured in Module 1 paying off.
-
----
-
-## 5. Configure the Language Server
-
-A language server gives Claude real-time type feedback as it generates code — instead
-of waiting for `mypy` to run at commit time, you see red squiggles the moment a type
-error is introduced.
-
-**Install the Pyright plugin:**
-
-```shell
-claude plugin install pyright-lsp@claude-plugins-official
-```
-
-Or discover it interactively: type `/plugins` → **Discover** → search for `pyright-lsp`.
-
-**Ensure the binary is available:**
-
-```shell
-# Using uv (recommended for this project)
-uv tool install pyright
-
-# Or via npm
-npm install -g pyright
-```
-
-**VS Code users:** No extra steps needed. The Claude Code IDE extension automatically
-provides `getDiagnostics`, which bridges all of VS Code's diagnostics (Pylance, ESLint,
-and any other language extensions) directly into Claude Code. When Claude writes
-Python, it can call `getDiagnostics` to see the same errors and warnings you see in
-the Problems panel.
-
-> **Why LSP matters for agentic workflows.** The `pyright-lsp` plugin works in both
-> the CLI and VS Code. The `getDiagnostics` tool is VS Code-only. Together they give
-> Claude the same signals a human developer gets from their editor: real-time type
-> errors, missing imports, and signature mismatches — caught while Claude is still
-> in context, not after the fact at commit time. This tightens the feedback loop
-> and reduces the back-and-forth of "run mypy → see error → ask Claude to fix it."
 
 ---
 
@@ -240,10 +268,12 @@ Your conversation (limited)
 This is why delegating expensive searches to subagents is good practice — and it's
 exactly what Claude Code does automatically when you're in plan mode.
 
-Subagents also help guard against **context rot** and **context poisoning**. Because
-each subagent starts with a fresh context, a noisy or incorrect result from one task
-can't accumulate and corrupt the reasoning in the main conversation. If a subagent
-goes wrong, you restart that subagent — not your entire session.
+Subagents also help guard against **context rot** and **context poisoning**. Claude
+4.6 models handle long contexts better than earlier generations, but they are not
+immune — in extended sessions, older content still gets compressed. Because each
+subagent starts with a fresh context, a noisy or incorrect result from one task can't
+accumulate and corrupt the reasoning in the main conversation. If a subagent goes
+wrong, you restart that subagent — not your entire session.
 
 > **Session management — resuming, naming, and branching.**
 >
@@ -252,9 +282,9 @@ goes wrong, you restart that subagent — not your entire session.
 > - **`/rename <name>`** — labels the current session for easy recall later.
 > - **Rewind (`Esc+Esc`)** — undo Claude's recent file edits and the conversation up to a
 >   chosen checkpoint. Only tracks changes made via Write/Edit tools — not bash commands.
-> - **Fork (`Shift+Tab` once)** — creates a new branch of the conversation from the current
->   point, preserving the original session. Useful for trying an alternate approach without
->   losing your current context.
+> - **Fork (`/fork`)** — creates a new branch of the conversation from the current point,
+>   preserving the original session. Useful for trying an alternate approach without losing
+>   your current context.
 
 ---
 
@@ -356,6 +386,12 @@ After Claude creates the test, run it:
 
 **Learning tests** verify assumptions about external libraries you don't control. When you write mocks, you encode assumptions about how a library behaves — learning tests validate those assumptions by exercising the real library directly.
 
+> **Timing matters.** Write learning tests during the **research** phase — before you
+> commit to a plan. If your plan assumes a library behaves a certain way, a learning
+> test written early will catch the mistake before you've built on it. Discovering a
+> wrong assumption after implementation is much more expensive than discovering it
+> during research.
+
 ### Exercise
 
 Ask Claude to write learning tests for the claude-agent-sdk:
@@ -394,4 +430,4 @@ Commit the changes and then run /module to proceed to module 3.
 
 ---
 
-[← Module 1](module1.md)
+[← Module 1](module1.md)   [Module 3 →](module3.md)
