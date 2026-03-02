@@ -190,6 +190,28 @@ sequenceDiagram
 > A PRD at `docs/prds/adw-commands.md` defines all four commands we'll build
 > in this module using prompt-driven orchestration.
 
+### The Seven Phase Commands
+
+These are the building blocks you'll chain into delivery workflows in Module 4.
+Each command runs in a forked context (`context: fork`) so it doesn't pollute your
+main conversation.
+
+| Command | What it does | Delegates to |
+|---------|-------------|-------------|
+| `/research` | Decomposes a question into sub-questions, spawns parallel Explore subagents, and synthesises findings into a research report. | Explore subagents (Haiku) |
+| `/design` | Reads requirements and produces a technical spec covering architecture, components, interfaces, data models, and risks. | Plan subagent |
+| `/plan` | Turns a spec into a phased implementation plan where each phase is one atomic commit with files, test strategy, and acceptance criteria. | Plan subagent |
+| `/validation` | Validates a plan's structure (PHASE-NNN identifiers, atomicity, conventional commits) and traceability to specs. Returns READY / NOT READY / NEEDS REVISION. | `validation` agent |
+| `/implement` | Executes a plan using TDD (Red → Green → Refactor), runs quality checks (pytest, ruff, mypy) after each phase, and creates one atomic commit per phase. | `implementation` agent |
+| `/review` | Multi-dimensional code review — quality (ruff, mypy, xenon), security (bandit), tests, and documentation — with severity ratings and an APPROVE / REQUEST_CHANGES recommendation. | `validation` agent |
+| `/document` | Analyses implementation changes, identifies affected docs, and updates them following documentation-standards conventions. | `documentation` agent |
+
+> **Notice the delegation pattern.** The first three commands (`/research`,
+> `/design`, `/plan`) delegate to built-in subagent types (Explore, Plan) using
+> inline Agent tool calls. The last four delegate to custom agents defined in
+> `.claude/agents/` via the `agent:` frontmatter key. You'll see both patterns
+> as you build your own extensions.
+
 ---
 
 > **Internal Plugin Marketplace.** Your team maintains an internal marketplace
