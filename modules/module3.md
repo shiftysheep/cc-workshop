@@ -612,11 +612,38 @@ preferences (verbosity, editor, shortcuts) go in `CLAUDE.local.md`.
 Treat CLAUDE.md like any other config file: small investments in accuracy pay off
 across every session.
 
-### Structuring Prompts with XML Tags
+### Prompt Engineering Fundamentals
 
-Anthropic officially recommends using XML tags to structure prompts with unambiguous boundaries. We've covered *where* to put context (CLAUDE.md, command files, hooks) and *when* it loads — now let's cover *how* to format the content within those files.
+We've covered *where* to put context (CLAUDE.md, command files, hooks) and *when* it
+loads — now let's cover *how* to write effective prompts and format the content within
+those files.
 
-Claude parses XML tags natively and unambiguously. Unlike markdown headers, which can blur section boundaries in complex prompts, XML tags make structure explicit and machine-readable.
+**Core principles:**
+
+1. **Be specific** — "Write a Python function that validates email addresses using
+   regex" beats "write a validator." Constraints reduce guessing.
+2. **Provide context** — tell Claude *why* you need something, not just *what*. "This
+   runs in a Lambda with a 512 MB memory limit" shapes better answers than silence.
+3. **Show examples** — a single input/output example is worth paragraphs of
+   description. Use few-shot patterns when output format matters.
+4. **Set constraints** — explicit boundaries ("do not modify files outside `src/`",
+   "keep the response under 50 lines") prevent scope creep.
+
+> **Prompt engineering evolves with the model.** Claude 4.6 requires less scaffolding
+> than earlier generations — it follows instructions more reliably, handles ambiguity
+> better, and needs fewer examples to understand a pattern. Techniques that were
+> essential for Claude 3.5 (heavy XML wrapping, exhaustive few-shot examples) may now
+> be optional. Start simple; add structure only when Claude's output drifts from what
+> you need.
+>
+> See Anthropic's latest guidance:
+> [docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview)
+
+#### Structuring with XML Tags
+
+Anthropic recommends XML tags for structuring prompts with unambiguous boundaries.
+Claude parses XML tags natively. Unlike markdown headers, which can blur section
+boundaries in complex prompts, XML tags make structure explicit and machine-readable.
 
 #### Common tag patterns
 
