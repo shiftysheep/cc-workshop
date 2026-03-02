@@ -8,20 +8,25 @@ Claude Agent SDK.
 
 ## Key Concepts
 
+| Concept | Why it matters |
+|---------|---------------|
+| **Context window** | The total amount of text Claude can see at once. Your conversation history, file contents, tool results, and system instructions all share this space. When it fills up, older content is summarised or dropped. |
+| **Plan mode** | A read-only mode (`Shift+Tab` twice) where Claude explores the codebase, asks clarifying questions, and produces a plan — but cannot write or edit files until you approve. Used before consequential, multi-step work. |
+| **Context rot** | The gradual degradation of response quality as the context window fills up. Claude 4.6 models handle long contexts better than earlier generations, but they are not immune — older content still gets compressed or dropped in very long sessions, causing Claude to lose track of earlier instructions, decisions, or important details. |
+| **Context poisoning** | When incorrect, misleading, or contradictory information enters the context and skews all subsequent responses. Common sources: a failed tool call Claude misinterprets, a wrong assumption made early in a session that gets reinforced, or a bad test result Claude reasons from incorrectly. Unlike context rot, poisoning can happen even in a mostly empty context. |
+
+## Glossary
+
 | Term | Definition |
 |------|-----------|
 | **MCP (Model Context Protocol)** | An open standard that lets AI assistants connect to external tools and data sources. An MCP server is a program that exposes capabilities — like fetching documentation — as tools Claude can call. |
-| **Context window** | The total amount of text Claude can see at once. Your conversation history, file contents, tool results, and system instructions all share this space. When it fills up, older content is summarised or dropped. |
 | **Token** | The basic unit Claude uses to process text. Roughly 1 token ≈ 4 characters. Your context window holds a fixed number of tokens, which is why managing what's in it matters. |
 | **Tool call** | When Claude invokes one of its available tools (e.g. `Read`, `Bash`) to perform an action. You'll see these logged in the terminal as Claude works. |
-| **Plan mode** | A read-only mode (`Shift+Tab` twice) where Claude explores the codebase, asks clarifying questions, and produces a plan — but cannot write or edit files until you approve. Used before consequential, multi-step work. |
 | **PRD (Product Requirements Document)** | A document describing what a feature should do, without specifying how to implement it. We use one to give Claude clear, stable requirements before it starts planning. |
 | **Claude Agent SDK** | A Python/TypeScript library that exposes the same agent loop powering Claude Code — built-in tools, subagent spawning, session management — so you can embed Claude's capabilities directly in your own programs. |
 | **Subagent** | An isolated Claude instance spawned for a focused subtask. Each subagent gets a fresh context window, restricted tools, and its own model. Built-in types — Explore, Plan, General-purpose — keep expensive work from polluting the main conversation. |
 | **Learning test** | A test that verifies assumptions about an external library you don't control. Exercises the real library directly — not mocks — so behavioural changes surface immediately on upgrades. |
 | **Amazon Bedrock** | AWS's managed AI service. We use it as the authentication and inference layer for Claude so we don't need a direct Anthropic API key. |
-| **Context rot** | The gradual degradation of response quality as the context window fills up. Older content gets compressed or dropped, causing Claude to lose track of earlier instructions, decisions, or important details. Long-running sessions are most vulnerable. |
-| **Context poisoning** | When incorrect, misleading, or contradictory information enters the context and skews all subsequent responses. Common sources: a failed tool call Claude misinterprets, a wrong assumption made early in a session that gets reinforced, or a bad test result Claude reasons from incorrectly. Unlike context rot, poisoning can happen even in a mostly empty context. |
 
 ---
 
@@ -142,7 +147,8 @@ Browse to the **Discover** tab, find **context7**, and install it at **user** sc
 
 ## 3. Examine Context Utilization
 
-MCP servers register tools that Claude discovers on demand via ToolSearch. Let's see what your context looks like before we start building.
+MCP servers register tools that Claude discovers on demand via ToolSearch. Let's see
+what your context looks like before we start building.
 
 In the chat box, run:
 
@@ -151,9 +157,31 @@ In the chat box, run:
 ```
 
 The colored grid shows how much of your context window is currently in use. Note the
-baseline now that Context7 is installed — MCP tool definitions are deferred via ToolSearch and only load into context when Claude needs them. This keeps your idle context lean.
+baseline now that Context7 is installed — MCP tool definitions are deferred via
+ToolSearch and only load into context when Claude needs them. This keeps your idle
+context lean.
 
-> **Why this matters:** Context is finite. With ToolSearch, MCP tools no longer add idle overhead — but once loaded, they stay in context for the session. Subagents remain valuable because each gets a fresh context window with only the tools it needs.
+Now try:
+
+```
+/clear
+```
+
+This resets your conversation entirely — a fresh context with zero history. You're
+back to a clean slate with only your CLAUDE.md and system instructions loaded.
+
+> **When to use each:**
+>
+> - **`/context`** — check how full your context is. Use it periodically during long
+>   sessions to decide whether to continue or start fresh.
+> - **`/clear`** — reset when your context is polluted, you're switching tasks, or
+>   Claude starts producing degraded responses (a sign of context rot). Cheaper than
+>   closing and reopening Claude.
+
+> **Why this matters:** Context is finite. With ToolSearch, MCP tools no longer add
+> idle overhead — but once loaded, they stay in context for the session. Subagents
+> remain valuable because each gets a fresh context window with only the tools it
+> needs.
 
 ---
 
@@ -240,10 +268,12 @@ Your conversation (limited)
 This is why delegating expensive searches to subagents is good practice — and it's
 exactly what Claude Code does automatically when you're in plan mode.
 
-Subagents also help guard against **context rot** and **context poisoning**. Because
-each subagent starts with a fresh context, a noisy or incorrect result from one task
-can't accumulate and corrupt the reasoning in the main conversation. If a subagent
-goes wrong, you restart that subagent — not your entire session.
+Subagents also help guard against **context rot** and **context poisoning**. Claude
+4.6 models handle long contexts better than earlier generations, but they are not
+immune — in extended sessions, older content still gets compressed. Because each
+subagent starts with a fresh context, a noisy or incorrect result from one task can't
+accumulate and corrupt the reasoning in the main conversation. If a subagent goes
+wrong, you restart that subagent — not your entire session.
 
 > **Session management — resuming, naming, and branching.**
 >
@@ -355,6 +385,12 @@ After Claude creates the test, run it:
 ## 13. Learning Tests
 
 **Learning tests** verify assumptions about external libraries you don't control. When you write mocks, you encode assumptions about how a library behaves — learning tests validate those assumptions by exercising the real library directly.
+
+> **Timing matters.** Write learning tests during the **research** phase — before you
+> commit to a plan. If your plan assumes a library behaves a certain way, a learning
+> test written early will catch the mistake before you've built on it. Discovering a
+> wrong assumption after implementation is much more expensive than discovering it
+> during research.
 
 ### Exercise
 
