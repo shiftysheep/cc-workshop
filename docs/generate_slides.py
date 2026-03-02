@@ -238,7 +238,7 @@ SLIDES: list[SlideData] = [
         bullets=[
             ("5. Explore → Plan → Code: ", "Separate thinking from doing — read the codebase before writing to it", 0),
             ("6. Progressive disclosure: ", "Right context, right scope, right time — don't front-load everything", 0),
-            ("7. Agent design: ", "Composable workers with model, tools, scope — agent design is API design", 0),
+            ("7. Agent design: ", "Composable workers with model, tools, scope — agent design is tool design", 0),
             ("8. Scale with isolation: ", "Worktrees, teams, headless, sandboxing — isolate to scale safely", 0),
         ],
         notes=(
@@ -369,7 +369,7 @@ SLIDES: list[SlideData] = [
     ImageSlide(
         title="Anatomy of a Custom Agent",
         image="images/agent_anatomy.png",
-        notes="Every custom agent is a markdown file with YAML frontmatter. The frontmatter is the API contract: identity (name, description — what the agent is and when to use it), cost control (model selection — Haiku for cheap workers, Opus for architects), tool scope (tools: allowlist — least privilege for the agent's role), and safety (permissionMode, sandbox flags). The markdown body is the system prompt: what the agent knows, how it reasons, what it produces. Agent design is API design — a well-defined agent is composable, testable, and reusable across commands. A poorly defined agent is a liability. Key insight: the tools: allowlist is not just safety — it's communication. A code-reviewer with only Read, Glob, and Grep communicates its role clearly. An agent with all tools is a generalist with no clear contract.",
+        notes="Every custom agent is a markdown file with YAML frontmatter. The frontmatter defines the tool's capabilities: identity (name, description — what the agent is and when to use it), cost control (model selection — Haiku for cheap workers, Opus for architects), tool scope (tools: allowlist — least privilege for the agent's role), and safety (permissionMode, sandbox flags). The markdown body is the system prompt: what the agent knows, how it reasons, what it produces. Agent design is tool design — a well-defined agent is composable, testable, and reusable across commands. A poorly defined agent is a liability. Key insight: the tools: allowlist is not just safety — it's communication. A code-reviewer with only Read, Glob, and Grep communicates its role clearly. An agent with all tools is a generalist with no clear contract.",
     ),
     # Slide 24: Agent MCP Scoping (with image)
     ImageSlide(

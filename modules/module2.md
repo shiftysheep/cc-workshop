@@ -349,7 +349,39 @@ After Claude creates the test, run it:
 
 ---
 
-## 13. Commit and Proceed
+## 13. Learning Tests
+
+**Learning tests** verify assumptions about external libraries you don't control. When you write mocks, you encode assumptions about how a library behaves — learning tests validate those assumptions by exercising the real library directly.
+
+### Exercise
+
+Ask Claude to write learning tests for the claude-agent-sdk:
+
+```python
+# Prompt Claude:
+# Write learning tests that verify:
+# 1. allowed_tools restricts the available tool list — only tools you configure
+#    are actually available to the agent
+# 2. The CLAUDECODE env var blocks nested SDK calls — the SDK sets this to
+#    prevent recursive invocations, so calling Claude within Claude raises an
+#    error unless you explicitly unset it
+# 3. Subprocesses spawned by Claude inherit the CLAUDECODE env var — ensuring
+#    the recursion guard propagates through the process tree
+```
+
+> **When to write learning tests**
+>
+> - Adding a **new dependency**: lock in your understanding of how it works
+> - **Upgrading a version**: catch behavioral changes before they break your mocks
+> - **Unsure about behavior**: use tests to explore the library, not guesswork
+>
+> Think of learning tests as **assumption back pressure** — they make your
+> assumptions explicit and testable, so library changes surface immediately
+> rather than silently invalidating your mock expectations.
+
+---
+
+## 14. Commit and Proceed
 
 Ask Claude to commit the changes, then advance to the next module:
 
