@@ -302,6 +302,24 @@ Orchestration hierarchy:
 > (`/team:feature`, `/feature`) orchestrate entire builds with team
 > coordination or sequential execution. Each level composes the one below it.
 
+> **Resuming interrupted runs.** The `--resume` flag works because the orchestrators
+> write state to disk after every phase transition:
+>
+> 1. **State file** — `state.json` tracks `current_phase`, completed outputs, and
+>    the session's `conversation_id`. Each phase updates this before starting the next.
+> 2. **Ctrl+C is safe** — interrupting mid-phase leaves state pointing at the
+>    in-progress phase. The next `--resume` restarts that phase from scratch (it does
+>    not attempt to recover partial work within a phase).
+> 3. **`--resume` vs. fresh start** — resume reads `current_phase` from `state.json`
+>    and skips completed phases. A fresh start ignores any existing state file and
+>    begins from phase 1.
+> 4. **When you can't resume** — if `state.json` is missing, corrupted, or references
+>    a phase that no longer exists (e.g., after changing the orchestrator), delete the
+>    state file and start fresh.
+>
+> This pattern carries into Module 6, where you'll build your own orchestrator with
+> the same state-driven resume support.
+
 ---
 
 ## 9. Agent Teams in Practice
@@ -376,6 +394,32 @@ CLI into a Claude Code clone with interactive chat, tool use, and session manage
 Use the ADW commands you built in Module 4 to drive the development.
 
 Run `/module` to switch to the module-6 branch and open the capstone instructions.
+
+---
+
+## Save It for Later: Weekly Session Summary
+
+This exercise connects headless mode, JSONL parsing, and cron scheduling into a
+practical automation you can use beyond the workshop.
+
+Ask Claude to build a script that:
+
+```markdown
+Write a Python script that:
+1. Reads Claude Code session JSONL files from ~/.claude/projects/
+2. Extracts key stats: sessions per day, total tokens used, tool calls by type,
+   and average session duration
+3. Generates a markdown summary and saves it to ~/claude-weekly-summary.md
+4. Can be scheduled as a weekly cron job
+
+Use headless mode (claude -p) to run the script generation itself.
+```
+
+> **Why this matters.** Session logs are a feedback loop. Reviewing them weekly
+> surfaces patterns — which tools you rely on most, how long sessions run before
+> context degrades, and where orchestrators spend their budget. This is the same
+> data you'd use to tune `--max-turns` and `--max-budget-usd` in production
+> pipelines.
 
 ---
 
