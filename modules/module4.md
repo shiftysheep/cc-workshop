@@ -95,6 +95,20 @@ orchestration starts.
 > writes. The new `/feature` skill will only fire when explicitly invoked.
 > Context is revealed at the moment it's needed — no earlier, no later.
 
+> **Phase dependencies drive orchestration.** The PRD defines explicit ordering
+> constraints that Claude must encode into the orchestration commands:
+>
+> - **Single-agent** (`/feature`, `/bug`): phases run sequentially — each phase's
+>   output feeds the next. Research produces findings, design produces a spec, plan
+>   produces phases, validation gates implementation.
+> - **Multi-agent** (`/team:feature`, `/team:bug`): Group 1 workers run in parallel,
+>   then a leader synthesises their outputs before Group 2 starts.
+>
+> When writing your own PRDs for orchestration, define these dependency chains
+> explicitly: what each phase outputs, what the next phase needs as input, and which
+> phases can safely run in parallel. Without this, Claude will guess at ordering —
+> and guessing wastes context on corrections.
+
 ---
 
 ## 3. Review and Build
@@ -119,7 +133,38 @@ Once satisfied, approve the plan. Claude will create the command files in
 
 ---
 
-## 4. Commit and Proceed
+## 4. Applying the Pattern to Your Own Projects
+
+The orchestration commands Claude just built follow a pattern you can reuse. When you
+have your own feature or bug to deliver, write a structured build instruction that
+explicitly chains your workflow commands:
+
+````markdown
+Read docs/prds/my-feature.md and deliver this feature using the following phases:
+
+1. Run /research to investigate the codebase and gather context
+2. Run /design to produce a technical spec
+3. Run /plan to create an implementation plan from the spec
+4. Run /validation to verify the plan is ready
+5. Run /implement to build it using TDD
+6. Run /review to check quality before committing
+7. Run /document to update affected documentation
+
+Carry forward key findings, file paths, and blockers between phases.
+````
+
+This is what the `/feature` command does under the hood — but writing it out
+explicitly gives you control over which phases to include, what to skip, and where
+to add custom steps (e.g., "run a security scan between review and document").
+
+> **When to use a command vs. a manual prompt.** Use `/feature` or `/bug` for
+> standard delivery. Write an explicit prompt when you need to customise the phase
+> sequence, skip phases, or insert project-specific steps. Both approaches use the
+> same underlying phase commands.
+
+---
+
+## 5. Commit and Proceed
 
 Ask Claude to commit the new command files, then advance to the next module:
 
