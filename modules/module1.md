@@ -6,17 +6,56 @@ foundation every subsequent module builds on.
 
 ---
 
+## Before You Begin: What is Git?
+
+This workshop uses **git** for version control. If you're new to git, here's what
+you need to know:
+
+- **Repository (repo)** — a folder whose history git tracks. This project is one.
+- **Commit** — a snapshot of your changes, with a message describing what changed.
+- **Branch** — a parallel line of work. We use branches to isolate each module's changes.
+- **Push** — sends your local commits to a remote server (GitHub) so others can see them.
+
+That's enough to follow along. For a fuller primer, see GitHub's
+[About Git](https://docs.github.com/en/get-started/using-git/about-git) guide.
+
+---
+
+## What is Claude Code?
+
+Claude Code is Anthropic's official **agent harness** — a framework that wraps a
+foundation model with tools, context management, memory, and workflow orchestration.
+
+| Layer | What it provides | Example |
+|-------|-----------------|---------|
+| **Model** | Raw intelligence | Claude Sonnet, Opus, Haiku |
+| **Agent harness** | Tools + context + memory + orchestration | Claude Code |
+| **Your configuration** | Project-specific behavior | CLAUDE.md, hooks, commands |
+
+A chat interface sends your message and shows a reply. An agent harness lets Claude
+read your files, run your tests, edit your code, and coordinate multi-step workflows —
+all within guardrails you define. This workshop teaches you to configure those guardrails.
+
+---
+
 ## Key Concepts
+
+| Concept | Why it matters |
+|---------|---------------|
+| **Back pressure** | A mechanism that actively resists bad output rather than silently accepting it. Pre-commit hooks are one form: they block a commit until quality gates pass, forcing Claude to fix issues immediately rather than drifting from standards. |
+| **Project scaffolding** | The initial structure, tooling, and configuration that all subsequent development builds on. A well-scaffolded project enforces quality from the first commit. |
+
+---
+
+## Glossary
 
 | Term | Definition |
 |------|-----------|
 | **UV** | A fast Python package and project manager. Replaces pip, virtualenv, and pip-tools with a single tool. We use it to manage dependencies and run the CLI. |
 | **Typer** | A Python library for building CLI applications using type hints. Minimal boilerplate — define a function, add type annotations, get a fully functional CLI command. |
 | **Pre-commit hook** | A script that runs automatically before each `git commit`. Used to enforce code quality gates — linting, type checking, security scanning — before changes enter version control. |
-| **CLAUDE.md** | A markdown file that provides persistent project instructions to Claude, loaded automatically every session. Exists at three scopes — global (`~/.claude/CLAUDE.md`), project (`./CLAUDE.md`), and personal (`./CLAUDE.local.md`) — so teams share conventions while individuals keep local overrides. |
-| **Back pressure** | A mechanism that actively resists bad output rather than silently accepting it. Pre-commit hooks are one form: they block a commit until quality gates pass, forcing Claude to fix issues immediately rather than drifting from standards. |
+| **CLAUDE.md** | A markdown file that provides persistent project instructions to Claude, loaded automatically every session. Exists at three scopes — global, project, and personal — so teams share conventions while individuals keep local overrides. |
 | **Status line** | A persistent display at the bottom of the terminal showing session state — model, context usage, working directory, and git status. Configured once; visible in every session. |
-| **Project scaffolding** | The initial structure, tooling, and configuration that all subsequent development builds on. A well-scaffolded project enforces quality from the first commit. |
 
 ---
 
