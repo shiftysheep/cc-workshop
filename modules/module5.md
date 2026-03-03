@@ -10,16 +10,23 @@ patterns, compare the output, and analyze the session logs.
 
 ## Key Concepts
 
+| Concept | Why it matters |
+|---------|---------------|
+| **Code-driven orchestration** | Composing a multi-step workflow through a Python script that invokes phase commands via `claude -p /<phase>` and carries state via a JSON file. Sequential, single-agent, robust, and resumable. |
+| **Team orchestration** | Composing a multi-step workflow through an agent team where a leader coordinates specialist workers via `TeamCreate`, `TaskCreate`, and `SendMessage`. Parallel where possible, prompt-driven, and defined in a slash command. |
+| **Sandboxing** | Isolating agent operations to limit blast radius — worktrees for filesystem isolation, subagents with restricted tools, permission modes that prevent unintended changes. |
+| **Agent design** | Designing effective agents by defining clear scope, appropriate tool access, quality system prompts, and explicit failure modes. Good agent design prevents scope creep and reduces wasted context. |
+
+---
+
+## Glossary
+
 | Term | Definition |
 |------|-----------|
-| **Code-driven orchestration** | Composing a multi-step workflow through a Python script that invokes phase commands via `claude -p /<phase>` and carries state via a JSON file. Sequential, single-agent, robust, and resumable. |
 | **Headless mode** | Running Claude non-interactively via `claude -p "prompt"`. The command runs, produces output, and exits. Key flags: `--output-format`, `--max-turns`, `--max-budget-usd`, `--allowedTools`. The foundation for code-driven orchestration and CI/CD integration. |
-| **Team orchestration** | Composing a multi-step workflow through an agent team where a leader coordinates specialist workers via `TeamCreate`, `TaskCreate`, and `SendMessage`. Parallel where possible, prompt-driven, and defined in a slash command. |
 | **Worktree** | A git feature that creates a separate working directory linked to the same repository. Each ADW runs in its own worktree so multiple workflows execute in parallel without conflicts. |
-| **Sandboxing** | Isolating agent operations to limit blast radius — worktrees for filesystem isolation, subagents with restricted tools, permission modes that prevent unintended changes. |
 | **State file** | A JSON file at `agents/{adw_id}/state.json` that persists workflow state between phases — completed phases, current phase, issue description, and plan file path. |
 | **Agent team** | Multiple specialised Claude instances coordinated by a leader agent. The leader creates tasks, assigns them to workers, and synthesises results. Workers operate in parallel with focused scope. |
-| **Agent design** | Designing effective agents by defining clear scope, appropriate tool access, quality system prompts, and explicit failure modes. Good agent design prevents scope creep and reduces wasted context. |
 | **Session log (JSONL)** | The transcript of a Claude Code session stored as JSON Lines. Contains every tool call, result, and message. Used for post-hoc analysis of agent behaviour and performance tuning. |
 
 ---
