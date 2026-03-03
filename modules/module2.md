@@ -392,18 +392,16 @@ After Claude creates the test, run it:
 
 ### Exercise
 
-Ask Claude to write learning tests for the claude-agent-sdk:
+Ask Claude to write learning tests for the Strands Agent SDK:
 
-```python
-# Prompt Claude:
-# Write learning tests that verify:
-# 1. allowed_tools restricts the available tool list — only tools you configure
-#    are actually available to the agent
-# 2. The CLAUDECODE env var blocks nested SDK calls — the SDK sets this to
-#    prevent recursive invocations, so calling Claude within Claude raises an
-#    error unless you explicitly unset it
-# 3. Subprocesses spawned by Claude inherit the CLAUDECODE env var — ensuring
-#    the recursion guard propagates through the process tree
+```markdown
+Write learning tests that verify:
+1. An Agent created with `tools=[]` cannot invoke any tools — the model
+   receives an empty tool list and tool-use requests are absent
+2. An Agent created with specific tools only has access to those tools —
+   the agent's tool registry matches what you configured
+3. Conversation history accumulates across multiple agent calls —
+   send two prompts and verify the messages list grows
 ```
 
 > **When to write learning tests**
