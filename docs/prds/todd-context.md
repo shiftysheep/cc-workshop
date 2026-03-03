@@ -44,7 +44,7 @@ Based on the project context, the test command is `uv run pytest`.
 
 ## Dependencies
 
-No new dependencies beyond `claude-agent-sdk>=0.1.0`.
+No new dependencies beyond `strands-agents`.
 
 ## Implementation Notes
 
