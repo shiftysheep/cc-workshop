@@ -104,11 +104,9 @@ code.
 
 In the chat box, run:
 
+```shell
+claude plugin install context7 --scope user
 ```
-/plugin
-```
-
-Browse to the **Discover** tab, find **context7**, and install it at **user** scope.
 
 > **What just happened?** The plugin manager configured a new MCP server for your
 > session. Claude now has access to two new tools: `resolve-library-id` and
