@@ -365,7 +365,7 @@ Merge the worktree changes and commit the orchestrator scripts
 > a fully functional agentic delivery system:
 >
 > - Module 1: Project scaffolding and quality gates
-> - Module 2: CLI tool backed by the Claude Agent SDK
+> - Module 2: CLI tool backed by the Strands Agent SDK
 > - Module 3: ADW foundations — phase commands, skills, agents, hooks
 > - Module 4: Orchestration commands — /feature, /bug, /team:feature, /team:bug
 > - Module 5: Parallel worktree execution, session log analysis, and
