@@ -9,9 +9,14 @@ scaffolding and composing it through plan mode.
 
 ## Key Concepts
 
+| Concept | Why it matters |
+|---------|---------------|
+| **Prompt-driven orchestration** | Composing a multi-step workflow through prose instructions in a command or skill. Single-agent commands execute phases sequentially; team commands coordinate parallel specialist workers — both defined in markdown, no code required. |
+
+## Glossary
+
 | Term | Definition |
 |------|-----------|
-| **Prompt-driven orchestration** | Composing a multi-step workflow through prose instructions in a command or skill. Single-agent commands execute phases sequentially; team commands coordinate parallel specialist workers — both defined in markdown, no code required. |
 | **Phase command** | A single-responsibility slash command that handles one step of the delivery workflow (e.g. `/research`, `/implement`). Composable building blocks for orchestration. |
 | **Orchestration command** | A higher-order slash command that composes phase commands into an end-to-end workflow. Can be single-agent (sequential phases) or multi-agent (parallel workers). |
 
@@ -75,19 +80,13 @@ also use TeamCreate/SendMessage for parallel worker coordination. Commands are
 stored in `.claude/commands/<name>.md`, while skills in `.claude/skills/<name>/SKILL.md`
 show structure with YAML frontmatter, instructions, and optional `references/`.
 
-**Dynamic context injection.** Skills, hooks, and CLAUDE.md form a layered
-context system:
-
-| Mechanism | When it fires | Use case |
-|-----------|--------------|----------|
-| `CLAUDE.md` | Every session, always | Project-wide constants |
-| **Skill** | When task matches description | Standards loaded on demand |
-| **Hook** | At lifecycle events | Validation, back pressure |
-
-The new `/feature` command adds a fourth pattern: **explicit invocation** of
-orchestration workflows. Unlike auto-loaded skills, commands fire only when
-the user types `/<name>` — giving the user direct control over when
-orchestration starts.
+**Dynamic context injection.** Module 3 introduced the layered context
+system — memory files (always present), skills (on-demand), and hooks (at
+lifecycle events). The `/feature` command adds a fourth pattern: **explicit
+invocation**, where context loading is triggered by the user running the
+command directly. Unlike auto-loaded skills, commands fire only when the user
+types `/<name>` — giving the user direct control over when orchestration
+starts.
 
 > **Progressive disclosure applied here.** Claude doesn't load all skills
 > into every context. A code quality skill doesn't fire when writing
@@ -140,7 +139,7 @@ have your own feature or bug to deliver, write a structured build instruction th
 explicitly chains your workflow commands:
 
 ````markdown
-Read docs/prds/my-feature.md and deliver this feature using the following phases:
+Read docs/prds/todd-rich-output.md and deliver this feature using the following phases:
 
 1. Run /research to investigate the codebase and gather context
 2. Run /design to produce a technical spec
