@@ -13,6 +13,7 @@ import configparser
 import json
 import shutil
 import subprocess  # nosec B404
+import sys
 from pathlib import Path
 from typing import cast
 
@@ -35,8 +36,15 @@ BEDROCK_ENV: dict[str, str] = {
     "CLAUDE_CODE_USE_BEDROCK": "1",
 }
 
-BEDROCK_ENV_KEYS = {
-    "awsAuthRefresh": "aws sso login --profile ${AWS_PROFILE}",
+def _auth_refresh_command() -> str:
+    """Return the awsAuthRefresh command for the current platform."""
+    if sys.platform == "win32":
+        return "aws sso login --profile $env:AWS_PROFILE"
+    return "aws sso login --profile ${AWS_PROFILE}"
+
+
+BEDROCK_ENV_KEYS: dict[str, str | dict[str, str]] = {
+    "awsAuthRefresh": _auth_refresh_command(),
     "env": BEDROCK_ENV,
 }
 
