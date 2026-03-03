@@ -93,6 +93,20 @@ the Problems panel.
 > in context, not after the fact at commit time. This tightens the feedback loop
 > and reduces the back-and-forth of "run mypy → see error → ask Claude to fix it."
 
+### Enable the LSP Tool
+
+Add `ENABLE_LSP_TOOL` to your `.claude/settings.json` to activate Claude's Language Server Protocol integration:
+
+```json
+{
+  "env": {
+    "ENABLE_LSP_TOOL": "1"
+  }
+}
+```
+
+Save the file and restart Claude Code for the setting to take effect.
+
 ---
 
 ## 2. Install the Context7 MCP Server
@@ -334,7 +348,8 @@ Compare to `/model opus` which uses Opus for everything (higher cost). `opusplan
 gives you Opus reasoning where it matters most and Sonnet speed for the rest.
 
 > **Pro tip — effort levels.** Each model also has effort levels (low / medium /
-> high) accessible via `/model`. Low for quick edits, high for complex reasoning.
+> high). Run `/model`, then press the **left/right arrow keys** to cycle through
+> effort levels before confirming. Low for quick edits, high for complex reasoning.
 > Extended thinking (`Alt+T`) gives Claude a scratchpad for longer chains. Both
 > affect cost and quality.
 

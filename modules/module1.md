@@ -153,17 +153,18 @@ project instructions that load automatically every session.
 > Project memory can also live at `./.claude/CLAUDE.md`. When scopes overlap,
 > project-level instructions take precedence over global.
 
-**Exercise:** Update the project `CLAUDE.md` with proper structure:
+**Exercise:** Ask Claude to build a proper CLAUDE.md for the project. In the chat box, enter:
 
 ```markdown
-Update the project CLAUDE.md to include:
+Create a project CLAUDE.md that covers:
 - Project description: todd is a Typer CLI application built as part of the Claude Code workshop
 - Tech stack: Python 3.13+, uv, pytest, Typer
 - How to run tests: uv run pytest
 - How to run the CLI: uv run todd
 - Coding standards: ruff (rules E, W, F, I, N, UP, B, C4, PLC, PLE, PLW, RUF), mypy strict
 - Commit conventions: conventional commits
-- Also have Claude update the project configuration (pyproject.toml) to match the CLAUDE.md standards (ruff rules, mypy strict mode, etc.)
+
+Also update the project configuration (pyproject.toml) to match these standards — configure the ruff rules and enable mypy strict mode.
 ```
 
 > **Callout:** This CLAUDE.md will shape Claude's behavior for the rest of the workshop.
@@ -187,10 +188,17 @@ In the chat box, run:
 > There are many other built-in slash commands you can see if you just type `/` in the chat window.
 > For a full list, see the [Anthropic docs on slash commands](https://code.claude.com/docs/en/interactive-mode#built-in-commands).
 
-> **Windows/PowerShell users:** ANSI escape codes may not render correctly.
-> Use this color-free variant instead:
-> ```
-> /statusline Show {model short name} | {context}% context | {cwd abbreviated} | {git_status} | {branch} where git status is plain text "clean" or "modified" without ANSI colors, abbreviate long paths, and omit git fields if not in a repo.
+> **Windows / PowerShell users — two options:**
+>
+> **Option A (Quick):** Run `/statusline` and include this hint in your prompt:
+> "Use PowerShell-compatible syntax — avoid backticks and ANSI escape sequences."
+>
+> **Option B (Manual):** Copy `scripts/statusline.ps1` to `~\.claude\statusline.ps1`,
+> then add a `statusLine` entry to `~\.claude\settings.json`:
+> ```json
+> {
+>   "statusLine": "powershell.exe -NoProfile -File ~/.claude/statusline.ps1"
+> }
 > ```
 
 > **Pro tip:** Type `/cost` to see token usage and spend for this session, or
