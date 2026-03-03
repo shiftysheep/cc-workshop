@@ -188,10 +188,17 @@ In the chat box, run:
 > There are many other built-in slash commands you can see if you just type `/` in the chat window.
 > For a full list, see the [Anthropic docs on slash commands](https://code.claude.com/docs/en/interactive-mode#built-in-commands).
 
-> **Windows/PowerShell users:** ANSI escape codes may not render correctly.
-> Use this color-free variant instead:
-> ```
-> /statusline Show {model short name} | {context}% context | {cwd abbreviated} | {git_status} | {branch} where git status is plain text "clean" or "modified" without ANSI colors, abbreviate long paths, and omit git fields if not in a repo.
+> **Windows / PowerShell users — two options:**
+>
+> **Option A (Quick):** Run `/statusline` and include this hint in your prompt:
+> "Use PowerShell-compatible syntax — avoid backticks and ANSI escape sequences."
+>
+> **Option B (Manual):** Copy `scripts/statusline.ps1` to `~\.claude\statusline.ps1`,
+> then add a `statusLine` entry to `~\.claude\settings.json`:
+> ```json
+> {
+>   "statusLine": "powershell.exe -NoProfile -File ~/.claude/statusline.ps1"
+> }
 > ```
 
 > **Pro tip:** Type `/cost` to see token usage and spend for this session, or
