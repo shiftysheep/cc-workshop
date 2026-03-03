@@ -267,14 +267,12 @@ The `document-skills` plugin from the Anthropic marketplace includes
 `skill-creator` — a guided skill that walks you through building new skills
 with correct frontmatter and structure.
 
-In the chat box, run:
-
-```
-/plugin
-```
-
-Browse to the **Discover** tab, find **document-skills** from the
-`anthropic-agent-skills` marketplace, and install it at **project** scope.
+> If you completed Module 1, the `document-skills` plugin is already installed.
+> Otherwise, install it now:
+> ```shell
+> claude plugin marketplace add anthropics/skills
+> claude plugin install document-skills@anthropic-agent-skills --scope project
+> ```
 
 > **The skill marketplace.** Claude Code supports shared skills distributed
 > through marketplaces. The `anthropic-agent-skills` marketplace is maintained
