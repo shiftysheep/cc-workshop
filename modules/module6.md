@@ -42,86 +42,198 @@ After Module 5, todd can:
 
 ## The Goal
 
-Build these capabilities incrementally. Each milestone has a PRD in `docs/prds/`
-that defines the feature. Work through them in order — each builds on the last.
+Build an open-source coding agent harness from scratch — no SDK dependency, just
+Python and the Anthropic API. Each milestone adds one layer of capability. Work
+through them in order; each builds on the last. By the end you'll have a
+functional agent that can read files, edit code, load project context, stream
+responses, and resume sessions.
+
+**Use your ADW tools.** The commands, agents, and orchestrators you built in
+Modules 3-5 are designed for exactly this kind of work. Try running
+`/feature` or `/team:feature` against the milestone descriptions below to let
+Claude drive the implementation.
 
 ---
 
-## Milestone 1: Interactive REPL
+## Milestone 1: Build the Tool-Use Loop
 
-**PRD:** `docs/prds/todd-repl.md`
+**Goal:** Implement a basic agent loop in Python — no SDK dependency, just the
+Anthropic API.
 
-Replace the single-shot query with an interactive terminal loop:
-- Read-eval-print loop with prompt handling
-- Conversation history (accumulating messages across turns)
-- Graceful exit (Ctrl+C, /exit)
-- Session display (show Claude's responses as they complete)
+**What to build:**
+
+The core agent loop follows this pattern:
+
+1. Read user input from the command line
+2. Build a message and send it to the Anthropic API with tool definitions
+3. Check the response for tool-use blocks
+4. If tools were called: execute them, append results, send the updated
+   conversation back to the API
+5. If no tools were called: print the assistant's text response and exit
+
+Start with just two tools: `read_file` (reads a file and returns its contents)
+and `write_file` (writes content to a file path). Define them as JSON tool
+schemas and implement the execution logic in Python.
+
+**Acceptance criteria:**
+- `uv run todd "read the file pyproject.toml and summarise it"` reads the file
+  via tool use and prints a summary
+- `uv run todd "create a file called hello.txt with the text 'hello world'"` writes
+  the file via tool use
+- The agent loops until the model stops requesting tools — no hardcoded turn limit
+- No SDK dependency beyond `anthropic` (the official Python client)
+
+**Exercise prompt:**
+
+```
+Build a tool-use agent loop in todd. Use the Anthropic Python client directly —
+no agent SDK. The loop should: read user input, call the API with tool
+definitions for read_file and write_file, execute any tool calls, and loop
+until the model responds with text only. Keep it minimal — no streaming, no
+REPL, just a single-shot prompt that can use tools.
+```
 
 ---
 
-## Milestone 2: Tool Use
+## Milestone 2: Open Agent Standards
 
-**PRD:** `docs/prds/todd-tools.md`
+**Goal:** Implement support for AGENTS.md — a portable file that describes your
+agent's capabilities and configuration.
 
-Register tools with the Strands Agent SDK so todd can act on the filesystem:
-- Read, Write, Edit — file operations
-- Bash — shell command execution
-- Glob, Grep — search operations
-- Permission prompts before destructive operations
+**What to build:**
+
+- On startup, check for an `AGENTS.md` file in the current working directory
+- Parse it and include its contents in the system prompt sent to the Anthropic API
+- Also check for an `.agents/` directory containing named agent configuration
+  files (e.g., `.agents/code-reviewer.md`)
+- If `AGENTS.md` exists, prepend its content to the system prompt so the model
+  knows what tools are available and how to behave
+
+This makes your harness portable: any project that includes an `AGENTS.md` file
+can describe its own agent behaviour without modifying your code.
+
+**Acceptance criteria:**
+- Create an `AGENTS.md` in the project root describing todd's tools and behaviour
+- `uv run todd "what tools do you have?"` responds based on the AGENTS.md content
+- Removing `AGENTS.md` doesn't break the harness — it falls back to a default
+  system prompt
+- `.agents/` directory files are discoverable but not loaded unless explicitly
+  referenced
+
+**Exercise prompt:**
+
+```
+Add AGENTS.md support to todd. On startup, check for AGENTS.md in the current
+directory and include its contents in the system prompt. Also scan for an
+.agents/ directory with named agent configs. Create an AGENTS.md for this
+project that describes the available tools (read_file, write_file) and the
+agent's purpose.
+```
 
 ---
 
-## Milestone 3: Streaming Output
+## Milestone 3: Load .claude Project Context
 
-**PRD:** `docs/prds/todd-streaming.md`
+**Goal:** Read CLAUDE.md and `.claude/` configuration to make the harness
+compatible with Claude Code projects.
 
-Show Claude's output token-by-token as it generates:
-- Stream text responses to the terminal
-- Display tool calls and their results inline
-- Handle interrupts (Ctrl+C to stop generation)
+**What to build:**
+
+- If `CLAUDE.md` exists in the project root, read it and include it in the
+  system prompt (in addition to AGENTS.md if present)
+- If `.claude/settings.json` exists, read it for tool permissions and
+  environment configuration
+- If `.claude/commands/` exists, list available commands and show them to the
+  user on startup or when they type `/help`
+- Layer the context: AGENTS.md (agent identity) + CLAUDE.md (project rules) +
+  settings.json (permissions)
+
+**Acceptance criteria:**
+- todd loads CLAUDE.md from the current project and the model follows its
+  instructions
+- Available commands from `.claude/commands/` are listed when the user asks
+- Missing files are handled gracefully — no errors if CLAUDE.md or .claude/
+  doesn't exist
+- The system prompt clearly separates agent identity (AGENTS.md) from project
+  rules (CLAUDE.md)
+
+**Exercise prompt:**
+
+```
+Add CLAUDE.md and .claude/ support to todd. Load CLAUDE.md into the system
+prompt alongside AGENTS.md. Read .claude/settings.json for configuration.
+Scan .claude/commands/ and show available commands to the user. Make sure
+everything degrades gracefully when files are missing.
+```
 
 ---
 
-## Milestone 4: CLAUDE.md Loading
+## Milestone 4: Add REPL and Streaming
 
-**PRD:** `docs/prds/todd-context.md`
+**Goal:** Replace the single-shot query with an interactive REPL and enable
+streaming responses.
 
-Discover and load context engineering files:
-- Auto-discover CLAUDE.md (project root, user home, .claude/ directory)
-- Load as system prompt content
-- Support @file import syntax
+**What to build:**
+
+- Wrap the agent loop in an interactive Read-Eval-Print Loop: prompt the user
+  for input, process it through the agent loop, display the result, repeat
+- Enable streaming using the Anthropic SDK's streaming API — show tokens as
+  they arrive rather than waiting for the complete response
+- Add a `/exit` command to quit the REPL cleanly
+- Add a `/help` command that lists available commands (including any from
+  `.claude/commands/`)
+- Handle `Ctrl+C` gracefully — interrupt the current generation without killing
+  the process
+
+**Acceptance criteria:**
+- `uv run todd` (no arguments) enters interactive REPL mode
+- `uv run todd "prompt"` still works as single-shot mode
+- Responses stream token-by-token to the terminal
+- Tool calls display inline (show what tool was called and its result)
+- `/exit` and `Ctrl+C` work without tracebacks
+
+**Exercise prompt:**
+
+```
+Add REPL and streaming to todd. Running with no arguments enters interactive
+mode. Responses stream token-by-token using the Anthropic streaming API.
+Add /exit and /help commands. Handle Ctrl+C to cancel generation without
+crashing. Keep single-shot mode working for uv run todd "prompt".
+```
 
 ---
 
 ## Milestone 5: Session Persistence
 
-**PRD:** `docs/prds/todd-sessions.md`
+**Goal:** Save conversation history to disk so sessions survive process restarts.
 
-Save and resume conversations:
-- Serialize conversation history to disk
-- `todd --continue` (most recent) and `todd --resume` (by name)
-- `/rename` for session naming
+**What to build:**
 
----
+- After each turn, append the conversation messages to a JSONL file
+- Session files live in `.sessions/` in the project root, named by timestamp
+  (e.g., `.sessions/2025-01-15T10-30-00.jsonl`)
+- On startup, load the most recent session automatically (or start fresh with
+  a `--new` flag)
+- Add a `--session <filename>` flag to resume a specific session by name
+- Each line in the JSONL file is one message (role + content), making it easy
+  to parse and inspect
 
-## Milestone 6 (Optional): Claude Code Session Viewer
+**Acceptance criteria:**
+- Closing and reopening todd resumes the previous conversation
+- `uv run todd --new` starts a fresh session
+- `uv run todd --session .sessions/2025-01-15T10-30-00.jsonl` resumes a
+  specific session
+- Session files are valid JSONL — one JSON object per line
+- The model remembers context from previous turns in the loaded session
 
-**PRD:** `docs/prds/session-viewer.md`
+**Exercise prompt:**
 
-Build a local web app for browsing Claude Code session history:
-- FastAPI + Jinja2 server-rendered app
-- Scans `~/.claude/projects/` for JSONL session files
-- Session list page with search, filters, and pagination
-- Session detail page with messages styled by type (user, assistant, tool use)
-- REST API at `/api/sessions` for programmatic access
-- Subagent session discovery with parent-child navigation
-
-This ties together everything from the workshop: JSONL parsing (Module 5),
-Python tooling (Module 1), API design, and the session log format you analyzed
-in the headless mode exercises.
-
-> **Use your ADW tools.** Run `/feature @docs/prds/session-viewer.md` to let
-> the orchestrator drive the implementation, or work through it interactively.
+```
+Add session persistence to todd. Save conversation history as JSONL in a
+.sessions/ directory. Load the most recent session on startup. Add --new to
+start fresh and --session to resume a specific file. Each line should be one
+message object with role and content.
+```
 
 ---
 
@@ -142,8 +254,9 @@ As you build, these operational skills will be useful:
 
 ## Further Reading
 
-- [Claude Code docs](https://code.claude.com/docs/en) — the product you're cloning
-- [Strands Agent SDK](https://github.com/strands-agents/sdk-python) — the library powering todd
+- [Claude Code docs](https://code.claude.com/docs/en) — the product you're building toward
+- [Anthropic API docs](https://docs.anthropic.com/en/api) — the API your harness calls directly
+- [AGENTS.md spec](https://github.com/anthropics/agents-md) — the open agent standards convention
 - IDE integrations: VS Code extension, JetBrains plugin
 - Plugins: `/plugin` marketplace for shared skills
 
