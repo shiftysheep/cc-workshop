@@ -9,19 +9,24 @@ by using session logs to analyze agent behavior and improve ADW velocity.
 
 ## Key Concepts
 
-| Term | Definition |
-|------|-----------|
-| **ARD (Architecture Reference Document)** | A technical reference that describes how a system is designed. We use Mermaid diagrams to make it visual and navigable. |
-| **Mermaid** | A text-based diagramming syntax that renders inside Markdown. Write diagram definitions as code; get flowcharts, sequence diagrams, and state machines as output. |
-| **Custom slash command** | A user-defined command stored in `.claude/commands/<name>.md`. Explicitly invoked with `/<name>`. Claude executes the markdown as a prompt template. |
-| **Skill** | A reusable capability stored in `.claude/skills/<name>/SKILL.md`. Claude loads it automatically when the task matches the skill's description — no explicit invocation needed. |
-| **Custom subagent** | A user-defined agent at `.claude/agents/<name>.md` with YAML frontmatter (model, tools, permissions) and a system prompt body. Extends the built-in subagent types with project-specific roles — such as a code reviewer restricted to read-only tools. |
-| **Hook** | A script that runs at a Claude Code lifecycle event (e.g. `PreToolUse`, `PostToolUse`, `Stop`). Configured in `.claude/settings.json`. Used for validation, logging, and back pressure. See [hook events](https://code.claude.com/docs/en/hooks#hook-events). |
+| Concept | Why it matters |
+|---------|---------------|
 | **Context engineering** | Intentionally shaping what's in the context window to improve Claude's output — what to include, what to exclude, and when to reset. CLAUDE.md, skills, hooks, and subagents are all context engineering tools. |
 | **Dynamic context injection** | Providing Claude with relevant context at the moment it's needed — via hooks, skills, or CLAUDE.md — rather than up front in every prompt. A specific context engineering technique. |
 | **Progressive disclosure** | Surfacing information incrementally: start with a summary, reveal detail on demand. Prevents overwhelming agents and users with irrelevant context. |
 | **Prompt-driven orchestration** | Composing a multi-step workflow through prose instructions in a command or skill. Single-agent commands execute phases sequentially; team commands coordinate parallel specialist workers — both defined in markdown, no code required. |
 | **Team orchestration** | Composing a multi-step workflow through an agent team where a leader coordinates specialist workers via `TeamCreate`, `TaskCreate`, and `SendMessage`. Parallel where possible, prompt-driven, and defined in a slash command. |
+
+## Glossary
+
+| Term | Definition |
+|------|-----------|
+| **ARD** | Architecture Reference Document — a technical reference that describes how a system is designed. We use Mermaid diagrams to make it visual and navigable. |
+| **Mermaid** | A text-based diagramming syntax that renders inside Markdown. Write diagram definitions as code; get flowcharts, sequence diagrams, and state machines as output. |
+| **Custom slash command** | A user-defined command stored in `.claude/commands/<name>.md`. Explicitly invoked with `/<name>`. Claude executes the markdown as a prompt template. |
+| **Skill** | A reusable capability stored in `.claude/skills/<name>/SKILL.md`. Claude loads it automatically when the task matches the skill's description — no explicit invocation needed. |
+| **Custom subagent** | A user-defined agent at `.claude/agents/<name>.md` with YAML frontmatter (model, tools, permissions) and a system prompt body. Extends the built-in subagent types with project-specific roles — such as a code reviewer restricted to read-only tools. |
+| **Hook** | A script that runs at a Claude Code lifecycle event (e.g. `PreToolUse`, `PostToolUse`, `Stop`). Configured in `.claude/settings.json`. Used for validation, logging, and back pressure. See [hook events](https://code.claude.com/docs/en/hooks#hook-events). |
 | **JSONL** | JSON Lines — one JSON object per line. Claude Code session transcripts are stored in this format, making them easy to stream and parse. |
 
 ---
@@ -110,6 +115,8 @@ a tool. In this repo:
 > Claude will see in user prompts. If your skill isn't firing when expected, the
 > description is the first thing to check.
 
+> For the full skills reference, see the [Claude Code skills documentation](https://code.claude.com/docs/en/skills).
+
 **Commands are focused workflows.** A command is a single markdown file at
 `.claude/commands/<name>.md`. It acts as a prompt template for a reproducible action.
 You invoke it explicitly with `/<name>`. Think of them as "do this specific thing":
@@ -163,7 +170,7 @@ sequenceDiagram
 | **Use case** | Phase execution, defined workflows | Standards, guidelines, domain knowledge |
 | **Location** | `.claude/commands/<name>.md` | `.claude/skills/<name>/SKILL.md` |
 | **Good for** | "Do this specific thing" | "Know this when doing related things" |
-| **Frontmatter** | `description`, `context`, `agent`, `allowed-tools` | `disable-model-invocation`, `context: fork`, `allowed-tools` |
+| **Frontmatter** | `description`, `disable-model-invocation`, `context`, `agent`, `allowed-tools` | `disable-model-invocation`, `context: fork`, `allowed-tools` |
 
 > **Command frontmatter fields:**
 >
@@ -173,6 +180,7 @@ sequenceDiagram
 > | `context: fork` | Runs the command in a forked conversation — output doesn't pollute your main context. All seven phase commands use this. |
 > | `agent` | Delegates execution to a custom agent in `.claude/agents/`. The command file becomes the agent's prompt. |
 > | `allowed-tools` | Restricts which tools are available during command execution. |
+> | `disable-model-invocation` | Prevents the command from auto-loading. The command only runs when explicitly invoked via `/<name>`. |
 >
 > Example from `/implement`:
 > ```yaml
@@ -188,6 +196,22 @@ sequenceDiagram
 > invokes it via `/skill-name`. Add `context: fork` to run it in an isolated subagent
 > (useful for workflows that shouldn't pollute the main context). This gives you
 > command-style explicit invocation with skill-level bundled references and scripts.
+
+Here is an example skill that delegates to the code-reviewer agent with forked context:
+
+```yaml
+---
+name: review
+description: "Review code for quality issues, security vulnerabilities, and style"
+disable-model-invocation: true
+context: fork
+agent: code-reviewer
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
+---
+```
 
 **When to use what:**
 
@@ -512,7 +536,7 @@ You've now explored three mechanisms for injecting context into Claude:
 
 | Mechanism | When it fires | Use case |
 |-----------|--------------|----------|
-| `CLAUDE.md` | Every session, always | Project-wide constants: tech stack, conventions, goals |
+| **Memory files** | Every session, always | Project-wide constants: tech stack, conventions, goals. Includes `CLAUDE.md`, `MEMORY.md`, and auto-memory files. |
 | **Skill** | When task matches description | Cross-cutting standards loaded on demand |
 | **Hook** | At lifecycle events | Validation, back pressure, enforcing quality gates |
 
@@ -697,15 +721,16 @@ Or export it in your shell: `export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
 | `TaskUpdate` | Updates task status (pending → in_progress → completed) |
 | `SendMessage` | Sends a direct message to a teammate |
 
-**Hands-on exercise:** Use a team to build your agents in parallel.
+**Hands-on exercise:** Use a team to run your agents in parallel.
 
 ```
-Create a team and use it to simultaneously build the code-reviewer agent (from
-Exercise 1) and the design agent (from Exercise 2). Launch both agents in parallel.
+Create a team with two workers: one using the code-reviewer agent to review the
+todd query command, and one using the design agent to produce a technical spec for
+adding conversation history to todd. Run both in parallel and compare the outputs.
 ```
 
 Observe how the team leader spawns two workers, assigns them tasks concurrently, and
-collects their results — rather than building each agent sequentially.
+collects their results — rather than running each agent sequentially.
 
 > **When teams help.** Teams shine for parallel independent tasks: two agents building
 > separate files, a research agent and a coding agent running simultaneously, or
