@@ -17,7 +17,7 @@ to pick up where you left off.
 ## Where Todd Stands
 
 After Module 5, todd can:
-- `uv run todd "prompt"` — send one prompt to Claude via the Agent SDK, print the response
+- `uv run todd "prompt"` — send one prompt to Claude via the Strands Agent SDK, print the response
 - No conversation history, no tool use, no streaming, no CLAUDE.md loading
 
 ## The Goal
@@ -43,7 +43,7 @@ Replace the single-shot query with an interactive terminal loop:
 
 **PRD:** `docs/prds/todd-tools.md`
 
-Register tools with the Agent SDK so todd can act on the filesystem:
+Register tools with the Strands Agent SDK so todd can act on the filesystem:
 - Read, Write, Edit — file operations
 - Bash — shell command execution
 - Glob, Grep — search operations
@@ -123,7 +123,7 @@ As you build, these operational skills will be useful:
 ## Further Reading
 
 - [Claude Code docs](https://code.claude.com/docs/en) — the product you're cloning
-- [Claude Agent SDK](https://github.com/anthropics/claude-agent-sdk) — the library powering todd
+- [Strands Agent SDK](https://github.com/strands-agents/sdk-python) — the library powering todd
 - IDE integrations: VS Code extension, JetBrains plugin
 - Plugins: `/plugin` marketplace for shared skills
 

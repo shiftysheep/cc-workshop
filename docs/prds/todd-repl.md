@@ -43,7 +43,7 @@ Bye.
 
 ## Dependencies
 
-No new dependencies beyond Milestone 0 (`claude-agent-sdk>=0.1.0`).
+No new dependencies beyond Milestone 0 (`strands-agents`).
 
 ## Implementation Notes
 

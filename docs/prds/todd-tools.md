@@ -2,7 +2,7 @@
 
 ## Overview
 
-Register filesystem and shell tools with the Agent SDK so todd can act on the
+Register filesystem and shell tools with the Strands Agent SDK so todd can act on the
 codebase — reading files, writing code, running commands. After this milestone,
 todd functions as a basic agentic coding tool.
 
@@ -13,7 +13,7 @@ uv run todd
 todd> read src/todd/cli.py and tell me what it does
 [Claude reads the file and explains it]
 
-todd> add a hello command to the CLI
+todd> add a greeting to the CLI output
 [Claude reads, edits, and verifies the change]
 ```
 
@@ -36,7 +36,7 @@ todd> add a hello command to the CLI
 
 ## Dependencies
 
-No new dependencies beyond `claude-agent-sdk>=0.1.0`.
+No new dependencies beyond `strands-agents`.
 
 ## Implementation Notes
 
