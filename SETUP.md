@@ -80,3 +80,9 @@ Configure claude to utilize this profile by creating/updating the following sett
   }
 }
 ```
+
+> **Windows / PowerShell users:** Replace the `awsAuthRefresh` value with:
+> ```json
+> "awsAuthRefresh": "aws sso login --profile $env:AWS_PROFILE"
+> ```
+> PowerShell uses `$env:VAR` instead of `${VAR}` for environment variable expansion.
