@@ -16,8 +16,7 @@ you need to know:
 - **Branch** — a parallel line of work. We use branches to isolate each module's changes.
 - **Push** — sends your local commits to a remote server (GitHub) so others can see them.
 
-That's enough to follow along. For a fuller primer, see GitHub's
-[git - the simple guide](https://rogerdudler.github.io/git-guide/).
+That's your git primer — it's all you need to follow along.
 
 ---
 
