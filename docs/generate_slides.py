@@ -189,7 +189,7 @@ SLIDES: list[SlideData] = [
             ),
             (
                 "Built-in tools: ",
-                "Read, Write, Edit, Bash, Glob, Grep, Task (subagents)",
+                "Read, Write, Edit, Bash, Glob, Grep, Agent (subagents)",
                 0,
             ),
             (
@@ -281,7 +281,7 @@ SLIDES: list[SlideData] = [
     ),
     # Slide 13: Module 2 Section Header
     SectionSlide(
-        title="Module 2: MCP, Plan Mode, and the Agent SDK",
+        title="Module 2: MCP, Plan Mode, and the Strands Agent SDK",
         notes="Module 2 introduces the critical concept of context as a finite resource. You'll install your first MCP server, see how MCP tools load on demand via ToolSearch, switch models for planning, and build a real feature through plan mode. The key progression: Module 1 was about Claude doing things for you. Module 2 is about Claude thinking before doing. Transition: What we do in this module.",
     ),
     # Slide 14: M2 What We Do
