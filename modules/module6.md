@@ -14,6 +14,26 @@ to pick up where you left off.
 
 ---
 
+## Key Concepts
+
+| Concept | Why it matters |
+|---------|---------------|
+| **Incremental capability building** | Each milestone adds one layer of capability — tool use, context loading, REPL, streaming — so you always have a working harness |
+| **Agent loop** | The core pattern of an agentic system: receive input → select tool → execute → observe → repeat until done |
+
+---
+
+## Glossary
+
+| Term | Definition |
+|------|-----------|
+| **REPL** | Read-Eval-Print Loop — an interactive prompt that processes one input at a time and shows results immediately |
+| **Open agent standards (AGENTS.md)** | Community conventions for describing agent capabilities and configurations in a portable, SDK-agnostic format |
+| **Streaming** | Receiving and displaying LLM output token-by-token as it's generated, rather than waiting for the complete response |
+| **Session persistence** | Saving conversation history to disk so it survives process restarts and can be resumed later |
+
+---
+
 ## Where Todd Stands
 
 After Module 5, todd can:
