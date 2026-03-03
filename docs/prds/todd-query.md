@@ -3,8 +3,8 @@
 ## Overview
 
 `todd` is a single-purpose CLI that accepts a natural language prompt as a positional
-argument, sends it to Claude via the Claude Agent SDK, and prints the result to
-stdout.
+argument, sends it to Claude via the Strands Agent SDK, and prints the result to
+stdout. This replaces the scaffold's greeting with a prompt-accepting default command.
 
 ## Usage
 
@@ -22,14 +22,14 @@ I'm running claude-sonnet-4-6.
 ### Functional
 
 - `todd` accepts a single positional string argument (the prompt)
-- The prompt is forwarded to Claude using the `claude-agent-sdk` Python package
+- The prompt is forwarded to Claude using the `strands-agents` Python package
 - The final result text is printed to stdout
-- No tools are required; this is a conversational query only (`allowed_tools=[]`)
-- Authentication uses Amazon Bedrock (`CLAUDE_CODE_USE_BEDROCK=1`) with standard AWS credential chain
+- No tools are required; this is a conversational query only (`tools=[]`)
+- Authentication uses a `BedrockModel` with standard AWS credential chain
 
 ### Non-Functional
 
-- Authentication issues are surfaced by the agent SDK's built-in guardrails — no additional handling is needed
+- Authentication issues are surfaced by SDK exceptions — no additional handling is needed
 - No streaming output; print the complete result once available
 
 ## Dependencies
@@ -37,7 +37,7 @@ I'm running claude-sonnet-4-6.
 Add to `pyproject.toml`:
 
 ```toml
-"claude-agent-sdk>=0.1.0"
+"strands-agents"
 ```
 
 ## Environment
@@ -45,18 +45,15 @@ Add to `pyproject.toml`:
 ```shell
 export CLAUDE_CODE_USE_BEDROCK=1
 # AWS credentials via standard chain (profile, instance role, env vars, etc.)
-
-# Unset CLAUDE_CODE so the agent SDK can spawn its own Claude instance.
-# When running inside Claude Code, this env var is set and can interfere
-# with a nested agent SDK session.
-unset CLAUDE_CODE
+# Strands uses Bedrock/Anthropic models directly — no CLAUDECODE guard var is set,
+# so uv run todd works seamlessly inside a Claude Code session.
 ```
 
 ## Implementation Notes
 
-Use the async `query` function from `claude_agent_sdk`. The result is available on
-messages that have a `result` attribute. Wrap the async entrypoint with
-`asyncio.run()` so Typer can call it synchronously.
+Create an `Agent` using `BedrockModel` from `strands_agents` and `strands_agents.models.bedrock`.
+Invoke the agent with the prompt string; the result is the agent's text response.
+The call is synchronous — no `asyncio.run()` wrapper needed.
 
 ## Out of Scope
 
