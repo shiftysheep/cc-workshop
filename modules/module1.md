@@ -95,11 +95,11 @@ In the chat box, enter:
 > directly.
 
 ```markdown
-Let's setup our project scaffolding utilizing UV with a src layout. We will be creating a Typer cli application with the name of todd. Include a hello command. Also setup pre-commit with ruff, mypy, bandit, vulture, and xenon hooks.
+Let's setup our project scaffolding utilizing UV with a src layout. We will be creating a Typer cli application with the name of todd. It should be a single default command that accepts an optional positional prompt argument — running `uv run todd` with no argument prints a greeting. Also setup pre-commit with ruff, mypy, bandit, vulture, and xenon hooks.
 ```
 
 Claude will create the project structure: `pyproject.toml`, the `src/todd/` package,
-a `hello` command wired up with Typer, and code quality tooling.
+a default command wired up with Typer, and code quality tooling.
 
 > **What just happened?** Claude used `Write` and `Bash` to build the entire
 > project structure — no manual file creation needed. Claude harnessed our existing
@@ -127,10 +127,10 @@ Now install the pre-commit hooks Claude created and validate they pass:
 Test the new command directly from the chat box using the `!` prefix to run shell commands:
 
 ```shell
-!uv run todd hello
+!uv run todd
 ```
 
-You should see `Hello. How can I assist?` (or similar) printed to the terminal.
+You should see a greeting message printed to the terminal.
 
 > **Tenet 1: Verify your work.** This manual test is a spot-check — it proves
 > the CLI works *right now*. In Module 2, we'll upgrade from manual verification
@@ -219,7 +219,7 @@ or both). Useful when Claude goes in a wrong direction. Note: only tracks file e
 via Write/Edit tools, not changes made by bash commands.
 
 > **Exercise:** Type `@src/todd/__init__.py` to reference the init file, then run
-> `!uv run todd hello` to verify the CLI still works.
+> `!uv run todd` to verify the CLI still works.
 
 ---
 
