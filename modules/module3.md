@@ -24,7 +24,7 @@ by using session logs to analyze agent behavior and improve ADW velocity.
 | **ARD** | Architecture Reference Document — a technical reference that describes how a system is designed. We use Mermaid diagrams to make it visual and navigable. |
 | **Mermaid** | A text-based diagramming syntax that renders inside Markdown. Write diagram definitions as code; get flowcharts, sequence diagrams, and state machines as output. |
 | **Custom slash command** | A user-defined command stored in `.claude/commands/<name>.md`. Explicitly invoked with `/<name>`. Claude executes the markdown as a prompt template. |
-| **Skill** | A reusable capability stored in `.claude/skills/<name>/SKILL.md`. Claude loads it automatically when the task matches the skill's description — no explicit invocation needed. |
+| **Skill** | A reusable capability stored in `.claude/skills/<name>/SKILL.md`. Claude executes it via the Skill tool when the task matches the skill's description. Skills appear in the `/` menu and can be invoked explicitly. |
 | **Custom subagent** | A user-defined agent at `.claude/agents/<name>.md` with YAML frontmatter (model, tools, permissions) and a system prompt body. Extends the built-in subagent types with project-specific roles — such as a code reviewer restricted to read-only tools. |
 | **Hook** | A script that runs at a Claude Code lifecycle event (e.g. `PreToolUse`, `PostToolUse`, `Stop`). Configured in `.claude/settings.json`. Used for validation, logging, and back pressure. See [hook events](https://code.claude.com/docs/en/hooks#hook-events). |
 | **JSONL** | JSON Lines — one JSON object per line. Claude Code session transcripts are stored in this format, making them easy to stream and parse. |
@@ -54,35 +54,24 @@ by using session logs to analyze agent behavior and improve ADW velocity.
 
 ---
 
-## 1. Generate the ADW Architecture Reference Document
+## 1. Generate a Codebase Walkthrough
 
-Before exploring the scaffolding, let's use Claude to produce a visual map of it.
-This is a demonstration of Claude as a documentation tool — no code required.
+This step introduces showboat — a CLI tool for creating executable demo documents
+that interleave commentary with live code output.
 
 In the chat box, enter:
 
 ```markdown
-Read the `.claude/` directory, then generate a comprehensive Architecture Reference Document at `docs/adr/adw.md`.
-Include the following Mermaid diagrams:
+Read the source and then plan a linear walkthrough of the code that explains how it all works in detail.
 
-1. Feature and bug workflow phase sequences (flowchart)
-2. Python orchestrator chaining pattern (sequence diagram)
-3. ADW component architecture showing the .claude/ directory structure (architecture diagram)
-4. ADW state lifecycle from creation to completion (state diagram)
-5. State JSON schema (entity relationship diagram)
+Then run "uvx showboat --help" to learn showboat — use showboat to create a walkthrough.md file in the repo and build the walkthrough in there, using showboat note for commentary and showboat exec plus sed or grep or cat or whatever you need to include snippets of code you are talking about.
 ```
 
-Claude will read the existing files, reason about the system design, and produce a
-structured document with all five diagrams.
-
-> **What just happened?** Claude read existing files and produced a technical
-> reference — no code was written. This is the same capability that makes Claude
-> useful for generating PRDs, ADRs, runbooks, and onboarding docs from existing
-> codebase knowledge. The Mermaid diagrams render directly in GitHub, VS Code, and
-> most markdown viewers.
-
-Review `docs/adr/adw.md` before continuing. You'll be referencing it throughout this
-module and the next.
+> **What just happened?** Claude used Read to understand the codebase, learned a new
+> tool via its `--help` output, then composed a walkthrough document that interleaves
+> explanation with real, verifiable code output. The walkthrough is both documentation
+> and a regression test — run `uvx showboat verify walkthrough.md` to re-execute all
+> code blocks and check they still match.
 
 ---
 
@@ -94,13 +83,13 @@ difference between the two primary extension mechanisms.
 **Skills are capability bundles.** A skill is a directory — `.claude/skills/<name>/` —
 containing a `SKILL.md` file with YAML frontmatter and instructions, plus optional
 `references/` subdirectory, scripts, and templates. Claude reads skill descriptions
-and decides whether to load one based on the current task — skills are not triggered
-automatically like hooks. The `description` field in a skill's YAML frontmatter is
+and decides whether to invoke one via the Skill tool based on the current task — unlike hooks, skills require explicit invocation.
+The `description` field in a skill's YAML frontmatter is
 the primary signal Claude uses to make this decision. Think of them as "know this when
 relevant": coding standards, domain knowledge, architectural context, or how to operate
 a tool. In this repo:
 
-- `.claude/skills/code-review/SKILL.md` — auto-loaded when Claude is doing code review
+- `.claude/skills/code-review/SKILL.md` — invoked via Skill tool during code review
 - `.claude/skills/documentation-standards/` — has a `references/templates.md` file with doc templates
 
 > **Skills are the right place to teach Claude how to use CLI tools.** When your project
@@ -165,7 +154,7 @@ sequenceDiagram
 
 | | Command | Skill |
 |-|---------|-------|
-| **Invocation** | Explicit (`/research`, `/implement`) | Automatic (description match) |
+| **Invocation** | Explicit (`/research`, `/implement`) | Skill tool (description match) |
 | **Structure** | Single `.md` file | Directory (`SKILL.md` + optional `references/`, scripts) |
 | **Use case** | Phase execution, defined workflows | Standards, guidelines, domain knowledge |
 | **Location** | `.claude/commands/<name>.md` | `.claude/skills/<name>/SKILL.md` |
@@ -227,18 +216,20 @@ allowed-tools:
 > Agents can invoke commands (e.g. an orchestrator agent running `/implement`).
 > Commands can delegate to agents (e.g. `/team:feature` spawning worker agents).
 
-> **Agents as calibrated skillsets.** An agent isn't just "a specialist worker" — it's
-> a worker whose capabilities are explicitly scoped. You control:
-> - **Tools** — which tools the agent can use (via `allowed-tools` frontmatter)
-> - **Model** — which model runs the agent (via `model` frontmatter)
-> - **Knowledge** — what domain context it receives (the agent file's markdown body)
-> - **MCP access** — which MCP servers are available (via `mcp-servers` frontmatter)
->
-> A narrowly scoped agent (e.g. `validation` with read-only tools) is safer and
-> cheaper than a general-purpose one. Start narrow — you can always widen scope later.
-> When choosing between "just use Claude directly" and "create an agent," ask: does
-> this task benefit from restricted tools, a specific model, or domain-specific
-> instructions? If yes, it's an agent. If no, a command or direct prompt is simpler.
+### Agents as calibrated skillsets
+
+An agent isn't just "a specialist worker" — it's a worker whose capabilities are
+explicitly scoped. You control:
+- **Tools** — which tools the agent can use (via `allowed-tools` frontmatter)
+- **Model** — which model runs the agent (via `model` frontmatter)
+- **Knowledge** — what domain context it receives (the agent file's markdown body)
+- **MCP access** — which MCP servers are available (via `mcp-servers` frontmatter)
+
+A narrowly scoped agent (e.g. `validation` with read-only tools) is safer and
+cheaper than a general-purpose one. Start narrow — you can always widen scope later.
+When choosing between "just use Claude directly" and "create an agent," ask: does
+this task benefit from restricted tools, a specific model, or domain-specific
+instructions? If yes, it's an agent. If no, a command or direct prompt is simpler.
 
 > **Four ways to deliver work.** The phase commands are reusable primitives.
 > You can compose them in four ways — two single-agent, two multi-agent:
@@ -275,6 +266,12 @@ main conversation.
 > `.claude/agents/` via the `agent:` frontmatter key. You'll see both patterns
 > as you build your own extensions.
 
+> **Exercise: Test the artifact chain.** Run `/research` with a simple topic and
+> confirm it writes findings to `docs/research/`. Then run `/design` and verify it
+> reads the research output. Since each phase uses `context: fork`, the only way
+> context passes between phases is through file artifacts scoped by
+> `${CLAUDE_SESSION_ID}` — this is by design.
+
 ---
 
 > **Internal Plugin Marketplace.** Your team maintains an internal marketplace
@@ -298,12 +295,7 @@ with correct frontmatter and structure.
 > claude plugin install document-skills@anthropic-agent-skills --scope project
 > ```
 
-> **The skill marketplace.** Claude Code supports shared skills distributed
-> through marketplaces. The `anthropic-agent-skills` marketplace is maintained
-> by Anthropic and includes productivity skills (document processing, frontend
-> design) and meta-skills (skill-creator, MCP builder). Installing a plugin
-> gives Claude access to the skills it contains — they appear in the `/` menu
-> and Claude can load them automatically by description match.
+Verify the skill-creator is available by typing `/skill-creator` in the chat box.
 
 ---
 
@@ -369,8 +361,10 @@ Do not suggest fixes — only identify issues.
 > **Exercise 2:** Ask Claude to create a design agent:
 > ```
 > Create .claude/agents/design.md — a design agent with model: opus, tools: Read,
-> Glob, Grep, Write, and the documentation-standards skill. The agent should produce
-> technical specifications for features based on PRDs and research findings.
+> Glob, Grep, Write, the documentation-standards skill, and context7 MCP server
+> (npx -y @upstash/context7-mcp@latest) for library documentation lookups. The agent
+> should produce technical specifications for features based on PRDs and research
+> findings.
 > ```
 > Notice that Claude creates the agent file itself — this is Claude building its own
 > tooling. Review the generated frontmatter and system prompt before continuing.
@@ -432,6 +426,12 @@ tools:
 
 You'll see three more agents (implementation.md, validation.md, documentation.md)
 when you explore the `.claude/` scaffolding in the next section.
+
+> **Agent-scoped hooks.** The implementation agent includes a `PostToolUse` hook in
+> its frontmatter that runs `lint-check.py` on every file write. This is narrower
+> than a project-level hook in `settings.json` — it fires only when this specific
+> agent writes code, not during research or design phases. Scoping hooks to agents
+> keeps feedback tight where it matters and quiet where it doesn't.
 
 
 ### Sandboxing and Controlled Autonomous Builds
