@@ -94,7 +94,7 @@ In the chat box, enter:
 > directly.
 
 ```markdown
-Let's setup our project scaffolding utilizing UV with a src layout. We will be creating a Typer cli application with the name of todd. It should be a single default command that accepts an optional positional prompt argument — running `uv run todd` with no argument prints a greeting. Also setup pre-commit with ruff, mypy, bandit, vulture, and xenon hooks.
+Let's setup our project scaffolding utilizing UV with a src layout. We will be creating a Typer CLI application with the name of todd. It should be a single default command — running `uv run todd` prints a greeting. Also setup pre-commit.
 ```
 
 Claude will create the project structure: `pyproject.toml`, the `src/todd/` package,
@@ -197,7 +197,7 @@ In the chat box, run:
 > then add a `statusLine` entry to `~\.claude\settings.json`:
 > ```json
 > {
->   "statusLine": "powershell.exe -NoProfile -File ~/.claude/statusline.ps1"
+>   "statusLine": "pwsh -NoProfile -File ~/.claude/statusline.ps1"
 > }
 > ```
 
