@@ -244,6 +244,13 @@ capabilities applied to everyday knowledge work tasks.
 > This gives Claude the ability to create PowerPoint and Excel files directly.
 > Restart Claude Code after installing.
 
+> **The skill marketplace.** Claude Code supports shared skills distributed
+> through marketplaces. The `anthropic-agent-skills` marketplace is maintained
+> by Anthropic and includes productivity skills (document processing, frontend
+> design) and meta-skills (skill-creator, MCP builder). Installing a plugin
+> gives Claude access to the skills it contains — they appear in the `/` menu
+> and Claude can invoke them via the Skill tool by description match.
+
 ---
 
 ### Exercise 1: Data Transformation
