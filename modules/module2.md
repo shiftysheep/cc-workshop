@@ -2,7 +2,7 @@
 
 In this module we'll install our first MCP server, explore how tools load on demand via ToolSearch,
 switch to a more capable model for planning, and build a real feature using the
-Claude Agent SDK.
+Strands Agent SDK.
 
 ---
 
@@ -23,7 +23,7 @@ Claude Agent SDK.
 | **Token** | The basic unit Claude uses to process text. Roughly 1 token ≈ 4 characters. Your context window holds a fixed number of tokens, which is why managing what's in it matters. |
 | **Tool call** | When Claude invokes one of its available tools (e.g. `Read`, `Bash`) to perform an action. You'll see these logged in the terminal as Claude works. |
 | **PRD (Product Requirements Document)** | A document describing what a feature should do, without specifying how to implement it. We use one to give Claude clear, stable requirements before it starts planning. |
-| **Claude Agent SDK** | A Python/TypeScript library that exposes the same agent loop powering Claude Code — built-in tools, subagent spawning, session management — so you can embed Claude's capabilities directly in your own programs. |
+| **Strands Agent SDK** | A Python library for building AI agents. We use it to give todd its own agent loop — send a prompt, get a response — backed by Claude on Amazon Bedrock. |
 | **Subagent** | An isolated Claude instance spawned for a focused subtask. Each subagent gets a fresh context window, restricted tools, and its own model. Built-in types — Explore, Plan, General-purpose — keep expensive work from polluting the main conversation. |
 | **Learning test** | A test that verifies assumptions about an external library you don't control. Exercises the real library directly — not mocks — so behavioural changes surface immediately on upgrades. |
 | **Amazon Bedrock** | AWS's managed AI service. We use it as the authentication and inference layer for Claude so we don't need a direct Anthropic API key. |
@@ -80,11 +80,12 @@ uv tool install pyright
 npm install -g pyright
 ```
 
-**VS Code users:** No extra steps needed. The Claude Code IDE extension automatically
-provides `getDiagnostics`, which bridges all of VS Code's diagnostics (Pylance, ESLint,
-and any other language extensions) directly into Claude Code. When Claude writes
-Python, it can call `getDiagnostics` to see the same errors and warnings you see in
-the Problems panel.
+**VS Code users:** You get an additional tool for free. The Claude Code IDE extension
+automatically provides `getDiagnostics`, which bridges all of VS Code's diagnostics
+(Pylance, ESLint, and any other language extensions) directly into Claude Code. This
+is complementary to the LSP plugin — `getDiagnostics` runs automatically on file
+changes, while the LSP tool requires explicit tool calls. Install pyright-lsp above
+for both capabilities.
 
 > **Why LSP matters for agentic workflows.** The `pyright-lsp` plugin works in both
 > the CLI and VS Code. The `getDiagnostics` tool is VS Code-only. Together they give
@@ -242,7 +243,7 @@ touching any code.
 
 > **Tenet 2: Be specific.** Compare this prompt to a vague "build me a query
 > command." The PRD references exact files (`src/todd/`), specifies dependencies
-> (`claude-agent-sdk`), defines expected output, and lists what's out of scope.
+> (`strands-agents`), defines expected output, and lists what's out of scope.
 > Each constraint reduces the space Claude has to guess — and guessing wastes
 > context tokens on clarification loops.
 
@@ -377,7 +378,7 @@ In the chat box, enter:
 ```markdown
 Write a test for the todd query command in tests/test_query.py.
 The test should verify that the query function returns a non-empty string
-when given a simple prompt. Use pytest and mock the Claude Agent SDK call
+when given a simple prompt. Use pytest and mock the Strands Agent SDK call
 so the test runs without Bedrock credentials.
 ```
 
