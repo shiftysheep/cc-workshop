@@ -16,18 +16,20 @@ Perform a comprehensive code review across quality, security, tests, and documen
 
 Delegates to the **validation** agent. The agent will:
 
-1. **Analyze scope** from `$ARGUMENTS` — determine what changes to review (git diff, specific files, or PR)
-2. **Run quality dimensions**:
+1. **Read context** — if `docs/specs/${CLAUDE_SESSION_ID}.md` exists, read it as the design spec; if `docs/plans/${CLAUDE_SESSION_ID}.md` exists, read it as the implementation plan. Use these to verify implementation matches intent.
+2. **Analyze scope** from `$ARGUMENTS` — determine what changes to review (git diff, specific files, or PR)
+3. **Run quality dimensions**:
    - Quality: ruff, mypy, xenon complexity
    - Security: bandit for vulnerabilities
    - Tests: coverage of changed code, test quality
    - Documentation: public APIs documented
-3. **Categorize findings** by severity: Blocking / Important / Suggestion
-4. **Optional plan completeness check**: if a plan path is provided, verify all phases were implemented
+4. **Categorize findings** by severity: Blocking / Important / Suggestion
+5. **Optional plan completeness check**: if a plan path is provided, verify all phases were implemented
+6. **Write review report** to `docs/reviews/${CLAUDE_SESSION_ID}.md`
 
 ## Output
 
-Review report with:
+Review report at `docs/reviews/${CLAUDE_SESSION_ID}.md` with:
 
 ```
 ## Code Review Report
@@ -49,6 +51,11 @@ Review report with:
 
 ### Recommendation
 APPROVE | REQUEST_CHANGES | NEEDS_DISCUSSION
+
+## Verdict
+PASS | FAIL
+
+<List of issues if FAIL>
 ```
 
 ## Usage

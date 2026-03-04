@@ -44,6 +44,8 @@ Produce a research report with:
 <suggested next steps based on findings>
 ```
 
+Write the research report to `docs/research/${CLAUDE_SESSION_ID}.md`.
+
 ## Usage
 
 ```
