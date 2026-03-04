@@ -16,7 +16,7 @@ Implement a plan using Test-Driven Development, creating one atomic commit per p
 
 Delegates to the **implementation** agent. The agent will:
 
-1. **Read the plan** from the path or description in `$ARGUMENTS`
+1. **Read the plan** — if `docs/plans/${CLAUDE_SESSION_ID}.md` exists, read it as the plan; otherwise read from the path or description in `$ARGUMENTS`
 2. **Verify assumptions** — check referenced files and prior phases exist
 3. **Implement each phase with TDD**:
    - Red: Write failing tests
