@@ -16,7 +16,7 @@ Validate an implementation plan before handing it off for implementation. Checks
 
 Delegates to the **validation** agent. The agent will:
 
-1. **Read the plan** from the path or description in `$ARGUMENTS`
+1. **Read the plan** — if `docs/plans/${CLAUDE_SESSION_ID}.md` exists, read it as the plan; otherwise read from the path or description in `$ARGUMENTS`
 2. **Validate structure**:
    - Each phase has a `[PHASE-NNN]` identifier
    - Each phase maps to exactly one atomic commit

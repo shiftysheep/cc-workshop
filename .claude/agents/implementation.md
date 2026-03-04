@@ -5,6 +5,13 @@ description: TDD implementation specialist — write code, create tests, refacto
 skills:
   - testing
   - documentation-standards
+hooks:
+  PostToolUse:
+    - matcher: "Write|Edit|MultiEdit"
+      hooks:
+        - type: command
+          command: "uv run python .claude/hooks/lint-check.py"
+          timeout: 30
 ---
 
 # Implementation Agent
