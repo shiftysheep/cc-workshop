@@ -13,7 +13,7 @@ Create a phased implementation plan with atomic commits, saved to `docs/plans/`.
 
 ## Workflow
 
-1. **Read input** — consume any referenced spec document, research findings, or feature description from `$ARGUMENTS`
+1. **Read input** — if `docs/specs/${CLAUDE_SESSION_ID}.md` exists, read it as the design spec; also consume any referenced spec document, research findings, or feature description from `$ARGUMENTS`
 2. **Delegate to Plan subagent** (use Agent tool with `subagent_type: "Plan"`) for planning:
    - Provide full spec/research context in the prompt
    - Ask it to produce phases with `[PHASE-XXX]` IDs, each representing one atomic commit
@@ -35,7 +35,7 @@ Each phase MUST include:
 
 ## Output
 
-Plan document at `docs/plans/plan-<feature>.md` with:
+Plan document at `docs/plans/${CLAUDE_SESSION_ID}.md` with:
 
 ```
 ## Plan: <Feature Name>
