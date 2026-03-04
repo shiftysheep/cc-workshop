@@ -72,7 +72,7 @@ class TwoColumnSlide(SlideData):
     right: list[Bullet] = field(default_factory=list)
 
 
-# All 41 slides in exact order
+# All 43 slides in exact order
 SLIDES: list[SlideData] = [
     # Slide 1: Title slide
     TitleSlide(
@@ -216,7 +216,7 @@ SLIDES: list[SlideData] = [
         bullets=[
             ("1. Verify your work: ", "Tests and expected outputs are the single highest-leverage thing you can provide", 0),
             ("2. Be specific: ", "Reference files, constraints, patterns — vague prompts produce vague output", 0),
-            ("3. CLAUDE.md + hooks: ", "Persistent memory plus automated gates — deterministic quality from commit one", 0),
+            ("3. Memory files: ", "Persistent context shapes Claude's behavior across sessions", 0),
             ("4. Context is finite: ", "Manage aggressively — performance degrades as the window fills", 0),
         ],
         notes=(
@@ -227,7 +227,7 @@ SLIDES: list[SlideData] = [
             "enters and corrupts reasoning. These failure modes are why Tenet 4 matters.\n\n"
             "Module mapping: #1 starts in M1 (manual check) and deepens in M2 (automated test). "
             "#2 is demonstrated through PRD-driven workflows starting in M2. "
-            "#3 is the M1 headline (CLAUDE.md + pre-commit) and deepens in M3 (PostToolUse hooks). "
+            "#3 is the M1 headline (CLAUDE.md memory files) and deepens across modules. "
             "#4 is the M2 headline (context visualization, subagent isolation).\n\n"
             "Transition: The next four tenets build on these foundations."
         ),
@@ -281,7 +281,7 @@ SLIDES: list[SlideData] = [
     ),
     # Slide 13: Module 2 Section Header
     SectionSlide(
-        title="Module 2: MCP, Plan Mode, and the Strands Agent SDK",
+        title="Module 2: MCP, Plan Mode, and the Agent SDK",
         notes="Module 2 introduces the critical concept of context as a finite resource. You'll install your first MCP server, see how MCP tools load on demand via ToolSearch, switch models for planning, and build a real feature through plan mode. The key progression: Module 1 was about Claude doing things for you. Module 2 is about Claude thinking before doing. Transition: What we do in this module.",
     ),
     # Slide 14: M2 What We Do
@@ -549,22 +549,34 @@ SLIDES: list[SlideData] = [
             "github.com/anthropics/prompt-eng-interactive-tutorial"
         ),
     ),
-    # Slide 40: Module 6 Homework
-    ContentSlide(
-        title="Homework: Build a Claude Code Clone",
-        bullets=[
-            "Module 6 is a self-paced capstone project",
-            "Open `modules/module6.md` for 5 milestone PRDs",
-            "Use your ADW tools — `/feature` and `/team:feature` work here",
-        ],
-        notes="Module 6 is take-home. Participants extend todd from a single-shot "
-              "prompt forwarder into an interactive agentic tool — a miniature Claude "
-              "Code clone. Five milestones: REPL, Tool Use, Streaming, CLAUDE.md "
-              "Loading, Session Persistence. Each has a PRD in docs/prds/. Estimated "
-              "2-4 hours across multiple sessions. Use `claude --resume` to pick up "
-              "where you left off.",
+    # Slide 40: Module 6 Section Header
+    SectionSlide(
+        title="Module 6: Build a Claude Code Clone",
+        notes="Module 6 is a self-paced capstone. Participants extend todd from a single-shot prompt forwarder into an interactive agentic tool — a miniature Claude Code clone. Five milestones: tool-use loop, REPL, streaming, CLAUDE.md loading, session persistence. Each milestone has a PRD in docs/prds/. Use the ADW commands built in Modules 3–5. Estimated 2–4 hours across multiple sessions.",
     ),
-    # Slide 41: Closing
+    # Slide 41: M6 Let's get to work
+    ContentSlide(
+        title="Let's get to work",
+        bullets=[
+            "Open your terminal, run `claude` from the project root, then open `modules/module6.md`",
+            "Open `modules/module6.md` for 5 milestone PRDs",
+            ("Use your ADW tools: ", "`/feature` and `/team:feature` work here", 0),
+        ],
+        notes="Participants work through module6.md at their own pace across multiple sessions. Use `claude --resume` to pick up where you left off.\n\nPresenter talking points:\n- Milestone 1: Build the tool-use loop — agent loop pattern, read_file + write_file tools, no SDK\n- Milestone 2: REPL — interactive prompt, Read-Eval-Print Loop\n- Milestone 3: Streaming — token-by-token output\n- Milestone 4: CLAUDE.md loading — context injection at startup\n- Milestone 5: Session persistence — resume conversations across restarts",
+    ),
+    # Slide 42: M6 Summary
+    ContentSlide(
+        title="Summarizing what we have seen",
+        bullets=[
+            ("Agent loop: ", "receive input → select tool → execute → observe → repeat", 0),
+            ("Direct API use: ", "JSON tool schemas, no SDK dependency", 0),
+            ("REPL: ", "Interactive prompt — Read-Eval-Print Loop", 0),
+            ("Streaming: ", "Token-by-token output for responsive UX", 0),
+            ("Session persistence: ", "Resume conversations across restarts", 0),
+        ],
+        notes="Module 6 is the payoff: participants have built a functional Claude Code clone from scratch. Every milestone added one capability layer. The agent loop pattern — receive, select, execute, observe — is the same pattern that powers Claude Code itself. These skills transfer directly to building any agentic tool with the Anthropic API.",
+    ),
+    # Slide 43: Closing — Questions placeholder
     SectionSlide(
         title="Questions?",
         layout=LAYOUT_CLOSING,
