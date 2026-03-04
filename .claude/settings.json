@@ -3,19 +3,5 @@
     "ENABLE_LSP_TOOL": "1",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
-  "hooks": {
-    "PostToolUse": [
-      {
-        "hooks": [
-          {
-            "command": "uv run python .claude/hooks/lint-check.py",
-            "timeout": 30,
-            "type": "command"
-          }
-        ],
-        "matcher": "Write|Edit|MultiEdit"
-      }
-    ]
-  },
   "plansDirectory": "./docs/plans"
 }
