@@ -13,7 +13,7 @@ Design software architecture and produce a technical specification document to `
 
 ## Workflow
 
-1. **Read input** — consume any referenced research findings, PRD, or feature description from `$ARGUMENTS`
+1. **Read input** — if `docs/research/${CLAUDE_SESSION_ID}.md` exists, read it as prior research context; also consume any referenced research findings, PRD, or feature description from `$ARGUMENTS`
 2. **Analyze requirements** — identify functional requirements, constraints, and quality attributes
 3. **Delegate to Plan subagent** (use Agent tool with `subagent_type: "Plan"`) for architecture design:
    - Provide full requirements context in the prompt
@@ -27,7 +27,7 @@ Plan subagents excel at structured analysis and design with clear outputs.
 
 ## Output
 
-Spec document at `docs/specs/spec-<feature>.md` with:
+Spec document at `docs/specs/${CLAUDE_SESSION_ID}.md` with:
 
 ```
 ## Spec: <Feature Name>
