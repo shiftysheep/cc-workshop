@@ -433,8 +433,8 @@ SLIDES: list[SlideData] = [
     ),
     # Slide 28: Module 4 Section Header
     SectionSlide(
-        title="Module 4: Building Orchestration Commands",
-        notes="Module 4 builds the orchestration commands from a PRD. You'll use plan mode to architect four delivery workflows — /feature, /bug, /team:feature, /team:bug — and let Claude read the existing phase commands to understand the patterns before building. The key insight: Claude researches the scaffolding before planning, producing commands that correctly compose the primitives. This is prompt-driven orchestration. Transition: What we do.",
+        title="Module 4: Building Orchestration Skills",
+        notes="Module 4 builds the orchestration skills from a PRD. You'll use plan mode to architect four delivery workflows — /feature, /bug, /team:feature, /team:bug — and let Claude read the existing phase skills to understand the patterns before building. The key insight: Claude researches the scaffolding before planning, producing skills that correctly compose the primitives. This is prompt-driven orchestration. Transition: What we do.",
     ),
     # Slide 29: M4 Let's get to work
     ContentSlide(
@@ -443,7 +443,7 @@ SLIDES: list[SlideData] = [
             "Open your terminal, run `claude` from the project root, then open `modules/module4.md`",
             "Open `modules/module4.md` for our list of tasks",
         ],
-        notes="Participants follow the steps in module4.md at their own pace. Flag down an assistant if you get stuck.\n\nPresenter talking points:\n- Activate plan mode, give Claude the ADW PRD\n- Claude reads existing phase commands to understand invocation patterns\n- Review the plan for all four orchestration commands\n- Approve and let Claude build: /feature, /bug, /team:feature, /team:bug\n- Each command composes the phase primitives in different ways",
+        notes="Participants follow the steps in module4.md at their own pace. Flag down an assistant if you get stuck.\n\nPresenter talking points:\n- Activate plan mode, give Claude the ADW PRD\n- Claude reads existing phase skills to understand invocation patterns\n- Review the plan for all four orchestration skills\n- Approve and let Claude build: /feature, /bug, /team:feature, /team:bug\n- Each skill composes the phase primitives in different ways",
     ),
     # Slide 30: Phase Primitive Composition (with image)
     ImageSlide(
@@ -467,12 +467,12 @@ SLIDES: list[SlideData] = [
     ContentSlide(
         title="Summarizing what we have seen",
         bullets=[
-            ("Orchestration commands: ", "Compose phase primitives into end-to-end workflows", 0),
+            ("Orchestration skills: ", "Compose phase primitives into end-to-end workflows", 0),
             ("Plan mode as research: ", "Claude explores scaffolding before proposing a plan", 0),
             ("Four delivery variants: ", "/feature, /bug, /team:feature, /team:bug", 0),
-            ("Prompt-driven composition: ", "Commands defined in markdown, no code required", 0),
+            ("Prompt-driven composition: ", "Skills defined in markdown, no code required", 0),
         ],
-        notes="Module 4 produced four orchestration commands by composing the seven phase primitives. Plan mode was used not for code but for configuration — Claude explored the codebase, understood the patterns, and produced a plan for markdown files. This is prompt-driven orchestration: no code written, just configuration. Transition: Module 5 runs these commands against real PRDs.",
+        notes="Module 4 produced four orchestration skills by composing the seven phase primitives. Plan mode was used not for code but for configuration — Claude explored the codebase, understood the patterns, and produced a plan for markdown files. This is prompt-driven orchestration: no code written, just configuration. Transition: Module 5 runs these skills against real PRDs.",
     ),
     # Slide 34: Module 5 Section Header
     SectionSlide(

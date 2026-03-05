@@ -44,13 +44,13 @@ existing scaffolding to understand what it's composing before proposing a plan.
 Press `Shift+Tab` twice to enter plan mode, then enter:
 
 ```markdown
-Read docs/prds/adw-commands.md and plan how to create the four orchestration
-commands described in the PRD: /feature, /bug, /team:feature, and /team:bug.
-Research the existing phase commands and agent definitions to understand
+Read docs/prds/adw-skills.md and plan how to create the four orchestration
+skills described in the PRD: /feature, /bug, /team:feature, and /team:bug.
+Research the existing phase skills and agent definitions to understand
 the invocation and team coordination patterns.
 ```
 
-Claude will begin exploring the codebase — reading phase commands, existing
+Claude will begin exploring the codebase — reading phase skills, existing
 skills, and the hook configuration — to understand the patterns before
 planning.
 
@@ -67,26 +67,26 @@ planning.
 
 While Claude works on its plan, here's what it's exploring and why it matters.
 
-**Phase commands as primitives.** Claude reads the seven commands in
-`.claude/commands/` — research, design, plan, validation, implement, review,
-document. Each is a single-responsibility slash command: one clear job,
+**Phase skills as primitives.** Claude reads the seven skills in
+`.claude/skills/` — research, design, plan, validation, implement, review,
+document. Each is a single-responsibility skill: one clear job,
 defined inputs, defined output. This is what makes them composable — the
-orchestration commands can chain them both sequentially (single-agent) and
+orchestration skills can chain them both sequentially (single-agent) and
 in parallel (team-based) because each phase is self-contained.
 
-**Existing skills as patterns.** Claude reads existing commands AND skills to
-understand patterns. The new commands compose phase commands; the team variants
-also use TeamCreate/SendMessage for parallel worker coordination. Commands are
-stored in `.claude/commands/<name>.md`, while skills in `.claude/skills/<name>/SKILL.md`
-show structure with YAML frontmatter, instructions, and optional `references/`.
+**Existing skills as patterns.** Claude reads the existing skills to
+understand patterns. The new skills compose the phase skills; the team variants
+also use TeamCreate/SendMessage for parallel worker coordination. Skills are
+stored in `.claude/skills/<name>/SKILL.md` with YAML frontmatter, instructions,
+and optional `references/`.
 
 **Dynamic context injection.** Module 3 introduced the layered context
 system — memory files (always present), skills (on-demand), and hooks (at
-lifecycle events). The `/feature` command adds a fourth pattern: **explicit
+lifecycle events). The `/feature` skill adds a fourth pattern: **explicit
 invocation**, where context loading is triggered by the user running the
-command directly. Unlike auto-loaded skills, commands fire only when the user
-types `/<name>` — giving the user direct control over when orchestration
-starts.
+skill directly. With `disable-model-invocation: true`, skills fire only when
+the user types `/<name>` — giving the user direct control over when
+orchestration starts.
 
 > **Progressive disclosure applied here.** Claude doesn't load all skills
 > into every context. A code quality skill doesn't fire when writing
@@ -95,7 +95,7 @@ starts.
 > Context is revealed at the moment it's needed — no earlier, no later.
 
 > **Phase dependencies drive orchestration.** The PRD defines explicit ordering
-> constraints that Claude must encode into the orchestration commands:
+> constraints that Claude must encode into the orchestration skills:
 >
 > - **Single-agent** (`/feature`, `/bug`): phases run sequentially — each phase's
 >   output feeds the next. Research produces findings, design produces a spec, plan
@@ -112,21 +112,21 @@ starts.
 
 ## 3. Review and Build
 
-Claude will present a plan for the four command files. Review it, then confirm.
+Claude will present a plan for the four skill files. Review it, then confirm.
 
 Verify the plan includes:
 - `/feature` and `/bug`: correct phase sequences, `$ARGUMENTS`, context handoff between phases
 - `/team:feature` and `/team:bug`: Group 1 parallel workers (4 for feature, 3 for bug), leader synthesis step, Group 2 coordinated workers
-- File locations: `.claude/commands/feature.md`, `.claude/commands/bug.md`, `.claude/commands/team:feature.md`, `.claude/commands/team:bug.md`
+- File locations: `.claude/skills/feature/SKILL.md`, `.claude/skills/bug/SKILL.md`, `.claude/skills/team:feature/SKILL.md`, `.claude/skills/team:bug/SKILL.md`
 
-Once satisfied, approve the plan. Claude will create the command files in
-`.claude/commands/`.
+Once satisfied, approve the plan. Claude will create the skill files in
+`.claude/skills/`.
 
 > **What just happened?** You gave Claude a PRD and it produced four
-> orchestration commands that compose the seven existing phase commands. The
-> team commands introduce `TeamCreate` and `SendMessage` — the first time
+> orchestration skills that compose the seven existing phase skills. The
+> team skills introduce `TeamCreate` and `SendMessage` — the first time
 > these tools appear in the workshop. No code was written — just markdown
-> configuration. This is the power of the `.claude/` scaffolding: commands
+> configuration. This is the power of the `.claude/` scaffolding: skills
 > are primitives, they compose each other, and the entire system is defined
 > in markdown.
 
@@ -134,9 +134,9 @@ Once satisfied, approve the plan. Claude will create the command files in
 
 ## 4. Applying the Pattern to Your Own Projects
 
-The orchestration commands Claude just built follow a pattern you can reuse. When you
+The orchestration skills Claude just built follow a pattern you can reuse. When you
 have your own feature or bug to deliver, write a structured build instruction that
-explicitly chains your workflow commands:
+explicitly chains your workflow skills:
 
 ````markdown
 Read docs/prds/todd-rich-output.md and deliver this feature using the following phases:
@@ -152,23 +152,23 @@ Read docs/prds/todd-rich-output.md and deliver this feature using the following 
 Carry forward key findings, file paths, and blockers between phases.
 ````
 
-This is what the `/feature` command does under the hood — but writing it out
+This is what the `/feature` skill does under the hood — but writing it out
 explicitly gives you control over which phases to include, what to skip, and where
 to add custom steps (e.g., "run a security scan between review and document").
 
-> **When to use a command vs. a manual prompt.** Use `/feature` or `/bug` for
+> **When to use a skill vs. a manual prompt.** Use `/feature` or `/bug` for
 > standard delivery. Write an explicit prompt when you need to customise the phase
 > sequence, skip phases, or insert project-specific steps. Both approaches use the
-> same underlying phase commands.
+> same underlying phase skills.
 
 ---
 
 ## 5. Commit and Proceed
 
-Ask Claude to commit the new command files, then advance to the next module:
+Ask Claude to commit the new skill files, then advance to the next module:
 
 ```markdown
-Commit the new command files and then run /module to proceed to module 5.
+Commit the new skill files and then run /module to proceed to module 5.
 ```
 
 ---
