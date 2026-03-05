@@ -69,7 +69,7 @@ Configure claude to utilize this profile by creating/updating the following sett
 
 ```json
 {
-  "awsAuthRefresh": "aws sso login --profile ${AWS_PROFILE}",
+  "awsAuthRefresh": "aws-sso-util login",
   "env": {
     "AWS_REGION": "<SSO_REGION>",
     "AWS_PROFILE": "<CHANGE TO THE AWS PROFILE YOU WOULD LIKE TO USE FOR BEDROCK>",
@@ -81,8 +81,8 @@ Configure claude to utilize this profile by creating/updating the following sett
 }
 ```
 
-> **Windows / PowerShell users:** Replace the `awsAuthRefresh` value with:
-> ```json
-> "awsAuthRefresh": "aws sso login --profile $env:AWS_PROFILE"
-> ```
-> PowerShell uses `$env:VAR` instead of `${VAR}` for environment variable expansion.
+> **Windows users:** If Claude Code cannot find Git Bash, add `CLAUDE_CODE_GIT_BASH_PATH`
+> to the `env` block pointing to your `bash.exe`. Recent Git for Windows installs via winget
+> or GitHub Desktop place it at `%LOCALAPPDATA%\Programs\Git\bin\bash.exe` rather than
+> `C:\Program Files\Git\bin\bash.exe`. The automated setup script detects and sets this
+> automatically.
