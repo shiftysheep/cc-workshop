@@ -5,8 +5,8 @@ description: Propagate changes from the current module branch forward through al
 
 Automate the cascading merge of changes from an earlier module branch through all
 subsequent module branches. Each step creates an update branch, merges the previous
-module, pushes, creates a PR, merges the PR, and syncs — then moves to the next
-downstream branch.
+module, pushes, creates a PR, merges the PR via `--admin`, and syncs — then moves to
+the next downstream branch.
 
 Respects branch protection: every change goes through a PR via an `update/` branch.
 
@@ -39,36 +39,39 @@ branches (up to module-6).
 If $ARGUMENTS contains "dry-run": list each downstream step
 (module-(N+1) through module-6) and the operations that would run, then stop.
 
-### 3. Ensure source is current
+### 3. Fetch all remote refs
 
 ```
-git checkout module-N
-git pull origin module-N
+git fetch origin
 ```
+
+This ensures all `origin/module-N` refs are current before any merge. Do not
+`git pull` individual branches — work exclusively with remote refs throughout.
 
 ### 4. For each downstream branch M from (N+1) through 6
 
 **4a. Skip check (idempotency)**
 
-Run `git merge-base --is-ancestor module-(M-1) module-M`. If true, report
-"module-M already contains module-(M-1)" and skip to next.
+Run `git merge-base --is-ancestor origin/module-(M-1) origin/module-M`. If true,
+report "module-M already contains module-(M-1)" and skip to next.
 
-Check `git ls-remote --heads origin update/module-M-propagate`. If a remote
-branch exists, check for an open or merged PR. Resume or skip accordingly.
-
-**4b. Create update branch**
+**4b. Create update branch from remote**
 
 ```
-git checkout module-M
-git pull origin module-M
-git checkout -b update/module-M-propagate
+git checkout -B update/module-M-propagate origin/module-M
 ```
+
+Using `-B` and `origin/module-M` directly avoids a separate `git checkout module-M &&
+git pull` step and ensures we always start from the current remote state.
 
 **4c. Merge previous module**
 
 ```
-git merge module-(M-1) --no-edit
+git merge origin/module-(M-1) --no-edit
 ```
+
+Merge from the remote ref, not the local branch, so the previous step's PR merge is
+always reflected even without a local branch checkout.
 
 If conflicts: report conflicting files, show conflict markers, work with the
 user to resolve interactively. After resolution:
@@ -81,26 +84,32 @@ PRE_COMMIT_ALLOW_NO_CONFIG=1 git commit --no-edit
 **4d. Push and create PR**
 
 ```
-git push -u origin update/module-M-propagate
+git push origin update/module-M-propagate --force
 gh pr create --base module-M --head update/module-M-propagate \
   --title "Propagate module-(M-1) into module-M" \
   --body "Automated forward-merge of module-(M-1) changes via /propagate."
 ```
 
+Use `--force` on push so the command is re-runnable if the update branch already
+exists from a previous partial run.
+
 **4e. Merge the PR**
 
 ```
-gh pr merge <pr-number> --merge
+gh pr merge <pr-number> --merge --admin
 ```
 
-If merge fails, report the error and ask the user how to proceed.
+`--admin` is required because all module branches are protected. If merge fails,
+report the error and ask the user how to proceed.
 
-**4f. Sync local**
+**4f. Sync remote ref**
 
 ```
-git checkout module-M
-git pull origin module-M
+git fetch origin module-M
 ```
+
+Fetching only the merged branch updates `origin/module-M` so the next iteration
+merges from the fresh state — no branch checkout required.
 
 ### 5. Return to original branch
 
