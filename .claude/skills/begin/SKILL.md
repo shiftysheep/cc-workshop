@@ -1,5 +1,7 @@
 ---
+name: begin
 description: Start the workshop by switching to module-1 without carrying forward setup changes.
+disable-model-invocation: true
 ---
 # Purpose
 
