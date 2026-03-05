@@ -12,10 +12,7 @@ sys.path.insert(0, str(REPO_ROOT))
 import configure  # noqa: E402
 
 
-def _expected_auth_refresh() -> str:
-    if sys.platform == "win32":
-        return "aws sso login --profile $env:AWS_PROFILE"
-    return "aws sso login --profile ${AWS_PROFILE}"
+EXPECTED_AUTH_REFRESH = "aws-sso-util login"
 
 
 def test_parse_sso_profiles_empty_file(tmp_path: Path) -> None:
@@ -87,7 +84,7 @@ def test_merge_settings_creates_new_file(tmp_path: Path) -> None:
     assert settings_path.parent.exists()
 
     data = json.loads(settings_path.read_text())
-    assert data["awsAuthRefresh"] == _expected_auth_refresh()
+    assert data["awsAuthRefresh"] == EXPECTED_AUTH_REFRESH
     assert data["env"]["AWS_PROFILE"] == "test.Profile"
     assert data["env"]["AWS_REGION"] == "us-west-2"
     assert data["env"]["CLAUDE_CODE_USE_BEDROCK"] == "1"
@@ -153,7 +150,7 @@ def test_merge_settings_overwrites_bedrock_keys(tmp_path: Path) -> None:
 
     result = configure.merge_settings(settings_path, "new.Profile", "us-west-2")
 
-    assert result["awsAuthRefresh"] == _expected_auth_refresh()
+    assert result["awsAuthRefresh"] == EXPECTED_AUTH_REFRESH
     assert result["env"]["AWS_PROFILE"] == "new.Profile"
     assert result["env"]["AWS_REGION"] == "us-west-2"
     assert result["env"]["CLAUDE_CODE_USE_BEDROCK"] == "1"
@@ -169,4 +166,4 @@ def test_merge_settings_handles_malformed_json(tmp_path: Path) -> None:
 
     # Should create fresh config despite malformed input
     assert result["env"]["AWS_PROFILE"] == "test.Profile"
-    assert result["awsAuthRefresh"] == _expected_auth_refresh()
+    assert result["awsAuthRefresh"] == EXPECTED_AUTH_REFRESH
