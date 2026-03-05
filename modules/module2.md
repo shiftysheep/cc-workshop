@@ -96,17 +96,9 @@ for both capabilities.
 
 ### Enable the LSP Tool
 
-Add `ENABLE_LSP_TOOL` to your `.claude/settings.json` to activate Claude's Language Server Protocol integration:
-
-```json
-{
-  "env": {
-    "ENABLE_LSP_TOOL": "1"
-  }
-}
-```
-
-Save the file and restart Claude Code for the setting to take effect.
+> **Already configured.** This project's `.claude/settings.json` includes
+> `"ENABLE_LSP_TOOL": "1"`. Do not remove or modify this setting — it
+> activates Claude's Language Server Protocol integration.
 
 ---
 
@@ -368,35 +360,7 @@ You should see a response from Claude describing which model is active.
 
 ---
 
-## 12. Write a Verification Test
-
-Before committing, let's verify the feature with an automated test — not just a
-manual check.
-
-In the chat box, enter:
-
-```markdown
-Write a test for the todd query command in tests/test_query.py.
-The test should verify that the query function returns a non-empty string
-when given a simple prompt. Use pytest and mock the Strands Agent SDK call
-so the test runs without Bedrock credentials.
-```
-
-After Claude creates the test, run it:
-
-```shell
-!uv run pytest tests/ -v
-```
-
-> **Tenet 1: Verify your work.** The `!uv run todd` check from the previous step
-> was a manual spot-check — it proves the feature works *right now*, but it won't
-> catch regressions. An automated test locks in the expected behavior permanently.
-> This is Anthropic's #1 best practice: "Tests and expected outputs are the single
-> highest-leverage thing you can provide."
-
----
-
-## 13. Learning Tests
+## 12. Learning Tests
 
 **Learning tests** verify assumptions about external libraries you don't control. When you write mocks, you encode assumptions about how a library behaves — learning tests validate those assumptions by exercising the real library directly.
 
@@ -432,7 +396,7 @@ Write learning tests that verify:
 
 ---
 
-## 14. Commit and Proceed
+## 13. Commit and Proceed
 
 Ask Claude to commit the changes, then advance to the next module:
 
