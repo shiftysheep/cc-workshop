@@ -190,15 +190,14 @@ In the chat box, run:
 
 > **Windows / PowerShell users — two options:**
 >
-> **Option A (Quick):** Run `/statusline` and include this hint in your prompt:
-> "Use PowerShell-compatible syntax — avoid backticks and ANSI escape sequences."
+> **Option A (Prompt):** Run `/statusline` with the full prompt and a Windows constraint:
+> ```
+> /statusline Show {model short name} | {context}% context | {cwd} | {git_status} | {branch} where git status is green "clean" or yellow "modified" using ANSI colors, and omit git fields if not in a repo. Use PowerShell-compatible syntax — avoid backticks and ANSI escape sequences.
+> ```
 >
-> **Option B (Manual):** Copy `scripts/statusline.ps1` to `~\.claude\statusline.ps1`,
-> then add a `statusLine` entry to `~\.claude\settings.json`:
-> ```json
-> {
->   "statusLine": "pwsh -NoProfile -File ~/.claude/statusline.ps1"
-> }
+> **Option B (Pre-built script):** Paste this into the Claude chat box:
+> ```
+> Copy scripts/statusline.ps1 to ~/.claude/statusline.ps1 and add a statusLine entry to ~/.claude/settings.json that runs it with pwsh.
 > ```
 
 > **Pro tip:** Type `/cost` to see token usage and spend for this session, or
