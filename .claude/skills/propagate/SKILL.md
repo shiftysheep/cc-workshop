@@ -1,5 +1,7 @@
 ---
+name: propagate
 description: Propagate changes from the current module branch forward through all downstream module branches via PRs.
+disable-model-invocation: true
 ---
 # Purpose
 
