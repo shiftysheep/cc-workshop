@@ -40,15 +40,6 @@ Add to `pyproject.toml`:
 "strands-agents"
 ```
 
-## Environment
-
-```shell
-export CLAUDE_CODE_USE_BEDROCK=1
-# AWS credentials via standard chain (profile, instance role, env vars, etc.)
-# Strands uses Bedrock/Anthropic models directly — no CLAUDECODE guard var is set,
-# so uv run todd works seamlessly inside a Claude Code session.
-```
-
 ## Implementation Notes
 
 Create an `Agent` using `BedrockModel` from `strands_agents` and `strands_agents.models.bedrock`.
