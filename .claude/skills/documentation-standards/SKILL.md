@@ -36,8 +36,12 @@ status: draft|review|approved|superseded
 
 ## Output Templates
 
-See [output templates](references/templates.md) for Plan, Spec, ADR, and PRD
-starter structures.
+Starter structures for each document type:
+
+- [Plan template](references/plan.md)
+- [Spec template](references/spec.md)
+- [ADR template](references/adr.md)
+- [PRD template](references/prd.md)
 
 ## Related
 
