@@ -1,4 +1,5 @@
 ---
+name: implement
 description: Implement a plan using TDD methodology with atomic commits per phase
 context: fork
 agent: implementation
