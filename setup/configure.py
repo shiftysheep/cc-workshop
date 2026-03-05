@@ -36,15 +36,10 @@ BEDROCK_ENV: dict[str, str] = {
     "CLAUDE_CODE_USE_BEDROCK": "1",
 }
 
-def _auth_refresh_command() -> str:
-    """Return the awsAuthRefresh command for the current platform."""
-    if sys.platform == "win32":
-        return "aws sso login --profile $env:AWS_PROFILE"
-    return "aws sso login --profile ${AWS_PROFILE}"
-
+AUTH_REFRESH_COMMAND = "aws-sso-util login"
 
 BEDROCK_ENV_KEYS: dict[str, str | dict[str, str]] = {
-    "awsAuthRefresh": _auth_refresh_command(),
+    "awsAuthRefresh": AUTH_REFRESH_COMMAND,
     "env": BEDROCK_ENV,
 }
 
@@ -108,6 +103,43 @@ class ProfileSelector(App[str]):  # type: ignore[misc]
         self.exit(result=str(event.option.prompt))
 
 
+def _find_git_bash() -> str | None:
+    """Find bash.exe from Git for Windows.
+
+    Checks known install locations first, then falls back to a recursive
+    search of common root directories (suppressing permission errors).
+    """
+    # Fast path: check known locations
+    candidates = [
+        Path.home() / "AppData/Local/Programs/Git/bin/bash.exe",
+        Path("C:/Program Files/Git/bin/bash.exe"),
+        Path("C:/Program Files (x86)/Git/bin/bash.exe"),
+    ]
+    for path in candidates:
+        if path.exists():
+            return str(path)
+
+    # Slow path: search AppData then Program Files
+    from rich.console import Console  # type: ignore[import-not-found]
+
+    console = Console()
+    search_roots = [
+        Path.home() / "AppData",
+        Path("C:/Program Files"),
+        Path("C:/Program Files (x86)"),
+    ]
+    with console.status("[bold cyan]Searching for Git Bash..."):
+        for root in search_roots:
+            if not root.exists():
+                continue
+            try:
+                for hit in root.rglob("Git/bin/bash.exe"):
+                    return str(hit)
+            except PermissionError:
+                continue
+    return None
+
+
 def merge_settings(settings_path: Path, profile: str, region: str):
     """Merge Bedrock config into existing settings.json or create new.
 
@@ -136,6 +168,12 @@ def merge_settings(settings_path: Path, profile: str, region: str):
     bedrock_env["AWS_REGION"] = region
 
     merged["env"].update(bedrock_env)
+
+    # Add Git Bash path on Windows so Claude Code can find it
+    if sys.platform == "win32":
+        git_bash = _find_git_bash()
+        if git_bash:
+            merged["env"]["CLAUDE_CODE_GIT_BASH_PATH"] = git_bash
 
     # Ensure parent directory exists
     settings_path.parent.mkdir(parents=True, exist_ok=True)
