@@ -1,9 +1,9 @@
 ---
-# PRD: ADW Orchestration Commands
+# PRD: ADW Orchestration Skills
 
 ## Overview
 
-Create four slash commands that compose the existing ADW phase commands
+Create four slash-invocable skills that compose the existing ADW phase skills
 (`/research`, `/design`, `/plan`, `/validation`, `/implement`, `/review`,
 `/document`) into end-to-end delivery workflows. Two strategies:
 
@@ -13,11 +13,11 @@ Create four slash commands that compose the existing ADW phase commands
    coordinates specialist workers using `TeamCreate`, `TaskCreate`, and
    `SendMessage`.
 
-## Commands
+## Skills
 
 ### `/feature` — Single-Agent Feature Delivery
 
-Location: `.claude/commands/feature.md`
+Location: `.claude/skills/feature/SKILL.md`
 
 Phases: research → design → plan → validation → implement → review → document
 
@@ -27,7 +27,7 @@ inline summaries.
 
 ### `/bug` — Single-Agent Bug Fix
 
-Location: `.claude/commands/bug.md`
+Location: `.claude/skills/bug/SKILL.md`
 
 Phases: research → plan → validation → implement → review → document
 
@@ -36,7 +36,7 @@ bug description (or `@file` for a PRD).
 
 ### `/team:feature` — Multi-Agent Feature Delivery
 
-Location: `.claude/commands/team:feature.md`
+Location: `.claude/skills/team:feature/SKILL.md`
 
 **Group 1 — Parallel Analysis** (4 workers run simultaneously):
 
@@ -61,7 +61,7 @@ Workers coordinate via `SendMessage`. Leader produces final summary.
 
 ### `/team:bug` — Multi-Agent Bug Fix
 
-Location: `.claude/commands/team:bug.md`
+Location: `.claude/skills/team:bug/SKILL.md`
 
 Same as `/team:feature` but Group 1 has 3 workers (no Designer). Phases:
 research + plan + validation (parallel) → implement + review + document
@@ -69,14 +69,14 @@ research + plan + validation (parallel) → implement + review + document
 
 ## Requirements
 
-### Command Structure
+### Skill Structure
 
-- Each command lives at `.claude/commands/<name>.md`
-- All commands accept `$ARGUMENTS` (description or `@file` PRD reference)
-- Commands MUST NOT set `context: fork` in frontmatter — all four commands
+- Each skill lives at `.claude/skills/<name>/SKILL.md`
+- All skills accept `$ARGUMENTS` (description or `@file` PRD reference)
+- Skills MUST NOT set `context: fork` in frontmatter — all four skills
   run in the primary context so team activity remains visible to the user
-- Single-agent commands execute phases sequentially with context handoff
-- Team commands use `TeamCreate` for setup, `TaskCreate` for work items,
+- Single-agent skills execute phases sequentially with context handoff
+- Team skills use `TeamCreate` for setup, `TaskCreate` for work items,
   `SendMessage` for coordination
 
 ### Team Behavioural Requirements
@@ -86,7 +86,7 @@ research + plan + validation (parallel) → implement + review + document
 - Each worker receives the original description plus leader context
 - Leader produces a final summary when all workers complete
 
-### Context Handoff (single-agent commands)
+### Context Handoff (single-agent skills)
 
 Between phases, carry forward:
 - Key findings and decisions
@@ -96,8 +96,8 @@ Between phases, carry forward:
 ## Out of Scope
 
 - State file persistence between sessions
-- Python orchestrator scripts (these are the *work items* the commands build
-  in Module 4, not part of the commands themselves)
-- Worktree isolation (handled by the invoker, not the command)
+- Python orchestrator scripts (these are the *work items* the skills build
+  in Module 4, not part of the skills themselves)
+- Worktree isolation (handled by the invoker, not the skill)
 - Resumability from mid-workflow
 ---
