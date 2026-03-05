@@ -242,7 +242,7 @@ instructions? If yes, it's an agent. If no, a command or direct prompt is simple
 > 4. **`/team:bug`** — multi-agent, parallel analysis then coordinated
 >    implementation, 6 phases (no design)
 >
-> A PRD at `docs/prds/adw-commands.md` defines all four commands we'll build
+> A PRD at `docs/prds/adw-skills.md` defines all four skills we'll build
 > in this module using prompt-driven orchestration.
 
 ### The Seven Phase Commands
@@ -691,7 +691,7 @@ Use markdown when humans are the primary reader. Use XML when the agent is the p
 
 #### Exercise
 
-Open an existing command or skill file (e.g., `.claude/commands/research.md`) and identify where XML tags could improve clarity. Look for sections that blend instructions, context, and variable input — these are the best candidates for XML structure.
+Open an existing skill file (e.g., `.claude/skills/research/SKILL.md`) and identify where XML tags could improve clarity. Look for sections that blend instructions, context, and variable input — these are the best candidates for XML structure.
 
 > **Reference**: Anthropic's prompt engineering guide — [Use XML tags to structure your prompts](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/use-xml-tags)
 
