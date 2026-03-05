@@ -1,4 +1,5 @@
 ---
+name: document
 description: Update documentation to reflect implementation changes
 context: fork
 agent: documentation
