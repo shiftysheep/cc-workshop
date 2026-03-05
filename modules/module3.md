@@ -62,16 +62,27 @@ that interleave commentary with live code output.
 In the chat box, enter:
 
 ```markdown
-Read the source and then plan a linear walkthrough of the code that explains how it all works in detail.
+Walk through the `.claude/` directory — commands, skills, agents, and hooks —
+and explain how the extension architecture fits together.
 
-Then run "uvx showboat --help" to learn showboat — use showboat to create a walkthrough.md file in the repo and build the walkthrough in there, using showboat note for commentary and showboat exec plus sed or grep or cat or whatever you need to include snippets of code you are talking about.
+Plan a linear walkthrough that covers: the phase commands (what each does, how
+frontmatter like `context: fork` and `agent:` controls behavior), the skills
+(directory structure, SKILL.md frontmatter, references/), the agents (model,
+tools, skills, hooks scoping), and the lint-check hook (PostToolUse in the
+implementation agent). Show how commands delegate to agents, agents load skills,
+and hooks fire at lifecycle events.
+
+Then run "uvx showboat --help" to learn showboat — use showboat to create a
+walkthrough.md file in the repo and build the walkthrough in there, using
+showboat note for commentary and showboat exec plus cat or head or grep to
+include actual snippets from each .claude/ file you discuss.
 ```
 
-> **What just happened?** Claude used Read to understand the codebase, learned a new
-> tool via its `--help` output, then composed a walkthrough document that interleaves
-> explanation with real, verifiable code output. The walkthrough is both documentation
-> and a regression test — run `uvx showboat verify walkthrough.md` to re-execute all
-> code blocks and check they still match.
+> **What just happened?** Claude walked the `.claude/` extension architecture —
+> commands, skills, agents, and hooks — and built a live walkthrough document from
+> actual file contents. The walkthrough is both documentation and a regression test:
+> run `uvx showboat verify walkthrough.md` to re-execute all code blocks and check
+> they still match.
 
 ---
 
@@ -90,7 +101,7 @@ relevant": coding standards, domain knowledge, architectural context, or how to 
 a tool. In this repo:
 
 - `.claude/skills/code-review/SKILL.md` — invoked via Skill tool during code review
-- `.claude/skills/documentation-standards/` — has a `references/templates.md` file with doc templates
+- `.claude/skills/documentation-standards/` — has a `references/` directory with individual templates (plan, spec, ADR, PRD)
 
 > **Skills are the right place to teach Claude how to use CLI tools.** When your project
 > uses a custom CLI (like `todd`, `bb.py`, or a deployment tool), a skill can bundle the
@@ -120,41 +131,31 @@ implement a feature, research a topic, run a phase. In this repo:
 
 The distinction in practice:
 
-**Diagram 1: Extension point overview**
-
-```mermaid
-graph LR
-    User["User / Operator"] -->|invokes| Cmd["/command"]
-    User -->|invokes| Skill["/skill"]
-    Cmd -->|delegates| Agent["Agent"]
-    Skill -->|delegates| Agent
-    Hook["Hook<br>(lifecycle event)"] -->|fires at| ToolCall["Tool call"]
-    Agent -->|loads| Skill
-    Cmd -->|loads| Skill
-```
-
-**Diagram 2: Execution flow**
+**How commands, agents, skills, and hooks compose**
 
 ```mermaid
 sequenceDiagram
     participant U as User
-    participant C as Command
-    participant A as Agent
-    participant S as Skill
-    participant H as Hook
+    participant C as /implement
+    participant A as implementation agent
+    participant S as testing skill
+    participant H as PostToolUse hook
 
-    U->>C: /feature @prd.md
-    C->>A: delegate research phase
-    A->>S: load code-review skill
-    A->>H: PostToolUse fires on write
-    H-->>A: lint result (exit 0/2)
+    U->>C: /implement docs/plans/plan-auth.md
+    C->>A: delegate (agent: implementation)
+    A->>S: load testing skill (preloaded via skills:)
+    A->>A: Red: write failing test
+    A->>A: Green: write implementation
+    A->>H: PostToolUse fires (Write matched)
+    H-->>A: lint-check.py (exit 0 or 2)
     A-->>C: phase complete
-    C-->>U: plan ready for review
+    C-->>U: implementation summary
 ```
 
 | | Command | Skill |
 |-|---------|-------|
 | **Invocation** | Explicit (`/research`, `/implement`) | Skill tool (description match) |
+| **User-invocable** | Always (`/<name>`) | Yes (`/<skill-name>`); auto-loaded by default unless `disable-model-invocation: true` |
 | **Structure** | Single `.md` file | Directory (`SKILL.md` + optional `references/`, scripts) |
 | **Use case** | Phase execution, defined workflows | Standards, guidelines, domain knowledge |
 | **Location** | `.claude/commands/<name>.md` | `.claude/skills/<name>/SKILL.md` |
@@ -288,12 +289,14 @@ The `document-skills` plugin from the Anthropic marketplace includes
 `skill-creator` — a guided skill that walks you through building new skills
 with correct frontmatter and structure.
 
-> If you completed Module 1, the `document-skills` plugin is already installed.
-> Otherwise, install it now:
-> ```shell
-> claude plugin marketplace add anthropics/skills
-> claude plugin install document-skills@anthropic-agent-skills --scope project
-> ```
+**Skip this step if you completed Module 1** — the `document-skills` plugin is already installed.
+
+Otherwise, install it now (using `--scope user` so it's available across all your projects, not just this one):
+
+```shell
+claude plugin marketplace add anthropics/skills
+claude plugin install document-skills@anthropic-agent-skills --scope user
+```
 
 Verify the skill-creator is available by typing `/skill-creator` in the chat box.
 
@@ -351,7 +354,7 @@ Do not suggest fixes — only identify issues.
 | `memory` | Memory scope | `user`, `project`, `local` |
 | `isolation` | Execution isolation | `worktree` |
 
-> See the full [agent settings reference](https://code.claude.com/docs/en/agents)
+> See the full [agent settings reference](https://code.claude.com/docs/en/sub-agents)
 > for all available frontmatter fields.
 
 > **Exercise:** Create `.claude/agents/code-reviewer.md` with the configuration above.
@@ -696,9 +699,9 @@ Open an existing command or skill file (e.g., `.claude/commands/research.md`) an
 
 ## 8. Enable Agent Teams
 
-Agent teams let you coordinate multiple Claude instances working in parallel on a
-shared task list. A team leader assigns work; specialist workers execute concurrently
-and report back.
+Agent teams let you coordinate multiple Claude instances working on a shared task list,
+where workers communicate and adapt based on each other's output. A team leader
+assigns work; specialist workers execute concurrently and report back.
 
 **Enable the feature flag** in `.claude/settings.json`:
 
@@ -732,11 +735,17 @@ adding conversation history to todd. Run both in parallel and compare the output
 Observe how the team leader spawns two workers, assigns them tasks concurrently, and
 collects their results — rather than running each agent sequentially.
 
-> **When teams help.** Teams shine for parallel independent tasks: two agents building
-> separate files, a research agent and a coding agent running simultaneously, or
-> parallel validation passes. They add overhead for sequential dependent work (where
-> step B requires step A's output). Ask yourself: "Could these tasks run at the same
-> time?" If yes, a team likely helps.
+> **When teams help vs. parallel subagents.**
+>
+> - **Parallel subagents** (Agent tool with `run_in_background`): independent tasks
+>   that need no coordination — two agents researching separate topics, parallel
+>   validation passes. Simpler, lower overhead.
+> - **Teams**: parallel tasks that need **coordination** — workers sharing results via
+>   `SendMessage`, a shared task list with dependencies, or specialists adapting based
+>   on each other's output. Use teams when "worker B needs to know what worker A found."
+>
+> Teams add overhead; don't reach for them when parallel subagents are sufficient.
+> Ask: "Do these agents need to talk to each other?" If yes, a team helps.
 
 ---
 
