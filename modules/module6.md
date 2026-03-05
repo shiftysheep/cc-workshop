@@ -143,7 +143,7 @@ compatible with Claude Code projects.
   system prompt (in addition to AGENTS.md if present)
 - If `.claude/settings.json` exists, read it for tool permissions and
   environment configuration
-- If `.claude/commands/` exists, list available commands and show them to the
+- If `.claude/skills/` exists, list available skills and show them to the
   user on startup or when they type `/help`
 - Layer the context: AGENTS.md (agent identity) + CLAUDE.md (project rules) +
   settings.json (permissions)
@@ -151,7 +151,7 @@ compatible with Claude Code projects.
 **Acceptance criteria:**
 - todd loads CLAUDE.md from the current project and the model follows its
   instructions
-- Available commands from `.claude/commands/` are listed when the user asks
+- Available skills from `.claude/skills/` are listed when the user asks
 - Missing files are handled gracefully — no errors if CLAUDE.md or .claude/
   doesn't exist
 - The system prompt clearly separates agent identity (AGENTS.md) from project
@@ -162,7 +162,7 @@ compatible with Claude Code projects.
 ```
 Add CLAUDE.md and .claude/ support to todd. Load CLAUDE.md into the system
 prompt alongside AGENTS.md. Read .claude/settings.json for configuration.
-Scan .claude/commands/ and show available commands to the user. Make sure
+Scan .claude/skills/ and show available skills to the user. Make sure
 everything degrades gracefully when files are missing.
 ```
 
@@ -180,8 +180,8 @@ streaming responses.
 - Enable streaming using the Anthropic SDK's streaming API — show tokens as
   they arrive rather than waiting for the complete response
 - Add a `/exit` command to quit the REPL cleanly
-- Add a `/help` command that lists available commands (including any from
-  `.claude/commands/`)
+- Add a `/help` command that lists available skills (including any from
+  `.claude/skills/`)
 - Handle `Ctrl+C` gracefully — interrupt the current generation without killing
   the process
 
