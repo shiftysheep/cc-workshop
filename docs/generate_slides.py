@@ -118,7 +118,7 @@ SLIDES: list[SlideData] = [
             "M1: Scaffold a Typer CLI app from a natural language prompt",
             "M2: Build a simple CLI LLM tool called todd",
             "M3: Build phase commands, agents, hooks, and skills",
-            "M4: Build orchestration commands from PRD",
+            "M4: Build orchestration skills from PRD",
             "M5: Run parallel agent teams in isolated worktrees",
             "M6 (Take-home): Build todd into a Claude Code clone",
         ],
