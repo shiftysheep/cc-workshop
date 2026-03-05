@@ -1,4 +1,5 @@
 ---
+name: design
 description: Design architecture and produce technical specifications
 context: fork
 ---

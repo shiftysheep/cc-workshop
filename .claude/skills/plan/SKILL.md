@@ -1,4 +1,5 @@
 ---
+name: plan
 description: Create a phased implementation plan with atomic commits
 context: fork
 ---

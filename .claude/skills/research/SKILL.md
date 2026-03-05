@@ -1,4 +1,5 @@
 ---
+name: research
 description: Research codebase and documentation to answer questions and gather context
 context: fork
 ---
