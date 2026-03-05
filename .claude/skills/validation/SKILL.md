@@ -1,4 +1,5 @@
 ---
+name: validation
 description: Validate an implementation plan for quality, atomicity, and traceability
 context: fork
 agent: validation
