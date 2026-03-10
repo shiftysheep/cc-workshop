@@ -99,9 +99,27 @@ Read docs/prds/adw-feature.md and docs/prds/adw-bug.md
 
 ---
 
-## 3. Launch Two Worktrees
+## 3. Enable Agent Teams
 
-> **Agent teams are already enabled.** You enabled the flag in Module 3, Step 8.
+For the side-by-side comparison, temporarily enable the agent teams feature flag
+in `.claude/settings.json`:
+
+```json
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  }
+}
+```
+
+> **This is temporary.** We'll remove this flag after the comparison. Agent teams
+> are 7-10x more expensive than standard subagent execution due to coordination
+> overhead. The side-by-side demo shows when that cost is justified — and when
+> parallel subagents are the better default.
+
+---
+
+## 4. Launch Two Worktrees
 
 Open two terminal windows. Each runs an independent Claude instance in its
 own worktree:
@@ -135,7 +153,7 @@ instructor demo.
 
 ---
 
-## 4. How Worktree Isolation Works
+## 5. How Worktree Isolation Works
 
 While Claude works, here's what's happening under the hood.
 
@@ -172,7 +190,7 @@ Isolation layers:
 
 ---
 
-## 5. Monitor the Runs
+## 6. Monitor the Runs
 
 While both runs execute, observe what each is doing.
 
@@ -203,7 +221,7 @@ orchestrators being built support `--resume` precisely for this case.
 
 ---
 
-## 6. Compare the Output
+## 7. Compare the Output
 
 Once both runs complete (or after sufficient phases for comparison):
 
@@ -224,7 +242,7 @@ Compare the code produced by the two worktrees. Focus on:
 
 ---
 
-## 7. Analyze Session Logs
+## 8. Analyze Session Logs
 
 Claude Code writes a session log (JSONL) for every run, including worktree
 sessions. Each worktree gets its own project entry in `~/.claude/projects/`,
@@ -254,7 +272,7 @@ Find the session logs from both worktree runs and compare them. Show me:
 
 ---
 
-## 8. What the Orchestrators Do
+## 9. What the Orchestrators Do
 
 The commands just built Python scripts that implement code-driven
 orchestration. Here's what each component does.
@@ -329,7 +347,7 @@ Orchestration hierarchy:
 
 ---
 
-## 9. Agent Teams in Practice
+## 10. Agent Teams in Practice
 
 A retrospective on what you just observed.
 
@@ -352,16 +370,39 @@ more reliably it composes.
 | **Analysis phases** | Sequential — each waits | Parallel — all four simultaneously |
 | **Implementation** | Sequential | Coordinated — reviewer and documenter act on implementer output |
 | **Coordination** | None (one context) | Leader synthesis + `SendMessage` |
+| **Cost** | Baseline | 7-10x higher — coordination tokens add up |
 | **Resumability** | Built into output (`--resume`) | Re-run the command |
-| **Best for** | Simpler tasks, debugging | Complex tasks, time-sensitive delivery |
+| **Best for** | Most tasks — simpler, cheaper, debuggable | Coordination-heavy tasks where workers must share findings |
 
-> **Agent design is tool design.** Defining an agent is like designing a tool:
-> clear inputs, clear outputs, single responsibility, explicit error handling.
-> The better defined the interface, the more reliably it composes.
+> **The default is single-agent.** Teams are a specialized tool for tasks where
+> workers genuinely need to coordinate — sharing intermediate results, adapting
+> based on each other's output. For most delivery workflows, parallel subagents
+> (Agent tool with `run_in_background`) give you concurrency without the 7-10x
+> cost overhead.
 
 ---
 
-## 10. Commit and Wrap Up
+## 11. Disable Agent Teams
+
+Now that you've seen the comparison, remove the feature flag from
+`.claude/settings.json`:
+
+```json
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"  // ← delete this line
+  }
+}
+```
+
+Going forward, use the single-agent commands (`/feature`, `/bug`) as your default
+delivery tools. The team commands (`/team:feature`, `/team:bug`) remain available
+if you re-enable the flag for coordination-heavy work, but they're not the
+recommended path for the take-home project or day-to-day use.
+
+---
+
+## 12. Commit and Wrap Up
 
 ```
 Merge the worktree changes and commit the orchestrator scripts
@@ -380,8 +421,10 @@ Merge the worktree changes and commit the orchestrator scripts
 >
 > The patterns — PRDs as agent input, plan mode as review gate, hooks as
 > back pressure, commands as composable orchestrators, worktrees as
-> sandboxes, teams as parallelism — apply to any project where you want
-> Claude to do sustained, multi-step work reliably.
+> sandboxes — apply to any project where you want Claude to do sustained,
+> multi-step work reliably. Single-agent orchestration (`/feature`, `/bug`)
+> is the recommended default; teams are a specialized option for
+> coordination-heavy work where the cost premium is justified.
 
 > **Workshop Recap — Eight Tenets of Quality Output:**
 >
@@ -398,7 +441,8 @@ Merge the worktree changes and commit the orchestrator scripts
 
 **Take it home.** Module 6 is a capstone project: extend todd from a single-shot
 CLI into a Claude Code clone with interactive chat, tool use, and session management.
-Use the ADW commands you built in Module 4 to drive the development.
+Use `/feature` to drive the development — it's the right tool for sequential,
+milestone-based work.
 
 Run `/module` to switch to the module-6 branch and open the capstone instructions.
 
