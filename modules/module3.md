@@ -696,25 +696,13 @@ Open an existing skill file (e.g., `.claude/skills/research/SKILL.md`) and ident
 > **Reference**: Anthropic's prompt engineering guide — [Use XML tags to structure your prompts](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/use-xml-tags)
 ---
 
-## 8. Enable Agent Teams
+## 8. Agent Teams (Overview)
 
 Agent teams let you coordinate multiple Claude instances working on a shared task list,
 where workers communicate and adapt based on each other's output. A team leader
 assigns work; specialist workers execute concurrently and report back.
 
-**Enable the feature flag** in `.claude/settings.json`:
-
-```json
-{
-  "env": {
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
-  }
-}
-```
-
-Or export it in your shell: `export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
-
-**Team tools overview:**
+**Team tools:**
 
 | Tool | What it does |
 |------|-------------|
@@ -722,17 +710,6 @@ Or export it in your shell: `export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
 | `TaskCreate` | Adds a task to the team's task list |
 | `TaskUpdate` | Updates task status (pending → in_progress → completed) |
 | `SendMessage` | Sends a direct message to a teammate |
-
-**Hands-on exercise:** Use a team to run your agents in parallel.
-
-```
-Create a team with two workers: one using the code-reviewer agent to review the
-todd query command, and one using the design agent to produce a technical spec for
-adding conversation history to todd. Run both in parallel and compare the outputs.
-```
-
-Observe how the team leader spawns two workers, assigns them tasks concurrently, and
-collects their results — rather than running each agent sequentially.
 
 > **When teams help vs. parallel subagents.**
 >
@@ -745,6 +722,11 @@ collects their results — rather than running each agent sequentially.
 >
 > Teams add overhead; don't reach for them when parallel subagents are sufficient.
 > Ask: "Do these agents need to talk to each other?" If yes, a team helps.
+
+> **Cost note.** Agent teams are 7-10x more expensive than parallel subagents due to
+> coordination overhead — every `SendMessage` and leader synthesis step consumes
+> additional tokens. In Module 5 you'll see teams and single-agent execution
+> side-by-side to compare the trade-offs firsthand.
 
 ---
 
