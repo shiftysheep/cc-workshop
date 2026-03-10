@@ -6,8 +6,7 @@ Claude Code clone.
 
 **Use your ADW tools.** The commands, agents, and orchestrators you built in
 Modules 3-5 are designed for exactly this kind of work. Try running
-`/feature` or `/team:feature` against the PRDs below to let Claude drive
-the implementation.
+`/feature` against the PRDs below to let Claude drive the implementation.
 
 **Estimated time:** 2-4 hours across multiple sessions. Use `claude --resume`
 to pick up where you left off.
@@ -50,7 +49,7 @@ responses, and resume sessions.
 
 **Use your ADW tools.** The commands, agents, and orchestrators you built in
 Modules 3-5 are designed for exactly this kind of work. Try running
-`/feature` or `/team:feature` against the milestone descriptions below to let
+`/feature` against the milestone descriptions below to let
 Claude drive the implementation.
 
 ---
